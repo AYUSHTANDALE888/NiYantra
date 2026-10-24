@@ -2,14 +2,15 @@ import type { AuthUser } from '../auth/middleware.js';
 import * as clock from '../lib/clock.js';
 import { isoDate } from '../lib/dates.js';
 import { appendAuditStandalone } from '../lib/audit.js';
+import { runCycleWithLock, type CycleResult } from './cycle.js';
 
 export interface AdvanceResult {
   today: string;
   offsetDays: number;
-  cycle: Record<string, number> | null;
+  cycle: CycleResult;
 }
 
-/** Phase 0: move the simulated clock. Phase 2 adds the synchronous engine cycle. */
+/** Move the simulated clock forward and run one engine cycle synchronously (cycle lock, waits up to 10 s). */
 export async function advanceTime(actor: AuthUser, days: number): Promise<AdvanceResult> {
   const offsetDays = await clock.advance(days);
   await appendAuditStandalone({
@@ -18,5 +19,6 @@ export async function advanceTime(actor: AuthUser, days: number): Promise<Advanc
     action: 'TIME_ADVANCED',
     meta: { days, offsetDays, today: isoDate(clock.today()) },
   });
-  return { today: isoDate(clock.today()), offsetDays, cycle: null };
+  const cycle = await runCycleWithLock({ source: 'time-travel' });
+  return { today: isoDate(clock.today()), offsetDays, cycle };
 }

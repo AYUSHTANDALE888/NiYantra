@@ -1,16 +1,15 @@
 // Separate process. Two replicas run; the one holding the advisory lock is the leader and runs the engine.
 import os from 'node:os';
-import crypto from 'node:crypto';
 import pg from 'pg';
 import type { Prisma } from '@prisma/client';
 import { prisma } from './lib/db.js';
 import * as clock from './lib/clock.js';
 import { loadHolidays } from './lib/workdays.js';
 import { SCHEDULER_LOCK_ID } from './lib/locks.js';
-import { runEngineCycle, type CycleResult } from './engine/cycle.js';
+import { runCycleWithLock, type CycleResult } from './engine/cycle.js';
 
-const instanceId = `${os.hostname()}-${crypto.randomBytes(3).toString('hex')}`;
-const LOCK_RETRY_MS = 10_000;
+const instanceId = `${os.hostname()}-${process.pid}`;
+const LOCK_RETRY_MS = Number(process.env.LOCK_RETRY_MS ?? 10_000);
 const CYCLE_MS = Number(process.env.CYCLE_MS ?? 60_000);
 
 let isLeader = false;
@@ -33,7 +32,7 @@ async function cycle(): Promise<void> {
   await clock.refresh();
   await loadHolidays(prisma);
   try {
-    lastResult = await runEngineCycle();
+    lastResult = await runCycleWithLock({ instanceId }, 50_000);
   } catch (e) {
     lastResult = { error: (e as Error).message };
     console.error('[scheduler] cycle failed', e);
@@ -59,6 +58,8 @@ async function main(): Promise<void> {
     if (r.rows[0]?.ok) {
       isLeader = true;
       console.log(`[scheduler] ${instanceId} is leader`);
+      // A leader that was killed cannot clear its own flag; the new leader does.
+      await prisma.schedulerHeartbeat.updateMany({ where: { instanceId: { not: instanceId } }, data: { isLeader: false } }).catch(() => undefined);
       break;
     }
     await clock.refresh().catch(() => undefined);

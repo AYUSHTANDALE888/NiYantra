@@ -445,8 +445,13 @@ async function taskFor(db: Db, assignmentId: string): Promise<{ a: Awaited<Retur
  * When availability covering today is created (API) or begins (engine cycle): release the officer's open
  * assignments and reassign each, excluding them. Deadline items keep their due dates.
  */
-export async function releaseForAvailability(tx: Tx, userId: string, actor?: { id: string; role: string } | null) {
-  const open = await tx.assignment.findMany({ where: { officerId: userId, releasedAt: null }, orderBy: { assignedAt: 'asc' } });
+export async function releaseForAvailability(
+  tx: Tx,
+  userId: string,
+  actor?: { id: string; role: string } | null,
+  filter: (a: { id: string; taskType: TaskType }) => boolean = () => true,
+) {
+  const open = (await tx.assignment.findMany({ where: { officerId: userId, releasedAt: null }, orderBy: { assignedAt: 'asc' } })).filter(filter);
   const results: { applicationId: string; taskType: TaskType; toOfficerId: string | null; toOfficerName: string | null; reasonText: string | null }[] = [];
   for (const a of open) {
     const { task } = await taskFor(tx, a.id);

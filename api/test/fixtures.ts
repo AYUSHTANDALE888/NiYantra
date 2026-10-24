@@ -103,3 +103,38 @@ export async function userById(id: string) {
     select: { id: true, name: true, email: true, role: true, regionId: true, institutionId: true, reportsToId: true, title: true },
   });
 }
+
+/** Drive an application through the EVC to DECISION using the real actions (VERIFICATION_VISIT route). */
+export async function toDecision(app: Express, college: { id: string; role: string }, type: AppType = 'VERIFICATION_VISIT') {
+  const { addDays: add } = await import('../src/lib/dates.js');
+  const { nextWorkingDayFrom } = await import('../src/lib/workdays.js');
+  const s = await submitApp(app, college, { type });
+  if (s.status !== 201) throw new Error(JSON.stringify(s.body));
+  const id: string = s.body.application.id;
+  let a = await openAssignment(id);
+  if (a?.taskType === 'SCRUTINY') {
+    await act(app, await userById(a.officerId), id, 'COMPLETE_STAGE');
+    a = await openAssignment(id);
+  }
+  const members = await prisma.user.findMany({ where: { role: 'COMMITTEE' }, orderBy: { email: 'asc' } });
+  const back = clock.now();
+  const visit = nextWorkingDayFrom(add(clock.today(), 0));
+  const r = await act(app, await userById(a!.officerId), id, 'SCHEDULE_EVC', { payload: { memberIds: members.slice(0, 3).map((m) => m.id), visitDate: isoDate(visit), mode: 'ONLINE' } });
+  if (r.status !== 200) throw new Error(JSON.stringify(r.body));
+  clock.setOverride(new Date(Math.max(back.getTime(), visit.getTime() + 10 * 3_600_000)));
+  const rep = await act(app, await userById(members[0]!.id), id, 'SUBMIT_EVC_REPORT', {
+    payload: { checklist: { a: true, b: true, c: true, d: true, e: true }, recommendation: 'RECOMMEND_CONDITIONS', reportText: 'ok' },
+  });
+  if (rep.status !== 200) throw new Error(JSON.stringify(rep.body));
+  return id;
+}
+
+export async function decideWithConditions(app: Express, id: string, conditions: { condition: string; dueInDays: number }[]) {
+  const authority = await prisma.user.findFirstOrThrow({ where: { role: 'AUTHORITY', region: { applications: { some: { id } } } } });
+  const r = await act(app, authority, id, 'DECIDE', {
+    reason: 'Approved subject to conditions.',
+    payload: { outcome: 'APPROVED_WITH_CONDITIONS', conditions: conditions.map((c) => ({ condition: c.condition, dueDate: isoDate(addDays(clock.today(), c.dueInDays)) })) },
+  });
+  if (r.status !== 200) throw new Error(JSON.stringify(r.body));
+  return r;
+}

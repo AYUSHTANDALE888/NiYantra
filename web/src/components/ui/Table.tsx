@@ -64,7 +64,7 @@ export function Table<T>({ caption, columns, rows, rowKey, onRowClick, rowLabel,
   return (
     <div className="overflow-hidden rounded-lg border bg-surface">
       {toolbar ? <div className="flex flex-wrap items-center gap-3 border-b px-4 py-3">{toolbar}</div> : null}
-      <div className="max-h-table overflow-auto">
+      <div className="max-h-table overflow-auto" tabIndex={0} role="region" aria-label={caption}>
         <table className="w-full border-collapse text-base">
           <caption className="sr-only">{caption}</caption>
           <thead className="sticky top-0 z-10 bg-subtle">

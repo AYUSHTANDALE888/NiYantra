@@ -73,3 +73,28 @@ Choices made where the build spec was silent, plus the design review recorded at
 | Keyboard path | Rows open with Enter; dialogs trap focus; the apply form has an error summary that takes focus and links to fields. |
 | Nothing from 11.6 | Checked. The form check is "Check my entries" everywhere. |
 | axe | College home, apply, college case, officer, case view (officer and authority), EVC, committee, authority, Bureau and availability: 0 serious or critical issues. |
+
+## Phase 2
+
+- **Two advisory locks.** Leadership uses session lock `727001`, held by the leader scheduler on its dedicated `pg` connection for its whole life. Every engine cycle additionally takes lock `727002` on a short-lived dedicated connection. The leader takes it every minute; the API takes it for the synchronous cycle after time travel, waiting up to 10 seconds. This is how "the same leader lock" is honoured without the API ever becoming leader, and it guarantees cycles never overlap.
+- **Scheduler instance ids** are `hostname-pid`. A new leader clears `isLeader` on every other heartbeat row, so a leader that was killed (and could not clear its own flag) never shows as a second leader. The admin panel treats an instance as "not reporting" when its heartbeat is older than 150 seconds.
+- **AlertLog trigger dates.** For reminders, `triggerDate` is the date the offset was meant for (`due − offset`); `late` is true when that date is more than one day before today. For at-risk it is the day it fired; for overdue and escalation it is the due date.
+- **Several levels at once.** If an item jumps past more than one escalation threshold in a single cycle (time travel), each level fires once, in order, with its own notification and audit row.
+- **Escalation targets.** Walk `reportsToId` N steps from the responsible user; if the chain ends first (Bureau head, committee member, authority), the region HoD is notified. Level 3 also notifies the region's competent authority.
+- **Availability that begins** (engine step 6) releases an officer's open tasks only when the officer is also away on the next working day, or the task is urgent — the same horizon rule the engine uses when assigning, so tasks never bounce back and forth. Availability created through the API that covers today releases every open task, as specified.
+- **Digest counts.** X = OVERDUE alerts created in the last 24 hours (simulated time) for items whose responsible user is in the manager's subtree; Y = ESCALATED audit rows in the last 24 hours that notified the manager; Z = stalled cases held by the manager's subtree. The dedupe row uses a negative item id derived from a hash of the user id.
+- **Stalled** = IN_STAGE, no audit action for 10 working days (`lastActionAt`), and no open stage-type item overdue.
+- **ALERTS_SENT** is written once per cycle when anything was sent or released, with the counts and the instance id (or `time-travel`).
+- **Time travel** returns the new date and the cycle counts; the admin screen shows both.
+
+### Design review, phase 2
+
+| Check | Result |
+|---|---|
+| One primary action per view | Audit log: Verify integrity. Demo controls: no primary (time travel buttons are equal choices; Reset is destructive and confirmed). |
+| Tokens only | Yes. |
+| Tables for lists | Audit log and scheduler instances are tables; the directory is a tree (hierarchy, not records). |
+| Status never colour-only | Leader / Standby / Not reporting badges have dots and labels; verify result has an icon and text. |
+| Loading, empty, error | Tables use the shared states. |
+| Keyboard path | Tabs with arrow keys; scrollable table regions are focusable. |
+| axe | All four admin tabs: 0 serious or critical issues (after making scrollable table regions focusable). |
