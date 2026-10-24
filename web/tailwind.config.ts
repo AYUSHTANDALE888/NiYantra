@@ -1,0 +1,77 @@
+import type { Config } from 'tailwindcss';
+
+// Design tokens (section 11.2). No raw colour values anywhere else in the client.
+const colors = {
+  transparent: 'transparent',
+  current: 'currentColor',
+  white: '#FFFFFF',
+  page: '#F5F6F7',
+  surface: '#FFFFFF',
+  subtle: '#EEF0F2',
+  line: '#D0D5DB',
+  input: '#8C94A0',
+  primary: '#1B1F24',
+  secondary: '#4B5563',
+  muted: '#646B75',
+  accent: { DEFAULT: '#1D4ED8', hover: '#1E40AF', soft: '#EAF1FD' },
+  success: { DEFAULT: '#166534', soft: '#E8F5EC' },
+  warning: { DEFAULT: '#8A4B00', soft: '#FDF3E1' },
+  danger: { DEFAULT: '#B42318', soft: '#FDECEA' },
+  neutral: { DEFAULT: '#4B5563', soft: '#EEF0F2' },
+};
+
+export default {
+  content: ['./index.html', './src/**/*.{ts,tsx}'],
+  theme: {
+    screens: { sm: '640px', md: '768px', lg: '1024px', xl: '1280px' },
+    colors,
+    borderColor: { ...colors, DEFAULT: colors.line },
+    textColor: colors,
+    backgroundColor: colors,
+    ringColor: colors,
+    fontFamily: {
+      sans: ['-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', '"Noto Sans"', '"Helvetica Neue"', 'Arial', 'sans-serif', '"Noto Sans Devanagari"'],
+      mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'Consolas', 'monospace'],
+    },
+    fontSize: {
+      xs: ['12px', '16px'],
+      sm: ['13px', '18px'],
+      base: ['14px', '20px'],
+      lg: ['16px', '24px'],
+      xl: ['20px', '28px'],
+      '2xl': ['24px', '32px'],
+    },
+    fontWeight: { normal: '400', medium: '500', semibold: '600' },
+    spacing: {
+      0: '0px',
+      px: '1px',
+      0.5: '2px',
+      1: '4px',
+      1.5: '6px',
+      2: '8px',
+      3: '12px',
+      4: '16px',
+      6: '24px',
+      8: '32px',
+      12: '48px',
+      topbar: '56px',
+      sidebar: '232px',
+    },
+    borderRadius: { none: '0px', DEFAULT: '6px', lg: '8px', full: '9999px' },
+    boxShadow: { none: 'none', overlay: '0 4px 16px rgba(16,24,40,0.08)' },
+    extend: {
+      width: { num: '96px', sidebar: '232px', dialog: '480px', 'dialog-lg': '640px', control: '36px', 'control-sm': '32px' },
+      height: { chart: '280px', table: '70vh', topbar: '56px', row: '44px', control: '36px', 'control-sm': '32px', bar: '8px' },
+      minHeight: { control: '36px', touch: '44px', target: '24px' },
+      minWidth: { reason: '360px', content: '200px', control: '36px', touch: '44px', target: '24px' },
+      maxHeight: { table: '70vh' },
+      maxWidth: { md: '28rem', viewport: 'calc(100vw - 32px)', content: '1280px', dialog: '480px', 'dialog-lg': '640px', prose: '640px' },
+      transitionDuration: { 150: '150ms', 200: '200ms' },
+      keyframes: {
+        rise: { from: { opacity: '0', transform: 'translateY(4px)' }, to: { opacity: '1', transform: 'translateY(0)' } },
+      },
+      animation: { rise: 'rise 200ms ease-out' },
+    },
+  },
+  plugins: [],
+} satisfies Config;

@@ -1,0 +1,12 @@
+node_modules/
+dist/
+.env
+api/storage/*
+!api/storage/.gitkeep
+formcheck/models/*.joblib
+formcheck/data/
+__pycache__/
+.pytest_cache/
+*.log
+.vite/
+coverage/
