@@ -106,8 +106,18 @@ export const formcheckRulesSchema = z.object({
     .min(1),
 });
 
-export type Rules = z.infer<typeof rulesSchema>;
-export type AssignmentPolicy = z.infer<typeof policySchema>;
+type RawRules = z.infer<typeof rulesSchema>;
+type RawPolicy = z.infer<typeof policySchema>;
+type Full<T> = { [K in keyof T]-?: Exclude<T[K], undefined> };
+export type Rules = Omit<RawRules, 'types' | 'categories'> & {
+  types: Full<RawRules['types']>;
+  categories: Full<RawRules['categories']>;
+};
+export type AssignmentPolicy = Omit<RawPolicy, 'stageWeight' | 'eligibility' | 'taskSkill'> & {
+  stageWeight: Full<RawPolicy['stageWeight']>;
+  eligibility: Full<RawPolicy['eligibility']>;
+  taskSkill: { [K in keyof RawPolicy['taskSkill']]-?: string | null };
+};
 export type FormcheckRules = z.infer<typeof formcheckRulesSchema>;
 export type AppTypeName = (typeof TYPES)[number];
 export type StageName = (typeof STAGES)[number];
@@ -126,8 +136,21 @@ function load<T>(file: string, schema: z.ZodType<T>): T {
   return parsed.data;
 }
 
-export const rules: Rules = load('rules.json', rulesSchema);
-export const policy: AssignmentPolicy = load('assignment-policy.json', policySchema);
+function requireKeys(file: string, obj: Record<string, unknown>, keys: readonly string[], what: string) {
+  const missing = keys.filter((k) => !(k in obj));
+  if (missing.length) throw new Error(`Invalid ${file}: ${what} missing ${missing.join(', ')}`);
+}
+
+const rawRules = load('rules.json', rulesSchema);
+requireKeys('rules.json', rawRules.types, TYPES, 'types');
+requireKeys('rules.json', rawRules.categories, ['NEW', 'EXTENSION', 'EXPANSION'], 'categories');
+const rawPolicy = load('assignment-policy.json', policySchema);
+requireKeys('assignment-policy.json', rawPolicy.stageWeight, TASKS, 'stageWeight');
+requireKeys('assignment-policy.json', rawPolicy.eligibility, TASKS, 'eligibility');
+requireKeys('assignment-policy.json', rawPolicy.taskSkill, TASKS, 'taskSkill');
+
+export const rules = rawRules as Rules;
+export const policy = rawPolicy as AssignmentPolicy;
 export const formcheckRules: FormcheckRules = load('formcheck-rules.json', formcheckRulesSchema);
 
 export function typeConfig(type: AppTypeName) {

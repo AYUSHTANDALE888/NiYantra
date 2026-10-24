@@ -9,6 +9,12 @@ import { healthRouter } from './routes/health.js';
 import { demoRouter } from './routes/demo.js';
 import { adminRouter } from './routes/admin.js';
 import { notificationsRouter } from './routes/notifications.js';
+import { applicationsRouter } from './routes/applications.js';
+import { documentsRouter } from './routes/documents.js';
+import { availabilityRouter } from './routes/availability.js';
+import { queuesRouter } from './routes/queues.js';
+import { formsRouter } from './routes/forms.js';
+import { assignmentsRouter } from './routes/assignments.js';
 
 export function createApp() {
   const app = express();
@@ -29,6 +35,12 @@ export function createApp() {
   api.use('/demo', demoRouter());
   api.use('/admin', adminRouter());
   api.use('/notifications', notificationsRouter());
+  api.use('/applications', applicationsRouter());
+  api.use('/documents', documentsRouter());
+  api.use('/availability', availabilityRouter());
+  api.use('/assignments', assignmentsRouter());
+  api.use(formsRouter());
+  api.use(queuesRouter());
   app.use('/api', api);
 
   app.use((_req, res) => {

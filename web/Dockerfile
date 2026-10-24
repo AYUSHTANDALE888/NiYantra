@@ -4,6 +4,7 @@ COPY package.json package-lock.json ./
 COPY api/package.json api/package.json
 COPY web/package.json web/package.json
 RUN npm ci --workspace web --include-workspace-root=false
+COPY shared shared
 COPY web web
 WORKDIR /app/web
 RUN npx vite build

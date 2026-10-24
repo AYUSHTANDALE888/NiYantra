@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { Check, AlertTriangle, Clock, Circle, ArrowUpCircle, Loader } from 'lucide-react';
+import { Check, AlertTriangle, Clock, Circle, ArrowUpCircle, CircleDot } from 'lucide-react';
 import { cx } from '../../lib/format';
 
 export type Tone = 'neutral' | 'accent' | 'success' | 'warning' | 'danger';
@@ -33,7 +33,7 @@ export type StatusKind = 'done' | 'inProgress' | 'waitingOnCollege' | 'atRisk' |
 
 const STATUS: Record<StatusKind, { tone: Tone; label: string; Icon: typeof Check }> = {
   done: { tone: 'success', label: 'Done', Icon: Check },
-  inProgress: { tone: 'accent', label: 'In progress', Icon: Loader },
+  inProgress: { tone: 'accent', label: 'In progress', Icon: CircleDot },
   waitingOnCollege: { tone: 'warning', label: 'Waiting on college', Icon: Clock },
   atRisk: { tone: 'warning', label: 'At risk', Icon: AlertTriangle },
   overdue: { tone: 'danger', label: 'Overdue', Icon: AlertTriangle },

@@ -53,12 +53,16 @@ Password for every user: `demo1234`.
 ## Phase status
 
 - [x] Phase 0: foundation (compose stack, roles and audit guard, schema, config, clock, workdays, audit chains, auth, policy skeleton, directory seed, template and reset, design system and shell)
-- [ ] Phase 1: workflow and assignment
+- [x] Phase 1: workflow and assignment (routing, transitions, assignment engine with reasons, availability, uploads, role screens)
 - [ ] Phase 2: deadline engine and scheduler
 - [ ] Phase 3: Action Center and dashboards
 - [ ] Phase 4: post-approval and form check
 
 ## Modules
+
+**Workflow.** Each application type has a route (`shared/rules.json`) resolved at submission and stored on the case. A case is one record with a moving pointer: stage, status and holder. Every action goes through `performAction`, which validates the payload, checks `can(user, action, application)` (role, scope, transition table, current holder or assignment, separation of duties), then runs one database transaction that changes the case, moves assignments, updates deadline items, appends the audit row and creates notifications. There is no approve or reject anywhere except the competent authority's Decide.
+
+**Assignment.** When a stage needs an officer, the engine locks the region, loads eligible officers with their live load from open assignments, drops anyone away, over capacity, barred or recused, prefers continuity (the institution's portfolio officer for scrutiny and verification, the returning officer for re-scrutiny), and otherwise picks the lowest score (0.70 projected utilisation, 0.20 recent assignments, 0.10 specialisation mismatch). If no officer in the region qualifies it overflows to the Bureau; if nobody qualifies the task goes to the head of department's queue. Every assignment stores a plain-language reason ("Assigned to Priya Raman (Officer, South): portfolio officer for ABC Engineering College; utilisation 0.15 after this task. 50 eligible; none excluded. Tier 0. Policy v1."). Leave covering today releases and reassigns an officer's open tasks without moving deadlines.
 
 **Audit.** Every action appends a row to `AuditLog`. Rows are chained per application (and one global chain for non-case events): each row stores `sha256(prevHash + canonicalJSON(row))`, with a per-chain advisory lock so concurrent cases never block each other. The app role has no UPDATE, DELETE or TRUNCATE on the table, and a trigger rejects updates and deletes even from the owner. `GET /api/admin/audit/verify` recomputes every chain and names the first broken row.
 
