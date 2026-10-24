@@ -8,29 +8,93 @@ The system routes, assigns, reminds, explains and records. It never decides: the
 
 > **Placeholders.** All timelines, routes, application types, document lists, weights and thresholds are placeholders pending verification against the AICTE Approval Process Handbook (APH) and with AICTE officers. Form check results are measured on synthetic data.
 
-## Setup
+## Quick start (about 10 minutes, most of it the first image build)
 
-Requirements: Docker, Node 20 and Python 3.11.
+You need three things on the machine:
+
+| Tool | Version | Check with |
+|---|---|---|
+| Docker Desktop (or Docker Engine with the Compose plugin) | any recent | `docker compose version` |
+| Node.js | 20 or newer | `node -v` |
+| Git | any | `git --version` |
+
+Python 3.11 is only needed if you want to run the form check tests or develop without Docker (see below). Make sure nothing else is using ports **5432** (PostgreSQL), **4000** (API) or **8080** (web); a locally installed PostgreSQL is the usual culprit, so stop it first.
 
 ```bash
-cp .env.example .env
-npm run setup          # install, start the db container, migrate, audit guard, seed, build the template db
-docker compose up      # db, api, scheduler ×2, formcheck, web
+# 1. Get the code
+git clone https://github.com/sanjayvasudevan-c/SIH_project-repo.git
+cd SIH_project-repo
+git checkout claude/new-session-35imia     # until this branch is merged
+
+# 2. Configuration (the defaults work as they are)
+cp .env.example .env                       # Windows PowerShell: Copy-Item .env.example .env
+
+# 3. Install, create the database, migrate, seed the demo data, build the reset template
+npm run setup
+
+# 4. Start everything: database, API, two schedulers, form check service, web
+docker compose up -d --build
 ```
 
-Open http://localhost:8080 and pick a demo user on the sign-in page.
+Open **http://localhost:8080**, click a demo user on the sign-in page (it fills the email; the password for everyone is `demo1234`) and sign in.
 
-Other scripts:
+What `npm run setup` does, in order:
 
-| Script | What it does |
+1. `npm install` for the API and web workspaces.
+2. `docker compose up -d db`: starts PostgreSQL 16; on first start it runs `db/init/00_roles.sql`, which creates the `aicte_migrator` and `aicte_app` roles and the databases.
+3. Builds and briefly starts the form check container (it trains its model while the image builds), so the seeded form checks are scored by the real model.
+4. Recreates the `aicte` database, applies the Prisma migration and `api/prisma/sql/001_audit_guard.sql` (grants, append-only audit trigger, partial indexes, checks).
+5. Seeds the directory and about 190 applications of history (about 30 seconds). At the end it prints counts by stage and status, open flags by reason, utilisation per South officer, the demo users and one **West application id** (keep it for the access-denied demo).
+6. Copies the seeded database to the template `aicte_seed`, which `npm run demo:reset` restores in a second.
+
+Running `npm run setup` again wipes and reseeds everything.
+
+### Everyday commands
+
+| Command | What it does |
 |---|---|
-| `npm run dev` | API, scheduler and web locally (web on http://localhost:5173) against the compose database; formcheck via uvicorn |
-| `npm test` | API tests (Vitest + Supertest against a real PostgreSQL test database `aicte_test`) |
-| `npm run test:formcheck` | Form check service tests (pytest) |
-| `npm run demo:reset` | Recreate the working database from the template (a few seconds) |
-| `npm run demo:tamper` | As the postgres superuser, change one audit row behind the trigger's back (stands in for someone with server access) |
+| `docker compose up -d` | Start the stack (add `--build` after pulling new code) |
+| `docker compose ps` | See the containers; there are two `scheduler` replicas |
+| `docker compose logs -f api scheduler` | Follow the API and scheduler logs |
+| `docker compose down` | Stop the stack (data is kept in the `pgdata` volume) |
+| `docker compose down -v` | Stop and delete the database volume (then run `npm run setup` again) |
+| `npm run demo:reset` | Put the demo back to the seeded state in about a second (the admin's **Reset demo** button does the same) |
+| `npm run demo:tamper` | As the database superuser, edit one audit row behind the trigger's back, for the integrity demo |
+| `npm test` | API tests (Vitest + Supertest) against a separate `aicte_test` database on the same PostgreSQL |
+| `npm run test:formcheck` | Form check tests (pytest); needs Python 3.11 and `pip install -r formcheck/requirements.txt` |
 
-To use an existing local PostgreSQL 16 instead of the compose database: `SETUP_NO_DOCKER=1 npm run setup` with the URLs in `.env` pointing at it.
+Reset before each demo run. After a reset the schedulers reconnect on their own (Compose restarts them) and the API carries on.
+
+### Running without Docker (development)
+
+1. Install **PostgreSQL 16** and make sure the superuser `postgres` has the password `postgres` (or change `DEMO_ADMIN_URL` in `.env`). The setup script creates the roles and databases itself.
+2. Install **Python 3.11**, then the form check service and its model:
+   ```bash
+   python -m venv .venv && source .venv/bin/activate        # Windows: .venv\Scripts\activate
+   pip install -r formcheck/requirements.txt
+   python formcheck/training/generate.py && python formcheck/training/train.py && python formcheck/training/evaluate.py
+   ```
+3. Seed without Docker, then start the API, one scheduler, the web dev server and the form check service together (`npm run dev` calls `python3` for the form check; on Windows, start it yourself with `python -m uvicorn app.main:app --port 8000 --app-dir formcheck`):
+   ```bash
+   SETUP_NO_DOCKER=1 npm run setup     # Windows PowerShell: $env:SETUP_NO_DOCKER=1; npm run setup
+   npm run dev
+   ```
+   Open **http://localhost:5173**. If the form check service is running on port 8000 while you seed, the seeded checks use the model; otherwise they use the rules fallback (shown as "model unavailable").
+
+### Troubleshooting
+
+| Symptom | Fix |
+|---|---|
+| `port is already allocated` for 5432 | Another PostgreSQL is running. Stop it, or change the published port in `docker-compose.yml` and the URLs in `.env`. |
+| Setup stops at "Database did not become ready" | Docker is not running or the `db` container failed: `docker compose logs db`. |
+| `password authentication failed for user "aicte_migrator"` | The `pgdata` volume was created with other passwords. Run `docker compose down -v` and `npm run setup`. If you change passwords, change them in both `.env` and `db/init/00_roles.sql`. |
+| Sign-in page shows no demo users | The API is not up yet (`docker compose logs api`) or `DEMO_MODE` is not `true`. |
+| The admin Scheduler tab shows no leader | `docker compose ps scheduler`; one of the two replicas becomes leader within about 10 seconds. |
+| "Check my entries" says "Model unavailable, rules only" | The form check container is down: `docker compose logs formcheck`. Filing still works; the API uses the rules fallback. |
+| Times look off after time travel | Expected: the simulated date is shown in amber in the top bar. `npm run demo:reset` returns to today. |
+| First `docker compose up --build` is slow | It builds three images and trains the form check model once; later starts take seconds. |
+
+Default credentials and secrets in `.env.example` are for the demo only. Change `JWT_SECRET` and the database passwords before putting this anywhere but a laptop.
 
 ## Demo users
 
@@ -93,7 +157,7 @@ This script is automated with Playwright during development and passes end to en
 
 **Audit.** Every action appends a row to `AuditLog`. Rows are chained per application (and one global chain for non-case events): each row stores `sha256(prevHash + canonicalJSON(row))`, with a per-chain advisory lock so concurrent cases never block each other. The app role has no UPDATE, DELETE or TRUNCATE on the table, and a trigger rejects updates and deletes even from the owner. `GET /api/admin/audit/verify` recomputes every chain and names the first broken row.
 
-Try an update as the app role (rejected):
+Try an update as the app role (rejected with "permission denied"):
 
 ```bash
 docker compose exec db psql -U aicte_app -d aicte -c "UPDATE \"AuditLog\" SET reason = 'x' WHERE id = 1"

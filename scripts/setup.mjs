@@ -20,7 +20,7 @@ if (docker) {
   tryRun('docker rm -f aicte-formcheck-seed');
   if (tryRun('docker compose run -d --rm --name aicte-formcheck-seed -p 127.0.0.1:8001:8000 formcheck')) {
     env = { FORMCHECK_URL: 'http://127.0.0.1:8001' };
-    execSync('sleep 5');
+    await new Promise((r) => setTimeout(r, 5000));
   } else {
     console.warn('[setup] form check container did not start; seed form checks will use the rules fallback.');
   }
