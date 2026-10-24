@@ -4,6 +4,8 @@ Working prototype for the Smart India Hackathon 2026 AICTE problem statement *In
 
 The system routes, assigns, reminds, explains and records. It never decides: the only approve or reject is the competent authority's **Decide** action, which always needs a human click and a reason.
 
+> **What is placeholder.** All timelines, routes, application types, document lists, assignment weights, capacities and thresholds are pending verification against the APH and with AICTE officers. Holidays are placeholder dates. Form check results (including `formcheck/EVALUATION.md`) are measured on synthetic data. All people and institutions are fictional.
+
 > **Placeholders.** All timelines, routes, application types, document lists, weights and thresholds are placeholders pending verification against the AICTE Approval Process Handbook (APH) and with AICTE officers. Form check results are measured on synthetic data.
 
 ## Setup
@@ -50,13 +52,28 @@ Password for every user: `demo1234`.
 | officer.west@demo.in | Rahul Patil, officer, West |
 | admin@demo.in | Administrator (time travel, reset, audit) |
 
+## Demo script (after `npm run demo:reset`)
+
+1. Sign in as ABC Engineering College (`college.abc@demo.in`). Start a new institution application. Enter a built-up area larger than the land area: "Check my entries" shows R1 (High); fix it. If a Medium warning remains, enter a justification. Try to submit without the land lease (blocked; the message names it); attach it with an expiry 2 years ahead and submit. Priya's case view shows "Assigned to Priya Raman … portfolio officer".
+2. Sign in as Priya. Open the case from My tasks; the Form checks panel shows the history (mark the earlier R1 warning useful). Return it with "Lease covers 2 years, 3 required" and the land lease item. The case turns amber, the clock pauses, it leaves her own list and appears under "Waiting on college" after the next engine cycle (up to a minute).
+3. Sign in as the college and reply with a new lease (3 years). Re-scrutiny returns to Priya with the remaining days.
+4. Priya completes scrutiny. The EVC desk task goes to Ravi with its reason text.
+5. Admin advances 20 days. "EVC not scheduled" appears; escalation level 1 reaches Kumar.
+6. Sign in as Kumar. Team: per-officer figures, waiting-on breakdown, Escalated to me. Workforce: Arjun overloaded, Meena idle. Availability: add leave for Arjun starting today; his open tasks are reassigned (Meena takes the largest share), each with reason text. Workforce: reassign one task by hand and see "Recommended by system".
+7. Sign in as Ravi: open the EVC case, review the proposed committee, schedule for tomorrow, online. Admin advances 1 day. Sign in as the first committee member and submit the report. The case reaches Decision.
+8. Sign in as `authority.south@demo.in`: approve with conditions, "Submit fire NOC" due in 90 days.
+9. Admin advances 85 days. The college sees reminders at 30, 15 and 7 days (each once), and Priya sees the expiring lease in her portfolio under "Waiting on college". The college uploads the fire NOC on Compliance; the verification task goes to Priya; she verifies on the case; the case becomes Closed.
+10. Admin: filter the audit log by the application number (every step is there) and run Verify integrity (OK). Try an update as the app role (below): rejected. Run `npm run demo:tamper` and verify again: the broken row is named. Sign in as a South officer and open `/cases/<West id>` (the seed prints one): no access, logged as ACCESS_DENIED. Run `docker compose stop` on the leader scheduler (`docker compose ps scheduler` lists both; the admin Scheduler tab names the leader): the standby becomes leader within a minute and no alert repeats.
+
+This script is automated with Playwright during development and passes end to end twice in a row after a reset.
+
 ## Phase status
 
 - [x] Phase 0: foundation (compose stack, roles and audit guard, schema, config, clock, workdays, audit chains, auth, policy skeleton, directory seed, template and reset, design system and shell)
 - [x] Phase 1: workflow and assignment (routing, transitions, assignment engine with reasons, availability, uploads, role screens)
 - [x] Phase 2: deadline engine and scheduler (deadline items, pause and resume, leader election, reminders, overdue, escalation, digests, time travel, admin controls)
 - [x] Phase 3: Action Center and dashboards (flags with reasons and five-key order, college "What we need from you", team roll-up with drill-down, workforce with reassignment and portfolio moves, no-eligible-officer queue, seeded history)
-- [ ] Phase 4: post-approval and form check
+- [x] Phase 4: post-approval and form check (decide with conditions, undertakings and expiry items, evidence and renewal verification, automatic close, form check service with rules and an Isolation Forest, college and officer panels)
 
 ## Modules
 
@@ -69,6 +86,10 @@ Password for every user: `demo1234`.
 **Reports and workforce.** Senior officers, super seniors and heads of department see their direct reports' work received, completed, returned and held, ageing in stage, overdue items, deadlines met and utilisation, with each person's figures summed over everyone who reports to them and a drill-down to the next level. There is no ranking and no composite score. The workforce view shows each officer's load against capacity, availability today, open tasks and portfolio, flags overloaded and idle officers against their own team's average, and lets the manager reassign a task (the system's recommendation is shown and recorded) or move a portfolio.
 
 **Deadline engine and scheduler.** Every clock is a deadline item written inside the case transaction: stage deadlines in working days, the EVC scheduling and report deadlines, verification, undertakings and document expiry in calendar days. Returning a case pauses its clock and stores the remaining working days; the reply resumes it. Two scheduler processes run; the one holding a PostgreSQL advisory lock is the leader and runs a cycle every minute (the other waits and takes over within seconds if the leader stops). A cycle sends compliance reminders at 30, 15, 7 and 0 days, an at-risk alert at 80% of a stage deadline, an overdue alert, and escalations at 3, 7 and 14 days overdue up the `reportsTo` chain (HoD when the chain ends; the competent authority also at level 3). A unique key on every alert makes cycles idempotent, so a scheduler that was down catches up once, marking missed reminders late. Weekends and holidays are skipped. The admin's time travel moves a simulated clock that every date comparison uses, and runs a cycle at once.
+
+**Post-approval compliance.** An approval with conditions creates one undertaking (with a deadline item) per condition, and every verified document with an expiry date gets an expiry item. Colleges upload evidence or a renewed document from the Compliance page; the engine assigns a verification task (preferring the portfolio officer) with a 5-working-day clock. Verified evidence closes the undertaking; when the last one is verified the case closes automatically. Rejected evidence goes back to the college with the officer's remarks. A verified renewal replaces the expiry item.
+
+**Form check ("Check my entries").** While a college fills the form, the API checks required fields itself and asks the Python service for a score (800 ms timeout). The service applies five plausibility rules (built-up area larger than the plot, expired lease, fewer than 80% of required documents, more than 40 students per faculty member, less than 2 square metres per student) and an Isolation Forest trained on synthetic normal forms; rule hits are HIGH, a model-only anomaly is MEDIUM and names the three most unusual values with their typical values. If the service is down, the API evaluates the same rules file itself and marks the result "model unavailable". Warnings never block filing and never affect routing, deadlines, assignment or Action Center order; HIGH and MEDIUM warnings only ask the college for a justification, which the scrutiny officer sees alongside the check history and can label useful or not useful (stored with the model version). Evaluation figures in `formcheck/EVALUATION.md` are measured on synthetic data only.
 
 **Audit.** Every action appends a row to `AuditLog`. Rows are chained per application (and one global chain for non-case events): each row stores `sha256(prevHash + canonicalJSON(row))`, with a per-chain advisory lock so concurrent cases never block each other. The app role has no UPDATE, DELETE or TRUNCATE on the table, and a trigger rejects updates and deletes even from the owner. `GET /api/admin/audit/verify` recomputes every chain and names the first broken row.
 

@@ -167,7 +167,9 @@ export async function buildDesiredFlags(today: Date, db: Db = prisma): Promise<D
       const isCompliance = it.type === 'UNDERTAKING' || it.type === 'DOC_EXPIRY';
       const undertaking = it.type === 'UNDERTAKING' ? app.undertakings.find((u) => u.id === it.sourceId) : undefined;
       // Evidence submitted and waiting for verification is not the college's to act on.
-      const collegeActs = it.type !== 'UNDERTAKING' || undertaking?.status === 'OPEN';
+      // A renewal waiting for verification is not the college's to act on either.
+      const renewalPending = it.type === 'DOC_EXPIRY' && docs.some((x) => x.supersedesId === it.sourceId && !x.verified);
+      const collegeActs = (it.type !== 'UNDERTAKING' || undertaking?.status === 'OPEN') && !renewalPending;
 
       switch (it.type) {
         case 'STAGE_SLA': {

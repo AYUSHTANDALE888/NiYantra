@@ -195,6 +195,22 @@ export async function seedHistory(dir: Directory): Promise<void> {
       payload: { outcome, ...(conditions.length ? { conditions: conditions.map((c) => ({ condition: c.condition, dueDate: isoDate(addDays(T0, c.due)) })) } : {}) },
     });
   }
+  async function evidence(key: string) {
+    tick();
+    const u = await prisma.undertaking.findFirstOrThrow({ where: { applicationId: A(key), status: 'OPEN' } });
+    const app = await prisma.application.findUniqueOrThrow({ where: { id: A(key) }, include: { institution: true } });
+    const college = await prisma.user.findFirstOrThrow({ where: { institutionId: app.institutionId, role: 'COLLEGE' } });
+    const { uploadEvidence } = await import('../../src/workflow/actions.js');
+    await uploadEvidence(await user(college.id), u.id, { buffer: placeholderPdf(['Evidence', u.condition, app.institution.name]), originalname: 'evidence.pdf', mimetype: 'application/pdf', kind: 'EVIDENCE' });
+  }
+  async function verify(key: string) {
+    tick();
+    const u = await prisma.undertaking.findFirstOrThrow({ where: { applicationId: A(key), status: 'SUBMITTED' } });
+    const officer = await holderOf(A(key), ['VERIFY']);
+    if (!officer) return;
+    const { verifyEvidence } = await import('../../src/workflow/actions.js');
+    await verifyEvidence(officer, u.id, { accept: true, remarks: 'Document checked against the original.' });
+  }
   async function label(key: string, useful: boolean) {
     tick();
     const fc = await prisma.formCheckResult.findFirst({ where: { applicationId: A(key) }, orderBy: { createdAt: 'desc' } });
@@ -265,6 +281,10 @@ export async function seedHistory(dir: Directory): Promise<void> {
       ],
     },
     { key: 'd-rejected', lease: 600, outcome: 'REJECTED' },
+    { key: 'd-pending-1', lease: 500, outcome: 'APPROVED_WITH_CONDITIONS', conditions: [{ condition: 'Upload the NBA accreditation application receipt', due: 45 }] },
+    { key: 'd-pending-2', lease: 520, outcome: 'APPROVED_WITH_CONDITIONS', conditions: [{ condition: 'Submit the audited accounts for 2025-26', due: 40 }] },
+    { key: 'd-closed-1', lease: 700, outcome: 'APPROVED_WITH_CONDITIONS', conditions: [{ condition: 'Submit the fire safety NOC', due: 30 }] },
+    { key: 'd-closed-2', lease: 800, outcome: 'APPROVED_WITH_CONDITIONS', conditions: [{ condition: 'Appoint a librarian with the required qualifications', due: 20 }] },
   ];
   const decidedPool = take(otherSouth(), decided.length);
   // Earlier-approved institutions used for open special cases: one per portfolio officer.
@@ -278,6 +298,13 @@ export async function seedHistory(dir: Directory): Promise<void> {
     on(addWorkingDays(f, 12 + (k % 4)), () => report(d.key, d.outcome === 'REJECTED' ? 'RECOMMEND_REJECTION' : d.outcome === 'APPROVED' ? 'RECOMMEND_APPROVAL' : 'RECOMMEND_CONDITIONS'));
     on(addWorkingDays(f, 16 + (k % 4)), () => decide(d.key, d.outcome, d.conditions));
   });
+  // Evidence waiting for verification beyond 5 working days, and two cases closed after verification.
+  on(wd(9), () => evidence('d-pending-1'));
+  on(wd(8), () => evidence('d-pending-2'));
+  on(wd(22), () => evidence('d-closed-1'));
+  on(wd(20), () => verify('d-closed-1'));
+  on(wd(19), () => evidence('d-closed-2'));
+  on(wd(18), () => verify('d-closed-2'));
   // An on-time extension decided (scrutiny then decision) and a rejected extension.
   on(wd(40), () => file('d-ext-ok', priorPool[4]!, 'EXTENSION'));
   on(wd(34), () => complete('d-ext-ok'));

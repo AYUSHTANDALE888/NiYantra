@@ -7,7 +7,6 @@ import { Skeleton } from './components/ui';
 import { LoginPage } from './pages/Login';
 import { NoAccessPage } from './pages/NoAccess';
 import { StyleguidePage } from './pages/Styleguide';
-import { PlaceholderPage } from './pages/Placeholder';
 import { CollegeHomePage } from './pages/college/CollegeHome';
 import { ApplyPage } from './pages/college/Apply';
 import { CollegeCasePage } from './pages/college/CollegeCase';
@@ -18,6 +17,7 @@ import { AvailabilityPage } from './pages/Availability';
 import { AdminPage } from './pages/admin/Admin';
 import { TeamPage } from './pages/manager/Team';
 import { WorkforcePage } from './pages/manager/Workforce';
+import { CompliancePage } from './pages/college/Compliance';
 
 const MANAGERS: Role[] = ['SENIOR', 'SUPER_SENIOR', 'HOD'];
 
@@ -55,7 +55,7 @@ export function App() {
         <Route path="/college" element={<RequireRole roles={['COLLEGE']}><CollegeHomePage /></RequireRole>} />
         <Route path="/college/apply" element={<RequireRole roles={['COLLEGE']}><ApplyPage /></RequireRole>} />
         <Route path="/college/applications/:id" element={<RequireRole roles={['COLLEGE']}><CollegeCasePage /></RequireRole>} />
-        <Route path="/college/compliance" element={<RequireRole roles={['COLLEGE']}><PlaceholderPage title="Compliance" description="Undertakings and documents with expiry dates." /></RequireRole>} />
+        <Route path="/college/compliance" element={<RequireRole roles={['COLLEGE']}><CompliancePage /></RequireRole>} />
         <Route path="/cases/:id" element={<CaseViewPage />} />
         <Route path="/officer" element={<RequireRole roles={['OFFICER', 'BUREAU']}><OfficerHomePage /></RequireRole>} />
         <Route path="/evc" element={<RequireRole roles={['OFFICER', 'BUREAU']}><EvcQueuePage /></RequireRole>} />

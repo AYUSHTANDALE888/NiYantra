@@ -231,7 +231,7 @@ export async function caseDetail(user: AuthUser, applicationId: string) {
     documents: docs.map((d) => ({
       id: d.id,
       kind: d.kind,
-      label: docCfg.get(d.kind)?.label ?? d.kind,
+      label: docCfg.get(d.kind)?.label ?? (d.kind === 'UNDERTAKING_EVIDENCE' ? 'Undertaking evidence' : d.kind),
       critical: docCfg.get(d.kind)?.critical ?? false,
       fileName: d.fileName,
       mimeType: d.mimeType,
@@ -340,5 +340,24 @@ export async function caseDetail(user: AuthUser, applicationId: string) {
       toState: r.toState,
     })),
     permittedActions: await permittedActions(user, app),
+    verifyTasks: isCollege
+      ? []
+      : openAssignments
+          .filter((a) => a.taskType === 'VERIFY' && a.officerId === user.id)
+          .map((a) => {
+            const u = app.undertakings.find((x) => x.id === a.taskRefId);
+            const d = docs.find((x) => x.id === a.taskRefId);
+            const old = d?.supersedesId ? docs.find((x) => x.id === d.supersedesId) : undefined;
+            return u
+              ? { kind: 'EVIDENCE' as const, refId: u.id, title: `Evidence for "${u.condition}"`, documentId: u.evidenceDocId, detail: `Due ${isoDate(u.dueDate)}`, reasonText: a.reasonText }
+              : {
+                  kind: 'RENEWAL' as const,
+                  refId: a.taskRefId,
+                  title: `Renewed ${(docCfg.get(d?.kind ?? '')?.label ?? d?.kind ?? 'document').toLowerCase()}`,
+                  documentId: d?.id ?? null,
+                  detail: `New expiry ${d?.expiryDate ? isoDate(d.expiryDate) : '—'}${old?.expiryDate ? `, replaces one expiring ${isoDate(old.expiryDate)}` : ''}`,
+                  reasonText: a.reasonText,
+                };
+          }),
   };
 }

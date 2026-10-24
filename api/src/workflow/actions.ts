@@ -216,6 +216,8 @@ export async function submitApplication(user: AuthUser, input: z.infer<typeof su
         });
       }
       await tx.formCheckResult.update({ where: { id: check!.id }, data: { applicationId: app.id, justification } });
+      // Earlier checks on the same draft are linked too, so the officer sees the history.
+      await tx.formCheckResult.updateMany({ where: { draftId: input.draftId, institutionId: institution.id, applicationId: null }, data: { applicationId: app.id } });
       await appendAudit(tx, {
         actorId: user.id,
         actorRole: user.role,
@@ -538,3 +540,167 @@ export function actionLabel(a: CaseAction): string {
 }
 
 export { taskLabel };
+
+// ---------------------------------------------------------------- compliance actions (no stage change)
+
+async function denied(user: AuthUser, applicationId: string, action: string, reason: string, status: 403 | 404 = 403): Promise<never> {
+  await logAccessDenied(user, { applicationId, action, reason });
+  throw new HttpError(status, status === 404 ? "You don't have access to this page." : reason);
+}
+
+async function holdsVerify(tx: Tx | typeof prisma, applicationId: string, userId: string, refId: string) {
+  return tx.assignment.findFirst({ where: { applicationId, officerId: userId, releasedAt: null, taskType: 'VERIFY', taskRefId: refId } });
+}
+
+function single(file: UploadInput | undefined): UploadInput {
+  if (!file) throw badRequest('Choose a file to upload.');
+  return file;
+}
+
+/** College uploads evidence for an undertaking → SUBMITTED, VERIFY task, VERIFICATION item (5 working days). */
+export async function uploadEvidence(user: AuthUser, undertakingId: string, file: UploadInput | undefined, note?: string) {
+  const u = await prisma.undertaking.findUnique({ where: { id: undertakingId }, include: { application: true } });
+  if (!u) throw notFound();
+  const app = u.application;
+  if (user.role !== 'COLLEGE' || user.institutionId !== app.institutionId) return denied(user, app.id, 'UPLOAD_EVIDENCE', 'Only the institution can upload evidence.', 404);
+  if (u.status !== 'OPEN') throw conflict(u.status === 'SUBMITTED' ? 'Evidence is already waiting for verification.' : 'This undertaking is already verified.');
+  const f = single(file);
+  const s = saveBuffer(f.buffer, f.originalname, f.mimetype);
+  try {
+    await prisma.$transaction(async (tx) => {
+      const doc = await tx.document.create({
+        data: { applicationId: app.id, institutionId: app.institutionId, kind: 'UNDERTAKING_EVIDENCE', ...s, uploadedById: user.id, uploadedAt: now() },
+      });
+      await tx.undertaking.update({ where: { id: u.id }, data: { status: 'SUBMITTED', evidenceDocId: doc.id, remarks: null } });
+      await assign(tx, { applicationId: app.id, regionId: app.regionId, taskType: 'VERIFY', category: app.category, taskRefId: u.id }, user);
+      const days = rules.sla.VERIFICATION;
+      await openItem(tx, { applicationId: app.id, type: 'VERIFICATION', sourceId: u.id, dueDate: addWorkingDays(today(), days), unit: 'WORKING', totalDays: days });
+      await tx.application.update({ where: { id: app.id }, data: { lastActionAt: now() } });
+      await appendAudit(tx, { actorId: user.id, actorRole: user.role, action: 'UPLOAD_EVIDENCE', applicationId: app.id, reason: note ?? null, meta: { undertakingId: u.id, condition: u.condition, documentId: doc.id } });
+    }, TX_OPTIONS);
+  } catch (e) {
+    removeStored([s.storedName]);
+    throw e;
+  }
+}
+
+/** Officer holding the VERIFY task accepts (VERIFIED, maybe CLOSED) or rejects (back to OPEN, college notified). */
+export async function verifyEvidence(user: AuthUser, undertakingId: string, input: { accept: boolean; remarks?: string }) {
+  const u = await prisma.undertaking.findUnique({ where: { id: undertakingId }, include: { application: true } });
+  if (!u) throw notFound();
+  const app = u.application;
+  if (!(await holdsVerify(prisma, app.id, user.id, u.id))) return denied(user, app.id, 'VERIFY_EVIDENCE', 'Only the officer holding the verification task can verify this evidence.');
+  if (u.status !== 'SUBMITTED') throw conflict('There is no evidence waiting for verification.');
+  if (!input.accept && !input.remarks?.trim()) throw badRequest('Enter remarks that tell the college what is wrong.');
+  await prisma.$transaction(async (tx) => {
+    const task = (await holdsVerify(tx, app.id, user.id, u.id))!;
+    await tx.undertaking.update({
+      where: { id: u.id },
+      data: input.accept ? { status: 'VERIFIED', verifiedById: user.id, verifiedAt: now(), remarks: input.remarks ?? null } : { status: 'OPEN', remarks: input.remarks!.trim() },
+    });
+    if (input.accept && u.evidenceDocId) await tx.document.update({ where: { id: u.evidenceDocId }, data: { verified: true, verifiedById: user.id, verifiedAt: now() } });
+    await closeItems(tx, app.id, ['VERIFICATION'], 'outcome', u.id);
+    if (input.accept) await closeItems(tx, app.id, ['UNDERTAKING'], 'outcome', u.id);
+    await release(tx, task.id, 'COMPLETED', user);
+    await tx.application.update({ where: { id: app.id }, data: { lastActionAt: now() } });
+    await appendAudit(tx, {
+      actorId: user.id,
+      actorRole: user.role,
+      action: 'VERIFY_EVIDENCE',
+      applicationId: app.id,
+      reason: input.remarks ?? null,
+      meta: { undertakingId: u.id, accept: input.accept },
+    });
+    const colleges = await collegeUserIds(tx, app.institutionId);
+    if (!input.accept) {
+      await notify(tx, colleges, { applicationId: app.id, kind: 'EVIDENCE_REJECTED', message: `Evidence for "${u.condition}" on ${app.applicationNo} was not accepted: ${input.remarks!.trim()} Upload new evidence by ${formatDate(u.dueDate)}.` });
+      return;
+    }
+    await notify(tx, colleges, { applicationId: app.id, kind: 'EVIDENCE_VERIFIED', message: `Evidence for "${u.condition}" on ${app.applicationNo} was verified.` });
+    // The last undertaking verified closes an approved-with-conditions case.
+    const remaining = await tx.undertaking.count({ where: { applicationId: app.id, status: { not: 'VERIFIED' } } });
+    if (remaining === 0 && app.status === 'APPROVED_WITH_CONDITIONS') {
+      await tx.application.update({ where: { id: app.id }, data: { status: 'CLOSED' } });
+      await appendAudit(tx, {
+        actorId: null,
+        actorRole: 'SYSTEM',
+        action: 'CLOSED',
+        applicationId: app.id,
+        fromState: { stage: app.stage, status: 'APPROVED_WITH_CONDITIONS' },
+        toState: { stage: app.stage, status: 'CLOSED' },
+        reason: 'All undertakings verified',
+      });
+      await notify(tx, colleges, { applicationId: app.id, kind: 'CLOSED', message: `${app.applicationNo} is closed: every condition of the approval is met.` });
+    }
+  }, TX_OPTIONS);
+}
+
+/** College uploads a renewed document (new Document superseding the old one) → VERIFY task and VERIFICATION item. */
+export async function uploadRenewal(user: AuthUser, documentId: string, file: UploadInput | undefined, expiryDate: string) {
+  const old = await prisma.document.findUnique({ where: { id: documentId }, include: { application: true } });
+  if (!old || !old.application) throw notFound();
+  const app = old.application;
+  if (user.role !== 'COLLEGE' || user.institutionId !== old.institutionId) return denied(user, app.id, 'UPLOAD_RENEWAL', 'Only the institution can upload a renewal.', 404);
+  if (!old.expiryDate) throw badRequest('This document has no expiry date.');
+  if (!['APPROVED', 'APPROVED_WITH_CONDITIONS', 'CLOSED'].includes(app.status)) throw badRequest('Renewals are uploaded after approval. Reply to the deficiency instead.');
+  if (await prisma.document.count({ where: { supersedesId: old.id } })) throw conflict('A renewal of this document is already uploaded.');
+  const expiry = parseDateOnly(parse(z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Use the format YYYY-MM-DD'), expiryDate));
+  if (expiry <= today()) throw badRequest('The new expiry date must be in the future.');
+  const f = single(file);
+  const s = saveBuffer(f.buffer, f.originalname, f.mimetype);
+  try {
+    await prisma.$transaction(async (tx) => {
+      const doc = await tx.document.create({
+        data: { applicationId: app.id, institutionId: old.institutionId, kind: old.kind, ...s, uploadedById: user.id, uploadedAt: now(), expiryDate: expiry, supersedesId: old.id },
+      });
+      await assign(tx, { applicationId: app.id, regionId: app.regionId, taskType: 'VERIFY', category: app.category, taskRefId: doc.id }, user);
+      const days = rules.sla.VERIFICATION;
+      await openItem(tx, { applicationId: app.id, type: 'VERIFICATION', sourceId: doc.id, dueDate: addWorkingDays(today(), days), unit: 'WORKING', totalDays: days });
+      await tx.application.update({ where: { id: app.id }, data: { lastActionAt: now() } });
+      await appendAudit(tx, { actorId: user.id, actorRole: user.role, action: 'UPLOAD_RENEWAL', applicationId: app.id, meta: { documentId: doc.id, supersedesId: old.id, kind: old.kind, expiryDate } });
+    }, TX_OPTIONS);
+  } catch (e) {
+    removeStored([s.storedName]);
+    throw e;
+  }
+}
+
+/** Officer verifies a renewal: the old DOC_EXPIRY item closes and a new one starts for the new expiry. */
+export async function verifyRenewal(user: AuthUser, documentId: string, input: { accept: boolean; remarks?: string }) {
+  const doc = await prisma.document.findUnique({ where: { id: documentId }, include: { application: true } });
+  if (!doc || !doc.application || !doc.supersedesId) throw notFound();
+  const app = doc.application;
+  if (!(await holdsVerify(prisma, app.id, user.id, doc.id))) return denied(user, app.id, 'VERIFY_RENEWAL', 'Only the officer holding the verification task can verify this renewal.');
+  if (doc.verified) throw conflict('This renewal is already verified.');
+  if (!input.accept && !input.remarks?.trim()) throw badRequest('Enter remarks that tell the college what is wrong.');
+  await prisma.$transaction(async (tx) => {
+    const task = (await holdsVerify(tx, app.id, user.id, doc.id))!;
+    await closeItems(tx, app.id, ['VERIFICATION'], 'outcome', doc.id);
+    await release(tx, task.id, 'COMPLETED', user);
+    if (input.accept) {
+      await tx.document.update({ where: { id: doc.id }, data: { verified: true, verifiedById: user.id, verifiedAt: now() } });
+      await closeItems(tx, app.id, ['DOC_EXPIRY'], 'closed', doc.supersedesId!);
+      await openItem(tx, { applicationId: app.id, type: 'DOC_EXPIRY', sourceId: doc.id, dueDate: doc.expiryDate!, unit: 'CALENDAR' });
+    } else {
+      // A rejected renewal is withdrawn so the college can upload a corrected one.
+      await tx.document.update({ where: { id: doc.id }, data: { supersedesId: null, applicationId: null } });
+    }
+    await tx.application.update({ where: { id: app.id }, data: { lastActionAt: now() } });
+    await appendAudit(tx, {
+      actorId: user.id,
+      actorRole: user.role,
+      action: 'VERIFY_RENEWAL',
+      applicationId: app.id,
+      reason: input.remarks ?? null,
+      meta: { documentId: doc.id, supersedesId: doc.supersedesId, accept: input.accept },
+    });
+    const label = rules.types[app.type].documents.find((d) => d.kind === doc.kind)?.label ?? doc.kind;
+    await notify(tx, await collegeUserIds(tx, app.institutionId), {
+      applicationId: app.id,
+      kind: input.accept ? 'RENEWAL_VERIFIED' : 'RENEWAL_REJECTED',
+      message: input.accept
+        ? `The renewed ${label.toLowerCase()} for ${app.applicationNo} was verified; it now expires on ${formatDate(doc.expiryDate!)}.`
+        : `The renewed ${label.toLowerCase()} for ${app.applicationNo} was not accepted: ${input.remarks!.trim()}`,
+    });
+  }, TX_OPTIONS);
+}

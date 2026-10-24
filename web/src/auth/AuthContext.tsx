@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
-import { api, getToken, setToken } from '../api/client';
+import { api, ApiError, getToken, setToken } from '../api/client';
 import type { Me } from '../api/types';
 
 interface AuthState {
@@ -33,7 +33,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     api
       .get<{ user: Me }>('/auth/me')
       .then((r) => setUser(r.user))
-      .catch(() => setToken(null))
+      // Only a real 401 ends the session; a network error or an aborted request (page navigating away) must not.
+      .catch((e) => {
+        if (e instanceof ApiError && e.status === 401) setToken(null);
+      })
       .finally(() => setLoading(false));
   }, []);
 

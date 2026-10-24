@@ -18,6 +18,7 @@ import { assignmentsRouter } from './routes/assignments.js';
 import { actionCenterRouter } from './routes/actionCenter.js';
 import { reportsRouter } from './routes/reports.js';
 import { institutionsRouter } from './routes/institutions.js';
+import { complianceRouter } from './routes/compliance.js';
 
 export function createApp() {
   const app = express();
@@ -45,6 +46,7 @@ export function createApp() {
   api.use('/action-center', actionCenterRouter());
   api.use('/reports', reportsRouter());
   api.use('/institutions', institutionsRouter());
+  api.use(complianceRouter());
   api.use(formsRouter());
   api.use(queuesRouter());
   app.use('/api', api);

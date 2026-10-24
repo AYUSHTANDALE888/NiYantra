@@ -201,6 +201,7 @@ export interface CaseDetail {
   formChecks: FormCheckView[];
   history: { id: string; at: string; action: string; actorName: string | null; actorRole: string; reason: string | null; fromState: unknown; toState: unknown }[];
   permittedActions: CaseAction[];
+  verifyTasks: { kind: 'EVIDENCE' | 'RENEWAL'; refId: string; title: string; documentId: string | null; detail: string; reasonText: string }[];
 }
 
 export interface ValidateResponse {
@@ -301,4 +302,9 @@ export interface UnassignedRow {
   taskRefId: string;
   since: string;
   reasonText: string;
+}
+
+export interface ComplianceView {
+  undertakings: { id: string; applicationId: string; applicationNo: string; condition: string; dueDate: string; daysToDue: number; status: string; remarks: string | null }[];
+  documents: { id: string; applicationId: string; applicationNo: string; kind: string; label: string; fileName: string; expiryDate: string; daysToExpiry: number; renewalPending: { id: string; expiryDate: string } | null }[];
 }

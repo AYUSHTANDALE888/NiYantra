@@ -128,3 +128,29 @@ Choices made where the build spec was silent, plus the design review recorded at
 | Charts | Flat stacked bars, light gridlines, 12px muted axis labels, three colours (neutral, warning, danger), exact values in the tooltip, totals alongside. |
 | Max 7 columns | Action Center reduced to 6 columns. |
 | axe | Team (senior and HoD), workforce (senior, HoD, Bureau), officer Action Center, college home: 0 serious or critical issues. |
+
+## Phase 4
+
+- **Compliance actions live in `workflow/actions.ts`** (`uploadEvidence`, `verifyEvidence`, `uploadRenewal`, `verifyRenewal`), each one transaction with its audit row (`UPLOAD_EVIDENCE`, `VERIFY_EVIDENCE`, `UPLOAD_RENEWAL`, `VERIFY_RENEWAL`, and `CLOSED` when the last undertaking is verified).
+- **Evidence documents** are stored as kind `UNDERTAKING_EVIDENCE` on the application and marked verified with the undertaking.
+- **Rejected evidence** returns the undertaking to OPEN with the officer's remarks; its due date and reminders continue. Rejection needs remarks.
+- **Renewals.** Only after approval, only for the current version of a document with an expiry, one pending renewal at a time, new expiry in the future. A rejected renewal is withdrawn (detached from the application) so the college can upload a corrected one; the old expiry item keeps running.
+- **No college flag while something waits for verification** (submitted evidence or a pending renewal); the officer side has the VERIFICATION item and, when it is late, EVIDENCE_PENDING_VERIFICATION.
+- **Check history on the case.** At submission every form check of the draft is linked to the application (the justification is stored on the latest), so the officer's Form checks panel shows the warnings the college saw and fixed, and any of them can be labelled.
+- **Model features.** The eleven section 9.2 features; areas, counts, square metres per student and students per faculty are `log1p`-transformed for the model (missing values imputed with the training median). Explanations use robust z-scores on the untransformed values with the median as the typical value. Python rounds like JavaScript (half up) so the rule values match the Node evaluator.
+- **Model limits, stated in EVALUATION.md.** An Isolation Forest trained on normal forms scores a value beyond the training range about like the most extreme normal values, so model-only recall is modest (about 12% on the synthetic faults, 2.2% false alarms); the rules carry the known faults and the model adds unusual combinations. The policy (200 trees, 256 samples, 97th percentile) was kept as specified.
+- **Parity samples.** `api/scripts/formcheck-samples.ts` writes `shared/formcheck-samples.json` (50 drafts with the Node rule hits); a Vitest test and a pytest test both check against it.
+- **Seeding with the model.** `npm run setup` starts the form check container with a port published on 127.0.0.1 for the duration of the seed only, so seeded form checks are scored by the real model; without Docker the seed uses `FORMCHECK_URL` if reachable, else the rules fallback (marked "model unavailable").
+- **Seed additions:** two cases closed after verified evidence, and two with evidence waiting beyond the 5-working-day verification clock (EVIDENCE_PENDING_VERIFICATION), bringing the total to 192 applications.
+- **Robustness found by the end-to-end run.** The API retries a model operation once when its pooled connection was terminated (a command-line demo reset recreates the database under the running API). The client ends a session only on a real 401 from `/auth/me`, not when a request is aborted by navigation.
+
+### Design review, phase 4
+
+| Check | Result |
+|---|---|
+| One primary action per view | Compliance: per-row upload buttons, primary inside the dialog. Verification panel: Verify is primary, Reject is destructive and confirmed with remarks. |
+| Tokens only | Yes. |
+| Tables for lists | Undertakings and documents with expiry are tables. |
+| Status never colour-only | Verified, waiting for verification, overdue, expiring, valid: all badges with icons and labels; countdowns in text. |
+| Plain language | "Upload evidence", "Upload renewal", "Verify", "Reject with remarks"; the form check is "Check my entries", never "AI". |
+| axe | Compliance, college home and case, officer Action Center and case (with verification), style guide, admin: 0 serious or critical issues. |

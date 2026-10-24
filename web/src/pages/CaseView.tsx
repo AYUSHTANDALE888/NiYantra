@@ -7,6 +7,7 @@ import { ActionPanel } from '../components/ActionPanel';
 import { statusKind } from '../components/AppStatus';
 import { DocumentViewer } from '../components/DocumentViewer';
 import { FormChecksPanel } from '../components/FormChecksPanel';
+import { VerifyPanel } from '../components/VerifyPanel';
 import { useClock } from '../components/Layout';
 import { Badge, Card, ErrorState, PageHeader, Skeleton, StatusBadge, Table, Tabs, Tracker, type Tone } from '../components/ui';
 import { formatDate, formatDateTime, formatNumber, relativeDays, roleLabel } from '../lib/format';
@@ -221,6 +222,7 @@ export function CaseViewPage() {
                     </ul>
                   )}
                 </Card>
+                <VerifyPanel detail={d} />
                 <Card title="Actions">
                   <ActionPanel detail={d} today={clock.data?.today ?? new Date().toISOString().slice(0, 10)} />
                 </Card>
