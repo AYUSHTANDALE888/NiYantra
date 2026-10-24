@@ -1,0 +1,44 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    @apply bg-page text-primary font-sans text-base antialiased;
+  }
+  body {
+    @apply bg-page;
+  }
+  :focus {
+    outline: none;
+  }
+  :focus-visible {
+    @apply ring-2 ring-accent ring-offset-2;
+  }
+  table {
+    font-variant-numeric: tabular-nums;
+  }
+  @media (pointer: coarse) {
+    .hit {
+      min-height: 44px;
+      min-width: 44px;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+@layer utilities {
+  .tnum {
+    font-variant-numeric: tabular-nums;
+  }
+  .id-text {
+    @apply font-mono text-sm;
+  }
+}
