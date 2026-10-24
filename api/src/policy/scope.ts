@@ -15,6 +15,8 @@ export async function scopeWhere(user: AuthUser, db: Db = prisma): Promise<Prism
         OR: [
           { assignments: { some: { officerId: user.id, releasedAt: null } } },
           { institution: { portfolioOfficerId: user.id } },
+          // The officer who returned a case keeps sight of it while the college replies.
+          { status: 'RETURNED', previousOfficerId: user.id },
         ],
       };
     case 'SENIOR':

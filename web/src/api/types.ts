@@ -215,3 +215,90 @@ export interface ValidateResponse {
   canSubmit: true;
   justificationRequired: boolean;
 }
+
+export interface ACRow {
+  applicationId: string;
+  applicationNo: string;
+  institutionName: string;
+  typeLabel: string;
+  stage: Stage;
+  stageLabel: string;
+  status: Status;
+  daysInStage: number;
+  ageing: '0-7' | '8-15' | '16+';
+  task: { label: string; reasonText: string; officerName: string } | null;
+  primary: { reasonCode: string; label: string; reasonText: string; nextAction: string; escalationLevel: number; ownerRole: string };
+  reasons: string[];
+  escalationLevel: number;
+  nextEscalationAt: string | null;
+}
+
+export interface ACSummary {
+  held: number;
+  dueThisWeek: number;
+  overdue: number;
+  waitingOnCollege: number;
+  escalatedToMe: number;
+  openPoints: number;
+  capacity: number;
+}
+
+export interface Metrics {
+  received: number;
+  completed: number;
+  returned: number;
+  closed: number;
+  heldNow: number;
+  ageing: { d0to7: number; d8to15: number; d16plus: number };
+  overdueNow: number;
+  worstOverdueDays: number;
+  slaMet: number;
+  slaTotal: number;
+  slaMetPct: number | null;
+  avgWorkingDaysPerStage: number | null;
+  openPoints: number;
+  capacity: number;
+  utilisation: number | null;
+  officers: number;
+  availableToday: number;
+}
+
+export interface TeamReport {
+  base: { id: string; name: string; role: string };
+  periodDays: number;
+  rows: { user: { id: string; name: string; role: string; title: string | null }; hasReports: boolean; availability: { kind: string; until: string } | null; metrics: Metrics }[];
+  totals: Metrics;
+  waitingOn: { officer: number; college: number; evcOrCommittee: number; authority: number };
+  escalatedToMe: { flagId: string; applicationId: string; applicationNo: string; institutionName: string; level: number; label: string; reasonText: string }[];
+}
+
+export interface WorkloadRow {
+  id: string;
+  name: string;
+  role: string;
+  region: string | null;
+  senior: { id: string; name: string } | null;
+  capacity: number;
+  openPoints: number;
+  utilisation: number;
+  availability: { kind: string; until: string; reason: string } | null;
+  openTasks: { assignmentId: string; applicationId: string; applicationNo: string; institutionName: string; stage: string; taskType: string; taskLabel: string; weight: number; assignedAt: string; reasonText: string }[];
+  portfolio: { id: string; name: string; permanentId: string }[];
+  portfolioSize: number;
+  flag: 'OK' | 'OVERLOADED' | 'IDLE';
+  teamAverage: number;
+}
+
+export interface UnassignedRow {
+  flagId: string;
+  applicationId: string;
+  applicationNo: string;
+  institutionName: string;
+  region: string;
+  stage: string;
+  taskType: string;
+  taskLabel: string;
+  taskRefId: string;
+  since: string;
+  reasonText: string;
+}

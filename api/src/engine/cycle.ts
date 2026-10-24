@@ -235,7 +235,7 @@ export async function stalledApplications(today: Date) {
 }
 
 /** One full cycle. Callers hold the cycle lock (runCycleWithLock). */
-export async function runEngineCycle(meta: Record<string, string> = {}): Promise<CycleResult> {
+export async function runEngineCycle(meta: Record<string, string> = {}, opts: { flags?: boolean; digests?: boolean } = {}): Promise<CycleResult> {
   await clock.refresh().catch(() => undefined);
   await loadHolidays(prisma);
   const today = clock.today();
@@ -249,8 +249,8 @@ export async function runEngineCycle(meta: Record<string, string> = {}): Promise
   for (const it of items) await processItem(it, today, c);
 
   await availabilityStarts(today, c);
-  const flags = await buildFlags(today);
-  await digests(today, c);
+  const flags = opts.flags === false ? {} : await buildFlags(today);
+  if (opts.digests !== false) await digests(today, c);
 
   const sent = c.reminders + c.atRisk + c.overdue + c.escalations + c.digests;
   if (sent > 0 || c.released > 0) {

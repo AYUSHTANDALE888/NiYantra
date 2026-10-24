@@ -61,11 +61,11 @@ export default {
     boxShadow: { none: 'none', overlay: '0 4px 16px rgba(16,24,40,0.08)' },
     extend: {
       width: { num: '96px', sidebar: '232px', dialog: '480px', 'dialog-lg': '640px', control: '36px', 'control-sm': '32px' },
-      height: { table: '70vh', topbar: '56px', row: '44px', control: '36px', 'control-sm': '32px', bar: '8px' },
+      height: { chart: '280px', table: '70vh', topbar: '56px', row: '44px', control: '36px', 'control-sm': '32px', bar: '8px' },
       minHeight: { control: '36px', touch: '44px', target: '24px' },
-      minWidth: { content: '200px', control: '36px', touch: '44px', target: '24px' },
+      minWidth: { reason: '360px', content: '200px', control: '36px', touch: '44px', target: '24px' },
       maxHeight: { table: '70vh' },
-      maxWidth: { viewport: 'calc(100vw - 32px)', content: '1280px', dialog: '480px', 'dialog-lg': '640px', prose: '640px' },
+      maxWidth: { md: '28rem', viewport: 'calc(100vw - 32px)', content: '1280px', dialog: '480px', 'dialog-lg': '640px', prose: '640px' },
       transitionDuration: { 150: '150ms', 200: '200ms' },
       keyframes: {
         rise: { from: { opacity: '0', transform: 'translateY(4px)' }, to: { opacity: '1', transform: 'translateY(0)' } },

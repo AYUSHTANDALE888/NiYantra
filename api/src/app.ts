@@ -15,6 +15,9 @@ import { availabilityRouter } from './routes/availability.js';
 import { queuesRouter } from './routes/queues.js';
 import { formsRouter } from './routes/forms.js';
 import { assignmentsRouter } from './routes/assignments.js';
+import { actionCenterRouter } from './routes/actionCenter.js';
+import { reportsRouter } from './routes/reports.js';
+import { institutionsRouter } from './routes/institutions.js';
 
 export function createApp() {
   const app = express();
@@ -39,6 +42,9 @@ export function createApp() {
   api.use('/documents', documentsRouter());
   api.use('/availability', availabilityRouter());
   api.use('/assignments', assignmentsRouter());
+  api.use('/action-center', actionCenterRouter());
+  api.use('/reports', reportsRouter());
+  api.use('/institutions', institutionsRouter());
   api.use(formsRouter());
   api.use(queuesRouter());
   app.use('/api', api);

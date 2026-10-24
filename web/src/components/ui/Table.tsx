@@ -14,6 +14,8 @@ export interface Column<T> {
   title?: (row: T) => string;
   className?: string;
   srOnlyHeader?: boolean;
+  /** Let long text wrap instead of truncating with a tooltip. */
+  wrap?: boolean;
 }
 
 export interface TableProps<T> {
@@ -135,7 +137,7 @@ export function Table<T>({ caption, columns, rows, rowKey, onRowClick, rowLabel,
                           <td
                             key={c.key}
                             title={c.title ? c.title(row) : undefined}
-                            className={cx('h-row max-w-xs truncate px-4', c.align === 'right' ? 'tnum text-right' : 'text-left', c.className)}
+                            className={cx('h-row px-4', c.wrap ? 'max-w-md py-2' : 'max-w-xs truncate', c.align === 'right' ? 'tnum text-right' : 'text-left', c.className)}
                           >
                             {c.render(row)}
                           </td>

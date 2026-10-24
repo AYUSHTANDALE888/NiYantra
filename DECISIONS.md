@@ -98,3 +98,33 @@ Choices made where the build spec was silent, plus the design review recorded at
 | Loading, empty, error | Tables use the shared states. |
 | Keyboard path | Tabs with arrow keys; scrollable table regions are focusable. |
 | axe | All four admin tabs: 0 serious or critical issues (after making scrollable table regions focusable). |
+
+## Phase 3
+
+- **Flag owners.** Stage-type flags are owned by the item's responsible user (the officer holding the task, the EVC desk officer, the first committee member for EVC reports, the region authority for decisions). Undertaking and document flags are owned by the college (`ownerRole COLLEGE`, no owner user); the portfolio officer is named as follow-up in the reason text when they are overdue. ESCALATED is owned by the level-N manager. BLOCKED (no eligible officer) is owned by the region HoD.
+- **An undertaking with evidence submitted** is not the college's to act on, so it raises no due-soon, overdue or urgent flag for the college while it waits for verification (EVIDENCE_PENDING_VERIFICATION covers the officer side).
+- **BLOCKED conditions implemented:** no eligible officer (kept while the task is unassigned); a critical document with an expiry (the land lease) that has expired on an open case ("needed for the next stage"); an EVC schedule due within 3 working days when fewer than 3 committee members are available on the next working day ("EVC due without committee proposal").
+- **URGENT** is raised for any open item due within 3 days (working days for stage items, calendar days for compliance items), not when already overdue (overdue has its own flags).
+- **Flag rows are upserted by `(applicationId, reasonCode, sourceItemId)`**; a flag that comes back after being resolved reopens with a new `raisedAt`. Each resolution writes a `FLAG_RESOLVED` audit row on the case chain.
+- **The Action Center lists one row per application**, showing its highest-priority flag (by the five sort keys) and badges for the others. Columns: application no, institution, task, days in stage, status, and "why and what next" (the next action in bold above the reason text), which keeps the table within 7 columns.
+- **Filters:** Mine (flags owned by me, never college-owned), Waiting on college (college-owned flags on cases in my scope), Escalated to me. Colleges see their own college-owned flags ("What we need from you").
+- **Officer scope** now also includes a case the officer returned while the college replies (`status RETURNED` and `previousOfficerId` = officer), so it shows under Waiting on college.
+- **Summary cards:** held = my open assignments; due this week = my open stage-type items due within 5 working days; overdue = my overdue-type flags (college-owned excluded); waiting on college = cases with college-owned flags in my scope.
+- **Team report.** Received = assignments to the person's subtree in the period; completed = COMPLETE_STAGE, FORWARD_SAC_SHC, VERIFY_EVIDENCE and VERIFY_RENEWAL by them; returned = RETURN by them; closed = their portfolio's cases decided or closed in the period; overdue now = their open stage-type items past due; SLA met % = MET ÷ (MET + MISSED) for stage-type items closed in the period; average working days per stage = stage deadline items closed in the period (created → closed). Ageing buckets count distinct held cases by working days in the current stage. Waiting-on counts open cases in the caller's scope by holder.
+- **Workforce team average** for IDLE is the average utilisation of officers with the same senior. Bureau sees every officer and Bureau member.
+- **Reassign options** (`GET /assignments/:id/options`, added) list the engine's own recommendation (region-wide, so it may name someone outside the manager's team) and the officers the manager may choose: their subtree (senior, super senior), their region plus Bureau (HoD), anyone (Bureau), with the reason any of them is blocked.
+- **Seed history (section 12)** is built in phase 3 because the phase 3 checkpoint needs it. Choices: ABC Engineering College has no applications (it is a known institution with a Permanent ID; NEW_INSTITUTION is allowed); earlier approvals for extension-type filers are verification visits approved months ago; every application has its linked form check (so there are about 180 results, 18 with HIGH warnings in phase 3; MEDIUM ones arrive with the model in phase 4); a balancing pass gives officers below 3 points one more extension-type application where they have an earlier-approved institution, so the region carries realistic load (186 applications in total).
+- **"Mostly to Meena."** When Arjun goes on leave, the engine spreads his 7 tasks by score: Meena (idle, but with the 0.1 specialisation-mismatch penalty for a category she has not handled in 30 days) takes the largest share (3), the rest go one each to the least-loaded officers. The policy weights were left as specified.
+- **Seed timing.** The seed runs a light engine cycle (no flags or digests) every fifth working day of the backdated history, skips cycles on the two short windows where availability is staged (so the staged leave does not release unrelated tasks), and finishes with a full cycle at real time.
+
+### Design review, phase 3
+
+| Check | Result |
+|---|---|
+| One primary action per view | Action Center and team have none (read and triage views); dialogs have one primary. |
+| Tokens only | Chart colours are read from the Tailwind theme (`lib/chartTokens.ts`); new tokens `h-chart`, `min-w-reason`. |
+| Tables for lists | Action Center, tasks, direct reports, officers and the no-eligible-officer queue are tables; the escalated list is a short list inside a card. |
+| Status never colour-only | Badges carry dots or icons and labels; the chart repeats the totals in text. |
+| Charts | Flat stacked bars, light gridlines, 12px muted axis labels, three colours (neutral, warning, danger), exact values in the tooltip, totals alongside. |
+| Max 7 columns | Action Center reduced to 6 columns. |
+| axe | Team (senior and HoD), workforce (senior, HoD, Bureau), officer Action Center, college home: 0 serious or critical issues. |

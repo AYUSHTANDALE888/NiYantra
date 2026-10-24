@@ -16,6 +16,8 @@ import { CaseViewPage } from './pages/CaseView';
 import { AuthorityQueuePage, BureauQueuePage, CommitteeQueuePage, EvcQueuePage } from './pages/Queues';
 import { AvailabilityPage } from './pages/Availability';
 import { AdminPage } from './pages/admin/Admin';
+import { TeamPage } from './pages/manager/Team';
+import { WorkforcePage } from './pages/manager/Workforce';
 
 const MANAGERS: Role[] = ['SENIOR', 'SUPER_SENIOR', 'HOD'];
 
@@ -60,8 +62,8 @@ export function App() {
         <Route path="/committee" element={<RequireRole roles={['COMMITTEE']}><CommitteeQueuePage /></RequireRole>} />
         <Route path="/authority" element={<RequireRole roles={['AUTHORITY']}><AuthorityQueuePage /></RequireRole>} />
         <Route path="/bureau" element={<RequireRole roles={['BUREAU']}><BureauQueuePage /></RequireRole>} />
-        <Route path="/team" element={<RequireRole roles={MANAGERS}><PlaceholderPage title="Team" description="Work done and pending across your team." /></RequireRole>} />
-        <Route path="/workforce" element={<RequireRole roles={[...MANAGERS, 'BUREAU']}><PlaceholderPage title="Workforce" description="Officer load, availability and portfolios." /></RequireRole>} />
+        <Route path="/team" element={<RequireRole roles={MANAGERS}><TeamPage /></RequireRole>} />
+        <Route path="/workforce" element={<RequireRole roles={[...MANAGERS, 'BUREAU']}><WorkforcePage /></RequireRole>} />
         <Route path="/availability" element={<RequireRole roles={['OFFICER', 'COMMITTEE', ...MANAGERS]}><AvailabilityPage /></RequireRole>} />
         <Route path="/admin" element={<RequireRole roles={['ADMIN']}><AdminPage /></RequireRole>} />
         <Route path="/styleguide" element={<RequireRole roles={['ADMIN']}><StyleguidePage /></RequireRole>} />
