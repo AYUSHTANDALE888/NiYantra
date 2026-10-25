@@ -1,28 +1,47 @@
-# Storyboard (Phase 2 proposal)
+# Storyboard v2
 
-Primary cut: about 4 min 30 s, 1920×1080, 30 fps. Short cut: about 90 s (scenes marked ★). Every scene is a real Playwright recording of the running app on a fresh `demo:reset`, using the synthetic demo accounts. Overlays (titles, callouts, zooms, subtitles) are added in Remotion; nothing inside the app frame is drawn or faked.
+Primary cut ≈ 4 min 45 s, 1920×1080, 30 fps. Short cut ≈ 90 s (chapters marked ★). Every app frame is a real Playwright recording on a fresh demo reset with synthetic accounts; Remotion adds only overlays (titles, chapter bar, callouts, zooms, cursor effects, subtitles, sound).
 
-Legend: **Rec** = recording scenario in `automation/scenarios/`. **State** = what must be true before recording.
+## The six editing principles, as concrete devices
 
-| # | Time | Scene | Rec / state | On screen (real actions) | Narration (draft) | Emphasis / callout | Transition |
-|---|---|---|---|---|---|---|---|
-| 0 ★ | 0:00–0:10 | Title card | none | Title "AICTE Demo Website", subtitle "Approval workflow prototype · Smart India Hackathon 2026", prototype disclaimer | "Approving a technical institution takes many hands and many deadlines. This prototype keeps every one of them visible." | Disclaimer line always visible | Fade in |
-| 1 ★ | 0:10–0:30 | Public portal | `01-public` · fresh reset | Home: cycle schedule, recent changes; press A+, Hindi, high contrast, back to English | "The public portal shows the current cycle's schedule and every rule change, in English or Hindi, with larger text and a high-contrast mode." | Zoom on the utility bar; callout "Same page, three accessibility modes" | Cut |
-| 2 ★ | 0:30–1:05 | College files | `02-file` · fresh reset | Sign in as ABC Engineering College; new application; enter a built-up area bigger than the land; Check my entries; leave out the land lease; submit disabled; add justification | "A college files under the rules pinned for its cycle. Check my entries flags an inconsistency, but never blocks. A missing critical document does block, and says which one." | Callout on the R1 warning; highlight the disabled Submit and its message | Slide left |
-| 3 | 1:05–1:25 | Assignment with reasons | `03-assign` · after 2 | Priya's Action Center; open the new case; "Assigned to… because…" panel | "The case is assigned automatically, and the system says why: portfolio, workload, and the rules version it was filed under." | Zoom on the reason text | Cut |
-| 4 ★ | 1:25–1:55 | Return and reply | `04-return` · after 3 | Priya returns with a deficiency; split screen: officer view and college view; clock badge turns amber "paused"; college uploads a 3-year lease; clock resumes | "When an officer returns an application, the clock pauses. It resumes with the remaining days when the college replies, back to the same officer." | Split screen; callout on the paused clock | Split-screen wipe |
-| 5 ★ | 1:55–2:25 | Time travel and escalation | `05-escalate` · after 4 | Admin advances 20 days; header shows "Simulated date"; Kumar's team dashboard shows the escalation; Action Center reasons | "In the demo, time can be moved forward. Twenty days later the deadline engine has escalated the overdue task, exactly once, to the officer's manager." | Callout "Simulated date"; zoom on the escalation row | Clock-wipe |
-| 6 | 2:25–2:50 | Leave and reassignment | `06-workforce` · after 5 | An officer takes leave; tasks reassigned with reasons; Kumar reassigns another task with the system's recommendation | "If an officer goes on leave, their open tasks are reassigned with reasons. Managers can also reassign, guided by a recommendation." | Callout "Recommended by system" | Cut |
-| 7 | 2:50–3:15 | Visit, report, decision | `07-decision` · after 6 | Ravi schedules the expert visit; committee submits the report; authority approves with conditions | "The expert visit is scheduled, the committee reports, and the competent authority approves with conditions." | Three quick zooms, one per role | Cut |
-| 8 | 3:15–3:35 | Compliance and close | `08-compliance` · after 7 | Advance 85 days; reminders; college uploads evidence; officer verifies; case CLOSED | "Conditions become tracked undertakings with reminders. Once evidence is verified, the case closes on its own." | Callout on CLOSED badge | Fade |
-| 9 ★ | 3:35–4:10 | Yearly rule change | `09-rules` · fresh reset | Rules Center; draft a corrigendum (add a document, extend a window); mark live → refused; impact preview; approver (a different person) approves and publishes; college sees the banner | "Rules change every year. An editor drafts the change, the impact is previewed before anything happens, and a second person must approve it. Filed cases keep the rules they were filed under." | Callout on the refusal text and the impact sentences; maker-checker names | Slide up |
-| 10 ★ | 4:10–4:25 | Audit and access | `10-audit` · after 9 | Admin verifies integrity (OK); run `demo:tamper` (terminal inset); verify again: "Broken: row N"; a South officer opens a West case: no access | "Every action is written to a hash-chained audit log. Tampering is detected, and access outside an officer's scope is refused and logged." | Terminal inset for the tamper command, labelled "demo tool" | Cut |
-| 11 ★ | 4:25–4:35 | Close | none | Recap of 4 features; repo link; disclaimer | "A prototype built on synthetic data, ready for review." | — | Fade out |
+| Principle | Device in the edit |
+|---|---|
+| 01 Guide the viewer's eyes | Smooth zoom (1.0→1.6×) toward the element about to be used, driven by the recorded click coordinates; everything else dims to 70 %; a soft spotlight ring around the target. |
+| 02 Show where you are | Persistent top-left chapter chip ("3 / 9 · Return and reply"), a role badge ("Signed in as: Scrutiny officer — Priya Raman") and the URL path in a small pill; a thin progress bar of chapters along the bottom. |
+| 03 Show cause and effect | After each key action: freeze 0.4 s on the click, then a labelled arrow from the button to the change it caused (badge colour, clock paused, new row), with a before/after mini split when the change is on another screen. |
+| 04 Explain alongside the interface | Narration plus a side card (≤ 12 words) that slides in at the edge, never covering the field in use; on-screen text names the rule or reason the app itself shows. |
+| 05 Make interactions readable | Visible cursor with click ripple and a clear click sound; typing at a human pace with soft key sounds; keystroke chips for Tab/Enter; field labels highlighted while being filled; slow-motion (0.6×) on the decisive click. |
+| 06 Organise into chapters | 9 chapter cards (2 s each, number + title + one-line purpose) and the chapter bar; chapter markers in the MP4 metadata and a chapters list in the README for YouTube. |
 
-Short cut (about 90 s): 0, 1 (shortened), 2, 4, 5, 9, 10, 11 with tighter narration.
+## Scene pattern for every feature
 
-## Honesty rules for this video
+A. Purpose (5–8 s): problem first, over a still of the starting screen with a title card.
+B. Real interaction (10–25 s): navigate, fill, trigger.
+C. Verified result (5–10 s): the saved record or updated screen, zoomed and labelled.
+D. Takeaway (3–5 s): one sentence on why it matters; transition to the next chapter.
 
-- The form check is shown in its real state. If the Python service is running, the narration says "rules plus a statistical model trained on synthetic data"; otherwise the badge "Model unavailable: rules only" is shown and the narration does not mention the model.
-- No claim about real AICTE rules, email or SMS, payments or official status. The prototype disclaimer stays visible on every frame of the app and on the title cards.
-- The time travel and tamper steps are labelled as demo tools.
+## Chapters
+
+| # | Chapter | A. Purpose | B. Real interaction | C. Verified result | D. Takeaway |
+|---|---|---|---|---|---|
+| 0 | Cold open (8 s) | "Approving a technical institution takes many hands — and many deadlines." | Fast montage (1 s each) of 6 real screens from later chapters | Title: AICTE Demo Website · prototype disclaimer | "Here is how this prototype keeps every step visible." |
+| 1 ★ | The public portal (25 s) | Anyone should see the schedule and every rule change, in their language | Home → press A+ → हिंदी → high contrast → back | Same page in three modes (split into thirds) | "Accessible before you even sign in." |
+| 2 ★ | A college files (40 s) | Forms are long; mistakes found late cost weeks | Sign in as ABC Engineering College → new application → built-up area larger than land → Check my entries → omit land lease | R1 HIGH warning (advice, not a block); Submit disabled naming the missing document; then submitted with a justification | "Problems caught at the desk, not months later." |
+| 3 | Assigned, with reasons (20 s) | Who handles a case, and why, is usually invisible | Priya's Action Center → open the case | "Assigned to Priya Raman … portfolio officer … utilisation … Rules 2027-28 v1" | "Every assignment explains itself." |
+| 4 ★ | Return and reply (35 s) | Delays are often blamed on the wrong side | Priya returns with a deficiency → college replies with a 3-year lease | Split screen: officer and college views; the clock badge turns amber "paused" then resumes with remaining days | "The clock is fair to both sides." |
+| 5 ★ | Deadlines that escalate (30 s) | Overdue work gets forgotten | Admin moves the simulated date forward 20 days | "Simulated date" clock animation; Kumar's dashboard shows the escalation exactly once; Action Center explains why | "Nothing slips quietly." |
+| 6 | Leave and workload (25 s) | When someone is away, their queue stalls | Officer adds leave → Kumar reassigns with the recommendation | Tasks moved with reasons; "Recommended by system" recorded | "Work follows capacity, with a record of why." |
+| 7 | Visit, decision, compliance (40 s) | Approval is not the end; conditions must be met | Expert visit scheduled → committee report → approval with conditions → 85 days later: reminders → evidence → verification | Case CLOSED | "From application to closure in one traceable thread." |
+| 8 ★ | Rules change every year (40 s) | Rule changes break systems and surprise colleges | Editor drafts a corrigendum → marks it live → refused → impact preview → a different person approves and publishes → college sees the banner | Refusal text, impact sentences, maker/checker names, banner "1 change … since your last visit" | "Change is previewed, approved by two people, and announced." |
+| 9 ★ | Trust and closing (25 s) | A log that can be edited proves nothing | Admin verifies integrity → (demo tool) a row is altered → verify again → South officer opens a West case | "Broken: row N" detected; access denied and logged | "Tamper-evident and scoped." Closing card: recap of 4 ideas, the live demo link, disclaimer |
+
+## Narration delivery
+
+- Emotional arc: curious (cold open) → reassuring (portal, filing) → concerned then relieved (return/clock, escalation) → confident (rules, trust) → warm close.
+- Breath pauses: about 0.25 s at commas, 0.6 s between sentences, 0.9 s before each takeaway line; the music dips 6 dB under speech and swells slightly at chapter cards.
+
+## Honesty rules
+
+- The form check is shown as it really runs: on the hosted site and locally without the Python service it says "Model unavailable: rules only", and the narration then talks about the rules only.
+- No claims about real AICTE rules, payments, email or SMS, or official status; the prototype disclaimer stays on the title and closing cards and is visible in every app frame.
+- Time travel and the tamper step are labelled "demo tool" on screen.

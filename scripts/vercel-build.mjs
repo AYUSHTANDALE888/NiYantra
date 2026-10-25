@@ -4,13 +4,15 @@
 //   config.json        /api/* → the function, files from static/, everything else → index.html (client routing);
 //                      a daily cron for the deadline engine
 // Before bundling it prepares the Neon database (api/scripts/hosted-prepare.ts).
+// The Vercel project's root directory is web/ so that Vercel does not treat api/**/*.ts as functions.
 import { execSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const out = path.join(root, '.vercel/output');
+// Written next to the directory the build runs in (the Vercel project's root directory is web/).
+const out = path.join(process.cwd(), '.vercel/output');
 const fn = path.join(out, 'functions/api.func');
 const run = (cmd, cwd = root) => {
   console.log(`$ ${cmd}`);
@@ -29,7 +31,7 @@ fs.cpSync(path.join(root, 'web/dist'), path.join(out, 'static'), { recursive: tr
 run(
   [
     'npx esbuild api/src/serverless.ts --bundle --platform=node --target=node22 --format=esm',
-    `--outfile=${path.relative(root, fn)}/index.mjs`,
+    `--outfile=${fn}/index.mjs`,
     '--external:@prisma/client --external:.prisma/client --external:pg-native',
     // CommonJS dependencies bundled into ESM still call require().
     `--banner:js="import { createRequire as __cr } from 'node:module'; const require = __cr(import.meta.url);"`,
