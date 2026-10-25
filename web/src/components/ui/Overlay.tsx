@@ -2,7 +2,7 @@ import { createContext, useCallback, useContext, useEffect, useId, useRef, useSt
 import { createPortal } from 'react-dom';
 import { X, ChevronDown, CheckCircle2 } from 'lucide-react';
 import { cx } from '../../lib/format';
-import { en } from '../../strings/en';
+import { useT } from '../../lib/prefs';
 import { Button } from './Button';
 import { Field, Textarea } from './Form';
 
@@ -19,6 +19,7 @@ export interface DialogProps {
 
 /** Modal dialog: title as the question, focus trapped and returned, Escape closes. */
 export function Dialog({ open, title, onClose, children, footer, size = 'md' }: DialogProps) {
+  const en = useT();
   const titleId = useId();
   const panel = useRef<HTMLDivElement>(null);
   const returnTo = useRef<HTMLElement | null>(null);
@@ -38,7 +39,7 @@ export function Dialog({ open, title, onClose, children, footer, size = 'md' }: 
 
   if (!open) return null;
   return createPortal(
-    <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-primary/40 p-4 pt-12">
+    <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-scrim p-4 pt-12">
       <div
         ref={panel}
         role="dialog"
@@ -102,6 +103,7 @@ export function ConfirmDialog({
   onConfirm: () => void;
   onClose: () => void;
 }) {
+  const en = useT();
   return (
     <Dialog
       open={open}
@@ -134,7 +136,7 @@ export function ReasonDialog({
   destructive,
   pending,
   error,
-  reasonLabel = en.common.reason,
+  reasonLabel,
   onConfirm,
   onClose,
   children,
@@ -151,6 +153,7 @@ export function ReasonDialog({
   onClose: () => void;
   children?: ReactNode;
 }) {
+  const en = useT();
   const [reason, setReason] = useState('');
   const [touched, setTouched] = useState(false);
   useEffect(() => {
@@ -184,7 +187,7 @@ export function ReasonDialog({
       <div className="flex flex-col gap-4">
         <div className="text-base text-secondary">{body}</div>
         {children}
-        <Field label={reasonLabel} hint={en.common.reasonHint} error={touched && missing ? en.common.reasonRequired : null}>
+        <Field label={reasonLabel ?? en.common.reason} hint={en.common.reasonHint} error={touched && missing ? en.common.reasonRequired : null}>
           {({ id, describedBy, invalid }) => (
             <Textarea id={id} data-autofocus aria-describedby={describedBy} invalid={invalid} value={reason} onChange={(e) => setReason(e.target.value)} onBlur={() => setTouched(true)} rows={3} />
           )}

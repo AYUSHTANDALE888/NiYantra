@@ -1,7 +1,7 @@
 import { forwardRef, useId, type ButtonHTMLAttributes, type ReactNode } from 'react';
 import { Loader2 } from 'lucide-react';
 import { cx } from '../../lib/format';
-import { en } from '../../strings/en';
+import { useT } from '../../lib/prefs';
 
 export type ButtonVariant = 'primary' | 'secondary' | 'tertiary' | 'destructive';
 
@@ -16,16 +16,17 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const variants: Record<ButtonVariant, string> = {
-  primary: 'bg-accent text-white border border-accent hover:bg-accent-hover hover:border-accent-hover',
+  primary: 'bg-accent text-on-solid border border-accent hover:bg-accent-hover hover:border-accent-hover',
   secondary: 'bg-surface text-primary border border-input hover:bg-subtle',
   tertiary: 'bg-transparent text-accent border border-transparent hover:bg-accent-soft',
-  destructive: 'bg-danger text-white border border-danger hover:opacity-90',
+  destructive: 'bg-danger text-on-solid border border-danger hover:opacity-90',
 };
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button(
   { variant = 'secondary', size = 'md', pending, pendingLabel, icon, disabledReason, disabled, className, children, type, ...rest },
   ref,
 ) {
+  const en = useT();
   const reasonId = useId();
   const isDisabled = disabled || pending;
   return (

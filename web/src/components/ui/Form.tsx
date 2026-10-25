@@ -1,7 +1,7 @@
 import { forwardRef, useId, useRef, useState, type InputHTMLAttributes, type ReactNode, type SelectHTMLAttributes, type TextareaHTMLAttributes } from 'react';
 import { AlertCircle, Paperclip } from 'lucide-react';
 import { cx } from '../../lib/format';
-import { en } from '../../strings/en';
+import { useT } from '../../lib/prefs';
 
 const control =
   'block w-full rounded border border-input bg-surface px-3 text-base text-primary transition-shadow duration-150 ease-out placeholder:text-muted disabled:bg-subtle disabled:text-muted';
@@ -19,6 +19,7 @@ export interface FieldProps {
 
 /** Label above, hint below, error below in danger with an icon (GOV.UK pattern). */
 export function Field({ label, hint, error, optional, children, className, id: idProp }: FieldProps) {
+  const en = useT();
   const auto = useId();
   const id = idProp ?? auto;
   const hintId = hint ? `${id}-hint` : undefined;

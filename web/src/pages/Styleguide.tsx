@@ -1,6 +1,7 @@
 import { useState, type ReactNode } from 'react';
 import { Check } from 'lucide-react';
 import { useTitle } from '../lib/useTitle';
+import { usePrefs } from '../lib/prefs';
 import {
   Avatar,
   Badge,
@@ -59,6 +60,7 @@ const rows: Row[] = [
 
 export function StyleguidePage() {
   useTitle('Style guide');
+  const prefs = usePrefs();
   const toast = useToast();
   const [tab, setTab] = useState<'one' | 'two' | 'three'>('one');
   const [seg, setSeg] = useState<'online' | 'physical'>('online');
@@ -68,6 +70,42 @@ export function StyleguidePage() {
   return (
     <div className="flex flex-col gap-8">
       <PageHeader title="Style guide" description="Every shared component in every state. Screens are composed only from these." breadcrumb={[{ label: 'Administration', to: '/admin' }, { label: 'Style guide' }]} />
+
+      <Section title="Themes, languages and text sizes">
+        <div className="flex flex-wrap items-center gap-3">
+          <SegmentedControl label="Text size" value={prefs.textSize} options={[{ value: 'sm', label: 'A- (87.5%)' }, { value: 'md', label: 'A (100%)' }, { value: 'lg', label: 'A+ (112.5%)' }, { value: 'xl', label: 'A++ (125%)' }]} onChange={prefs.setTextSize} />
+          <SegmentedControl label="Language" value={prefs.lang} options={[{ value: 'en', label: 'English' }, { value: 'hi', label: 'हिंदी' }]} onChange={prefs.setLang} />
+          <Checkbox label="High contrast" checked={prefs.contrast} onChange={prefs.setContrast} />
+        </div>
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+          {(['standard', 'contrast'] as const).map((theme) => (
+            <div key={theme} data-theme={theme === 'contrast' ? 'contrast' : undefined} className="flex flex-col gap-3 rounded-lg border bg-page p-4 text-primary">
+              <p className="text-sm font-semibold">{theme === 'contrast' ? 'High contrast' : 'Standard'}</p>
+              <div className="flex flex-wrap gap-2">
+                <Button variant="primary">Primary</Button>
+                <Button>Secondary</Button>
+                <Button variant="destructive">Destructive</Button>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <StatusBadge kind="done" />
+                <StatusBadge kind="waitingOnCollege" />
+                <StatusBadge kind="overdue" />
+                <StatusBadge kind="escalated" level={2} />
+              </div>
+              <p className="text-base">
+                AICTE Demo Website · <span lang="hi">एआईसीटीई डेमो वेबसाइट — अनुमोदन कार्यप्रवाह और अनुपालन निगरानी</span> · <a href="#top" className="text-accent underline">A link</a>
+              </p>
+              <div className="flex h-8 overflow-hidden rounded">
+                <span className="flex-1 bg-gov-ink" title="gov-ink" />
+                <span className="flex-1 bg-gov-nav" title="gov-nav" />
+                <span className="flex-1 bg-gov-saffron" title="gov-saffron (non-text only)" />
+                <span className="flex-1 bg-accent" title="accent" />
+                <span className="flex-1 bg-accent-soft" title="accent-soft" />
+              </div>
+            </div>
+          ))}
+        </div>
+      </Section>
 
       <Section title="Buttons">
         <div className="flex flex-wrap items-center gap-3">

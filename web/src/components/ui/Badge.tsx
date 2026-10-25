@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { Check, AlertTriangle, Clock, Circle, ArrowUpCircle, CircleDot } from 'lucide-react';
 import { cx } from '../../lib/format';
+import { useT } from '../../lib/prefs';
 
 export type Tone = 'neutral' | 'accent' | 'success' | 'warning' | 'danger';
 
@@ -44,8 +45,10 @@ const STATUS: Record<StatusKind, { tone: Tone; label: string; Icon: typeof Check
 
 /** Status is never colour alone: every badge has an icon and a text label. */
 export function StatusBadge({ kind, label, level }: { kind: StatusKind; label?: string; level?: number }) {
+  const t = useT();
   const s = STATUS[kind];
-  const text = label ?? (kind === 'escalated' && level ? `${s.label} · Level ${level}` : s.label);
+  const base = t.status[kind] ?? s.label;
+  const text = label ?? (kind === 'escalated' && level ? `${base} · Level ${level}` : base);
   return (
     <Badge tone={s.tone} icon={<s.Icon size={12} strokeWidth={2} aria-hidden />}>
       {text}

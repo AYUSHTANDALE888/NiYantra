@@ -9,6 +9,7 @@ import { Badge, Button, Card, DateInput, Dialog, Field, Input, PageHeader, Selec
 import { formatDate } from '../../lib/format';
 import { useTitle } from '../../lib/useTitle';
 import { useClock } from '../../components/Layout';
+import { useT } from '../../lib/prefs';
 import { AMENDMENT_KINDS, KIND_LABEL, STATUS_LABEL, STATUS_TONE, cycleLabel, type CycleRow } from './types';
 
 export function useCycles() {
@@ -21,7 +22,8 @@ export function useToday(): string {
 }
 
 export function RulesHomePage() {
-  useTitle('Rules Center');
+  const t = useT();
+  useTitle(t.rules.center);
   const me = useMe();
   const navigate = useNavigate();
   const cycles = useCycles();
@@ -33,24 +35,24 @@ export function RulesHomePage() {
   return (
     <div className="flex flex-col gap-6">
       <PageHeader
-        title="Rules Center"
-        description="Yearly rule packs: one base per approval cycle and dated amendments, each made by a rule editor and checked by a rule approver. Filed applications keep the rules they were filed under."
+        title={t.rules.center}
+        description={t.rules.intro}
         actions={
           editor ? (
             <div className="flex flex-wrap gap-2">
               <Button variant="primary" icon={<FilePlus2 size={18} aria-hidden />} onClick={() => setDraftOpen(true)}>
-                Draft an amendment
+                {t.rules.draft}
               </Button>
-              <Button onClick={() => setCycleOpen(true)}>New cycle</Button>
+              <Button onClick={() => setCycleOpen(true)}>{t.rules.newCycle}</Button>
               <Button icon={<Upload size={18} aria-hidden />} onClick={() => setImportOpen(true)}>
-                Import JSON
+                {t.rules.importJson}
               </Button>
             </div>
           ) : null
         }
       />
       <Table
-        caption="Approval cycles"
+        caption={t.rules.cycles}
         loading={cycles.isLoading}
         error={cycles.error ? (cycles.error as Error).message : null}
         onRetry={() => void cycles.refetch()}
@@ -60,15 +62,15 @@ export function RulesHomePage() {
         onRowClick={(c) => c.published && navigate(`/rules/versions/${c.published.id}`)}
         rowLabel={(c) => `Open the published rules of ${cycleLabel(c.code)}`}
         columns={[
-          { key: 'cycle', header: 'Cycle', render: (c) => <span className="font-medium">{cycleLabel(c.code)}</span> },
-          { key: 'pub', header: 'Published version', render: (c) => (c.published ? `v${c.published.version}` : '—') },
-          { key: 'eff', header: 'Effective from', render: (c) => (c.published ? formatDate(c.published.effectiveFrom) : '—') },
-          { key: 'pinned', header: 'Pinned open cases', align: 'right', render: (c) => c.pinnedOpenCases },
-          { key: 'draft', header: 'Draft in progress', render: (c) => (c.draftInProgress ? `v${c.draftInProgress.version} · ${STATUS_LABEL[c.draftInProgress.status].toLowerCase()}` : 'None') },
+          { key: 'cycle', header: t.rules.cycle, render: (c) => <span className="font-medium">{cycleLabel(c.code)}</span> },
+          { key: 'pub', header: t.rules.publishedVersion, render: (c) => (c.published ? `v${c.published.version}` : '—') },
+          { key: 'eff', header: t.rules.effectiveFrom, render: (c) => (c.published ? formatDate(c.published.effectiveFrom) : '—') },
+          { key: 'pinned', header: t.rules.pinnedOpen, align: 'right', render: (c) => c.pinnedOpenCases },
+          { key: 'draft', header: t.rules.draftInProgress, render: (c) => (c.draftInProgress ? `v${c.draftInProgress.version} · ${STATUS_LABEL[c.draftInProgress.status].toLowerCase()}` : 'None') },
         ]}
       />
       {(cycles.data?.cycles ?? []).map((c) => (
-        <Card key={c.id} title={`Versions of ${cycleLabel(c.code)}`}>
+        <Card key={c.id} title={t.rules.versionsOf(cycleLabel(c.code))}>
           <p className="mb-3 text-sm text-secondary">Base: {c.baseRef}</p>
           <Table
             caption={`Rule pack versions of ${cycleLabel(c.code)}`}
@@ -78,13 +80,13 @@ export function RulesHomePage() {
             onRowClick={(v) => navigate(`/rules/versions/${v.id}`)}
             rowLabel={(v) => `Open version ${v.version}`}
             columns={[
-              { key: 'v', header: 'Version', render: (v) => <span className="tnum font-medium">v{v.version}</span> },
-              { key: 'kind', header: 'Amendment', wrap: true, render: (v) => (v.kind ? `${KIND_LABEL[v.kind] ?? v.kind} · ${v.refNo}` : '—') },
-              { key: 'issued', header: 'Issued on', render: (v) => (v.issuedOn ? formatDate(v.issuedOn) : '—') },
-              { key: 'status', header: 'Status', render: (v) => <Badge tone={STATUS_TONE[v.status]}>{STATUS_LABEL[v.status]}{v.scheduledPublish ? ' · scheduled' : ''}</Badge> },
-              { key: 'maker', header: 'Maker', render: (v) => v.maker ?? '—' },
-              { key: 'checker', header: 'Checker', render: (v) => v.checker ?? '—' },
-              { key: 'pinned', header: 'Open cases', align: 'right', render: (v) => v.pinnedOpenCases },
+              { key: 'v', header: t.rules.version, render: (v) => <span className="tnum font-medium">v{v.version}</span> },
+              { key: 'kind', header: t.rules.amendment, wrap: true, render: (v) => (v.kind ? `${KIND_LABEL[v.kind] ?? v.kind} · ${v.refNo}` : '—') },
+              { key: 'issued', header: t.rules.issuedOn, render: (v) => (v.issuedOn ? formatDate(v.issuedOn) : '—') },
+              { key: 'status', header: t.track.status, render: (v) => <Badge tone={STATUS_TONE[v.status]}>{t.rules.status[v.status]}{v.scheduledPublish ? ' · scheduled' : ''}</Badge> },
+              { key: 'maker', header: t.rules.maker, render: (v) => v.maker ?? '—' },
+              { key: 'checker', header: t.rules.checker, render: (v) => v.checker ?? '—' },
+              { key: 'pinned', header: t.rules.openCases, align: 'right', render: (v) => v.pinnedOpenCases },
             ]}
           />
         </Card>

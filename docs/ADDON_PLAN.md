@@ -31,7 +31,7 @@ This maps `AICTE_RulePacks_UI_Addon_Prompt.md` onto the repository as it stands 
 
 ## 3. Differences from the v3 spec and from this prompt's assumptions
 
-- **Product name.** The prompt calls the prototype "ApprovalSetu"; the v3 build used "AICTE Approvals" as its working title. Part B renames the interface to ApprovalSetu / अनुमोदन सेतु with the "Not an official AICTE system" label, and drops "AICTE" from the product name.
+- **Product name.** The prompt calls the prototype "AICTE Demo Website"; the v3 build used "AICTE Approvals" as its working title. Part B renames the interface to AICTE Demo Website / एआईसीटीई डेमो वेबसाइट with the "Not an official AICTE system" label, and drops "AICTE" from the product name.
 - **Programmes.** v3 applications carry courses but no programme. Purview, schedule scoping and norms by level need one, so the apply form gains a programme field (`formData.programme`, a code from the pack's `programmes`), and institutions gain `kind` and `isTechnical` facts.
 - **Steps.** The prompt's commits are A1–A6 then B1–B4, while its sections run A1–A12. The work is grouped into six A commits as listed in the task list (A1 schema and expressions; A2 data model and service; A3 consumers and seed; A4 state machine, diff, rebase and API; A5 impact and screens; A6 tests, demo step 11 and docs) and four B commits.
 - **Python reads.** The Python service also read `shared/rules.json` and `shared/formcheck-rules.json` at runtime; both reads go (rules arrive in the request; a built-in copy is the fallback).
@@ -47,4 +47,4 @@ This maps `AICTE_RulePacks_UI_Addon_Prompt.md` onto the repository as it stands 
 | A4 API, diff, apply scope, rebase, import/export, public endpoints | `addon A4` | done |
 | A5 Rules Center, impact, notices | `addon A5` | done |
 | A6 A11 tests, demo step 11, README sections | `addon A6` | done |
-| B1–B4 interface | — | next |
+| B1–B4 interface | `addon B1-B4` | done |

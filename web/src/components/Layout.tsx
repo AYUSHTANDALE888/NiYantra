@@ -1,16 +1,14 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
-import { NavLink, Outlet, useNavigate } from 'react-router-dom';
+import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   Bell,
-  Building2,
   CalendarDays,
   ClipboardCheck,
   FilePlus2,
   Gavel,
   Inbox,
   LayoutDashboard,
-  LogOut,
   Palette,
   Settings,
   ShieldCheck,
@@ -24,8 +22,10 @@ import {
 import { api } from '../api/client';
 import type { ClockInfo, Me, NotificationItem } from '../api/types';
 import { useAuth, useMe } from '../auth/AuthContext';
-import { en } from '../strings/en';
-import { cx, formatDate, formatDateTime, roleLabel } from '../lib/format';
+import type { Strings } from '../strings/en';
+import { useT } from '../lib/prefs';
+import { CycleChip, FooterBar, Monogram, NameBlock, UtilityBar, UserMenu } from './shell/Shell';
+import { cx, formatDate, formatDateTime } from '../lib/format';
 import { Button, Dialog } from './ui';
 
 interface NavItem {
@@ -37,7 +37,7 @@ interface NavItem {
 
 const I = (C: typeof Bell) => <C size={20} strokeWidth={1.75} aria-hidden />;
 
-export function navFor(user: Me): NavItem[] {
+export function navFor(user: Me, en: Strings): NavItem[] {
   switch (user.role) {
     case 'COLLEGE':
       return [
@@ -94,6 +94,7 @@ export function useClock() {
 }
 
 function NotificationBell() {
+  const en = useT();
   const [open, setOpen] = useState(false);
   const qc = useQueryClient();
   const navigate = useNavigate();
@@ -123,7 +124,7 @@ function NotificationBell() {
       >
         <Bell size={20} strokeWidth={1.75} aria-hidden />
         {unread > 0 ? (
-          <span className="tnum absolute right-0.5 top-0.5 min-w-target rounded bg-danger px-1 text-center text-xs font-medium text-white" aria-hidden>
+          <span className="tnum absolute right-0.5 top-0.5 min-w-target rounded bg-danger px-1 text-center text-xs font-medium text-on-solid" aria-hidden>
             {unread > 99 ? '99+' : unread}
           </span>
         ) : null}
@@ -175,6 +176,7 @@ function NotificationBell() {
 }
 
 function SessionWarning() {
+  const en = useT();
   const { expiresAt, refresh, logout } = useAuth();
   const [show, setShow] = useState(false);
   const [pending, setPending] = useState(false);
@@ -221,76 +223,68 @@ function SessionWarning() {
 }
 
 export function Layout() {
+  const en = useT();
   const user = useMe();
-  const { logout } = useAuth();
   const clock = useClock();
-  const navigate = useNavigate();
-  const items = navFor(user);
+  const items = navFor(user, en);
   return (
-    <div className="min-h-screen bg-page">
-      <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded focus:bg-surface focus:px-4 focus:py-2 focus:text-accent">
-        {en.app.skip}
-      </a>
-      <header className="fixed inset-x-0 top-0 z-30 flex h-topbar items-center justify-between gap-4 border-b bg-surface px-4">
-        <div className="flex min-w-0 items-center gap-3">
-          <Building2 size={20} strokeWidth={1.75} className="shrink-0 text-accent" aria-hidden />
-          <span className="truncate text-lg font-semibold">{en.app.name}</span>
-        </div>
-        <div className="flex items-center gap-2 sm:gap-4">
-          {clock.data ? (
-            <span className={cx('tnum hidden whitespace-nowrap text-sm sm:inline', clock.data.simulated ? 'rounded bg-warning-soft px-2 py-0.5 font-medium text-warning' : 'text-secondary')}>
-              {clock.data.simulated ? `${en.app.simulatedDate}: ` : `${en.app.today}: `}
-              {formatDate(clock.data.today)}
+    <div className="flex min-h-screen flex-col bg-page">
+      <header className="sticky top-0 z-30">
+        <UtilityBar />
+        <div className="border-b bg-surface">
+        <div className="flex h-16 items-center justify-between gap-4 px-4">
+          <Link to="/" className="flex min-w-0 items-center gap-3 no-underline">
+            <Monogram size={36} />
+            <span className="hidden sm:block">
+              <NameBlock compact />
             </span>
-          ) : null}
-          <NotificationBell />
-          <div className="hidden text-right md:block">
-            <p className="text-base font-medium leading-tight">{user.name}</p>
-            <p className="text-xs text-secondary">
-              {roleLabel(user.role)}
-              {user.regionCode ? `, ${user.regionCode === 'SOUTH' ? 'South' : 'West'}` : ''}
-            </p>
+          </Link>
+          <div className="flex items-center gap-2 sm:gap-3">
+            <CycleChip />
+            {clock.data ? (
+              <span className={cx('tnum hidden whitespace-nowrap text-sm md:inline', clock.data.simulated ? 'rounded bg-warning-soft px-2 py-0.5 font-medium text-warning' : 'text-secondary')}>
+                {clock.data.simulated ? `${en.app.simulatedDate}: ` : `${en.app.today}: `}
+                {formatDate(clock.data.today)}
+              </span>
+            ) : null}
+            <NotificationBell />
+            <UserMenu />
           </div>
-          <Button
-            size="sm"
-            variant="tertiary"
-            icon={<LogOut size={16} strokeWidth={1.75} aria-hidden />}
-            onClick={() => {
-              logout();
-              navigate('/login');
-            }}
-          >
-            {en.app.signOut}
-          </Button>
+        </div>
         </div>
       </header>
-      <nav aria-label="Main" className="fixed bottom-0 left-0 top-topbar z-20 w-12 border-r bg-surface pt-4 lg:w-sidebar">
-        <ul className="flex flex-col gap-1 px-1 lg:px-3">
-          {items.map((it) => (
-            <li key={it.to}>
-              <NavLink
-                to={it.to}
-                end={it.end}
-                title={it.label}
-                className={({ isActive }) =>
-                  cx(
-                    'hit flex h-control items-center gap-3 rounded px-2 text-base transition-colors duration-150 ease-out lg:px-3',
-                    isActive ? 'bg-accent-soft font-semibold text-accent' : 'font-medium text-secondary hover:bg-subtle hover:text-primary',
-                  )
-                }
-              >
-                {it.icon}
-                <span className="sr-only lg:not-sr-only">{it.label}</span>
-              </NavLink>
-            </li>
-          ))}
-        </ul>
-      </nav>
-      <main id="main" tabIndex={-1} className="pl-12 pt-topbar lg:pl-sidebar">
-        <div className="max-w-content p-4 sm:p-6">
-          <Outlet />
-        </div>
-      </main>
+      <div className="flex flex-1">
+        <nav aria-label={en.gov.mainNav} className="w-12 shrink-0 border-r bg-surface pt-4 lg:w-sidebar">
+          <ul className="sticky top-28 flex flex-col gap-1">
+            {items.map((it) => (
+              <li key={it.to}>
+                <NavLink
+                  to={it.to}
+                  end={it.end}
+                  title={it.label}
+                  className={({ isActive }) =>
+                    cx(
+                      'hit flex h-control items-center gap-3 border-l-[3px] px-2 text-base transition-colors duration-150 ease-out lg:px-4',
+                      isActive ? 'border-accent bg-accent-soft font-semibold text-accent' : 'border-transparent font-medium text-secondary hover:bg-subtle hover:text-primary',
+                    )
+                  }
+                >
+                  {it.icon}
+                  <span className="sr-only lg:not-sr-only">{it.label}</span>
+                </NavLink>
+              </li>
+            ))}
+          </ul>
+        </nav>
+        <main id="main" tabIndex={-1} className="min-w-0 flex-1">
+          <div className="max-w-content p-4 sm:p-6">
+            <Outlet />
+          </div>
+        </main>
+      </div>
+      <footer>
+        <FooterBar fluid />
+      </footer>
       <SessionWarning />
     </div>
   );

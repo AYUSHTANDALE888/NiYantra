@@ -20,6 +20,7 @@ import { reportsRouter } from './routes/reports.js';
 import { institutionsRouter } from './routes/institutions.js';
 import { complianceRouter } from './routes/compliance.js';
 import { publicRulesRouter, rulesRouter } from './routes/rules.js';
+import { publicRouter } from './routes/public.js';
 
 export function createApp() {
   const app = express();
@@ -38,6 +39,7 @@ export function createApp() {
   api.use('/auth', authRouter());
   // Public, no login: what changed this cycle and the current windows (portal home page).
   api.use('/rules/public', publicRulesRouter());
+  api.use('/public', publicRouter());
   api.use(requireAuth);
   api.use('/demo', demoRouter());
   api.use('/admin', adminRouter());
