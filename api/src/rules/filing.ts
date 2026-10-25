@@ -13,6 +13,12 @@ export interface FilingContext {
   hasPriorApproval: boolean;
 }
 
+/** Demo setting (only honoured when DEMO_MODE=true): file outside the windows. */
+export async function ignoreScheduleSetting(db: Db = prisma): Promise<boolean> {
+  if (process.env.DEMO_MODE !== 'true') return false;
+  return (await db.simClock.findUnique({ where: { id: 1 } }))?.ignoreSchedule ?? false;
+}
+
 export async function filingContext(
   institutionId: string,
   type: AppType | null,
@@ -28,7 +34,8 @@ export async function filingContext(
     application: type ? { type } : {},
     programmeCode: typeof formData.programme === 'string' ? formData.programme : null,
   };
-  const filing = await forNewFiling(now(), facts, opts, db);
+  const ignoreSchedule = opts.ignoreSchedule ?? (await ignoreScheduleSetting(db));
+  const filing = await forNewFiling(now(), facts, { ignoreSchedule }, db);
   const rules = filing.ok ? filing.rules : await newestRules(db);
   return { facts, filing, rules, hasPriorApproval: past > 0 };
 }

@@ -497,8 +497,10 @@ model Holiday {
 }
 
 model SimClock {
-  id         Int @id @default(1)
-  offsetDays Int @default(0)
+  id             Int     @id @default(1)
+  offsetDays     Int     @default(0)
+  /// Demo only (DEMO_MODE=true): file outside the application windows. Set by the admin; audited.
+  ignoreSchedule Boolean @default(false)
 }
 
 model SchedulerHeartbeat {

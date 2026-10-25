@@ -12,6 +12,8 @@ import { contentHash } from './hash.js';
 import { validatePack, type PackContent } from './schema.js';
 import type { ExprError } from './expr.js';
 import { onPublished, syncHolidays } from './service.js';
+import { checkApplyScope, type ApplyScope } from './diff.js';
+import { diffForPublish, rebaseAfterPublish } from './rebase.js';
 
 export interface RulesActor {
   id: string;
@@ -185,11 +187,12 @@ export async function deleteDraft(actor: RulesActor, id: string) {
 
 // ---------------------------------------------------------------- review
 
-/** Extra checks a version must pass before review (apply scope, add-on A4). Registered by diff.ts. */
-type ReviewCheck = (tx: Tx, v: RulePackVersion, content: PackContent) => Promise<ExprError[]>;
-const reviewChecks: ReviewCheck[] = [];
-export function registerReviewCheck(c: ReviewCheck): void {
-  reviewChecks.push(c);
+/** Apply-scope check against the version it would replace (the cycle's published version, else its parent). */
+async function scopeErrors(tx: Tx, v: RulePackVersion & { amendment: { applyScope: unknown } | null }): Promise<ExprError[]> {
+  const base = (await tx.rulePackVersion.findFirst({ where: { cycleId: v.cycleId, status: 'PUBLISHED' } })) ?? (v.parentVersionId ? await tx.rulePackVersion.findUnique({ where: { id: v.parentVersionId } }) : null);
+  if (!base) return [];
+  const diff = await diffForPublish(tx, base, v);
+  return checkApplyScope(diff, (v.amendment?.applyScope ?? {}) as ApplyScope);
 }
 
 export async function submitVersion(actor: RulesActor, id: string) {
@@ -199,7 +202,7 @@ export async function submitVersion(actor: RulesActor, id: string) {
     if (v.status !== 'DRAFT') throw conflict(`Version ${v.version} is not a draft.`);
     const check = validatePack(v.content);
     if (!check.ok) throw badRequest('Fix the errors before you submit for review.', { errors: check.errors });
-    const extra = (await Promise.all(reviewChecks.map((c) => c(tx, v, check.pack)))).flat();
+    const extra = await scopeErrors(tx, v);
     if (extra.length) throw badRequest(extra[0]!.message, { errors: extra });
     const updated = await tx.rulePackVersion.update({ where: { id }, data: { status: 'IN_REVIEW', submittedById: actor.id, submittedAt: now(), rejectedRemarks: null } });
     await audit(tx, actor, 'RULES_SUBMITTED', v, { contentHash: v.contentHash });
@@ -243,18 +246,11 @@ export async function rejectVersion(actor: RulesActor, id: string, remarks: stri
 
 // ---------------------------------------------------------------- publish
 
-/** Work done inside the publish transaction after the status change (live rebase, add-on A4). */
-type PublishHook = (tx: Tx, actor: RulesActor, published: RulePackVersion, previous: RulePackVersion | null) => Promise<Record<string, unknown>>;
-const publishHooks: PublishHook[] = [];
-export function registerPublishHook(h: PublishHook): void {
-  publishHooks.push(h);
-}
-
 /**
  * Publish an APPROVED version: the cycle's current version becomes SUPERSEDED. Refused while effectiveFrom is in
  * the future, unless `scheduled`; then it is marked for the engine to publish on that date.
  */
-export async function publishVersion(actor: RulesActor, id: string, opts: { scheduled?: boolean; action?: 'RULES_PUBLISHED' | 'RULES_ROLLED_BACK'; meta?: Record<string, unknown> } = {}) {
+export async function publishVersion(actor: RulesActor, id: string, opts: { scheduled?: boolean } = {}) {
   if (actor.role !== 'RULE_APPROVER' && actor.role !== 'SYSTEM') throw forbidden('Publishing needs the rule approver role.');
   const result = await prisma.$transaction(async (tx) => {
     const v = await load(tx, id);
@@ -264,20 +260,22 @@ export async function publishVersion(actor: RulesActor, id: string, opts: { sche
       if (!opts.scheduled) throw conflict(`Version ${v.version} takes effect on ${isoDate(v.effectiveFrom)}. Schedule the publication instead.`);
       const updated = await tx.rulePackVersion.update({ where: { id }, data: { scheduledPublish: true } });
       await audit(tx, actor, 'RULES_PUBLISH_SCHEDULED', v, { effectiveFrom: isoDate(v.effectiveFrom) });
-      return { version: updated, scheduled: true, meta: {} };
+      return { version: updated, previous: null, scheduled: true };
     }
     const previous = await tx.rulePackVersion.findFirst({ where: { cycleId: v.cycleId, status: 'PUBLISHED' } });
     if (previous) await tx.rulePackVersion.update({ where: { id: previous.id }, data: { status: 'SUPERSEDED' } });
     const updated = await tx.rulePackVersion.update({ where: { id }, data: { status: 'PUBLISHED', publishedById: actor.id, publishedAt: now(), scheduledPublish: false } });
     const current = await tx.rulePackVersion.findMany({ where: { status: 'PUBLISHED' }, select: { content: true } });
     await syncHolidays(tx, current.map((c) => c.content as unknown as PackContent));
-    const meta: Record<string, unknown> = {};
-    for (const h of publishHooks) Object.assign(meta, await h(tx, actor, updated, previous));
-    await audit(tx, actor, opts.action ?? 'RULES_PUBLISHED', v, { previousVersionId: previous?.id ?? null, contentHash: v.contentHash, ...opts.meta, ...meta });
-    return { version: updated, scheduled: false, meta };
-  }, { ...TX_OPTIONS, timeout: 120_000 });
-  if (!result.scheduled) await onPublished();
-  return result;
+    const rollbackOf = (v.content as unknown as PackContent).meta.rollbackOfVersionId ?? null;
+    await audit(tx, actor, rollbackOf ? 'RULES_ROLLED_BACK' : 'RULES_PUBLISHED', v, { previousVersionId: previous?.id ?? null, contentHash: v.contentHash, ...(rollbackOf ? { rollbackOfVersionId: rollbackOf } : {}) });
+    return { version: updated, previous, scheduled: false };
+  }, TX_OPTIONS);
+  if (result.scheduled) return { version: result.version, scheduled: true, rebased: 0, movedItems: 0 };
+  await onPublished();
+  // Live amendments move open cases forward, one transaction per case.
+  const r = await rebaseAfterPublish(actor, result.version, result.previous ?? null);
+  return { version: result.version, scheduled: false, ...r };
 }
 
 /** Engine: publish APPROVED versions marked as scheduled once their effectiveFrom has arrived. */
@@ -285,4 +283,83 @@ export async function publishScheduled(): Promise<number> {
   const due = await prisma.rulePackVersion.findMany({ where: { status: 'APPROVED', scheduledPublish: true, effectiveFrom: { lte: today() } }, select: { id: true, publishedById: true, approvedById: true } });
   for (const d of due) await publishVersion({ id: d.approvedById ?? 'system', role: 'SYSTEM' }, d.id);
   return due.length;
+}
+
+// ---------------------------------------------------------------- rollback, export, import
+
+/** A new DRAFT whose content equals an older version of the same cycle. History is never edited. */
+export async function draftRollback(actor: RulesActor, olderId: string, input: { effectiveFrom: string; summary?: string }) {
+  need(actor, 'RULE_EDITOR', 'Drafting a rollback');
+  const older = await prisma.rulePackVersion.findUnique({ where: { id: olderId }, include: { cycle: true } });
+  if (!older) throw notFound('That version does not exist.');
+  if (!['PUBLISHED', 'SUPERSEDED'].includes(older.status)) throw badRequest('Roll back only to a version that was published.');
+  const current = await prisma.rulePackVersion.findFirst({ where: { cycleId: older.cycleId, status: 'PUBLISHED' } });
+  if (!current) throw conflict('The cycle has no published version.');
+  if (current.id === older.id) throw badRequest('That version is already the published one.');
+  const content = older.content as unknown as PackContent;
+  return createDraft(actor, {
+    parentVersionId: current.id,
+    effectiveFrom: input.effectiveFrom,
+    content: { ...content, meta: { ...content.meta, rollbackOfVersionId: older.id } },
+    amendment: {
+      kind: 'CORRIGENDUM',
+      refNo: `Rollback to ${older.cycle.code} v${older.version}`,
+      issuedOn: isoDate(today()),
+      title: `Rollback to ${older.cycle.code} v${older.version}`,
+      summary: input.summary ?? `The rules return to those of version ${older.version}.`,
+    },
+  });
+}
+
+export const EXPORT_SCHEMA_VERSION = 1;
+
+export async function exportVersion(actor: RulesActor, id: string) {
+  const v = await prisma.rulePackVersion.findUnique({ where: { id }, include: { amendment: true, cycle: true } });
+  if (!v) throw notFound('That rule pack version does not exist.');
+  await prisma.$transaction((tx) => audit(tx, actor, 'RULES_EXPORTED', v, { contentHash: v.contentHash }));
+  const a = v.amendment;
+  return {
+    schemaVersion: EXPORT_SCHEMA_VERSION,
+    cycle: v.cycle.code,
+    version: v.version,
+    status: v.status,
+    effectiveFrom: isoDate(v.effectiveFrom),
+    content: v.content,
+    amendment: a ? { kind: a.kind, refNo: a.refNo, issuedOn: isoDate(a.issuedOn), title: a.title, summary: a.summary, applyScope: a.applyScope } : null,
+    contentHash: v.contentHash,
+  };
+}
+
+/**
+ * Import an exported JSON file as a new DRAFT of its cycle (parent: the cycle's published version). The content is
+ * validated against the schema, nothing in it is executed, and the hash is recomputed (a mismatch is reported).
+ */
+export async function importVersion(actor: RulesActor, file: unknown) {
+  need(actor, 'RULE_EDITOR', 'Importing rules');
+  const f = file as { schemaVersion?: unknown; cycle?: unknown; content?: unknown; amendment?: Partial<AmendmentInput> | null; effectiveFrom?: unknown; contentHash?: unknown };
+  if (!f || typeof f !== 'object' || f.schemaVersion !== EXPORT_SCHEMA_VERSION) throw badRequest(`Import a file exported by this system (schemaVersion ${EXPORT_SCHEMA_VERSION}).`);
+  const check = validatePack(f.content);
+  if (!check.ok) throw badRequest('The imported rules are not valid.', { errors: check.errors });
+  const cycleCode = String(f.cycle ?? check.pack.meta.cycle);
+  const cycle = await prisma.approvalCycle.findUnique({ where: { code: cycleCode } });
+  if (!cycle) throw badRequest(`Cycle ${cycleCode} does not exist here. Create it first.`);
+  const parent = await prisma.rulePackVersion.findFirst({ where: { cycleId: cycle.id, status: 'PUBLISHED' } });
+  if (!parent) throw badRequest(`Cycle ${cycleCode} has no published version to build on.`);
+  const recomputed = contentHash(check.pack);
+  const a = f.amendment ?? {};
+  const v = await createDraft(actor, {
+    parentVersionId: parent.id,
+    effectiveFrom: typeof f.effectiveFrom === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(f.effectiveFrom) ? f.effectiveFrom : isoDate(today()),
+    content: check.pack,
+    action: 'RULES_IMPORTED',
+    amendment: {
+      kind: (a.kind ?? 'CIRCULAR') as AmendmentKind,
+      refNo: String(a.refNo ?? 'Imported'),
+      issuedOn: typeof a.issuedOn === 'string' ? a.issuedOn : isoDate(today()),
+      title: String(a.title ?? 'Imported rules'),
+      summary: String(a.summary ?? 'Imported from a JSON file.'),
+      applyScope: (a.applyScope ?? {}) as AmendmentInput['applyScope'],
+    },
+  });
+  return { version: v, hashMatched: f.contentHash === recomputed };
 }

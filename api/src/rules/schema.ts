@@ -27,6 +27,8 @@ const metaSchema = z.object({
   title: z.string().min(1).max(200),
   baseRef: z.string().min(1).max(200),
   notes: z.string().max(4000).optional(),
+  /** Set on a rollback: the older version whose content this version restores. */
+  rollbackOfVersionId: z.string().optional(),
 });
 
 const programmeSchema = z.object({
