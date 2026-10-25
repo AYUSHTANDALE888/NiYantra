@@ -1,4 +1,4 @@
-# AICTE Approval & Compliance Platform (SIH 2026 prototype)
+# AICTE Demo Website / एआईसीटीई डेमो वेबसाइट: approval workflow and compliance monitoring (SIH 2026 prototype)
 
 Working prototype for the Smart India Hackathon 2026 AICTE problem statement *Integrated AICTE Approval Workflow Automation, Compliance Monitoring and Alert Management System*. This build covers phases 0 to 4 of the final architecture (v3).
 
@@ -143,6 +143,7 @@ This script (steps 1–11) is automated with Playwright during development and p
 - [x] Phase 3: Action Center and dashboards (flags with reasons and five-key order, college "What we need from you", team roll-up with drill-down, workforce with reassignment and portfolio moves, no-eligible-officer queue, seeded history)
 - [x] Phase 4: post-approval and form check (decide with conditions, undertakings and expiry items, evidence and renewal verification, automatic close, form check service with rules and an Isolation Forest, college and officer panels)
 - [x] Add-on: yearly rule packs (cycles, versions and amendments; maker-checker Rules Center; pinning; live rebase for relaxing changes; impact preview; public notices)
+- [x] Add-on: GIGW-style interface (AICTE Demo Website shell, public pages, high contrast, text sizes, Hindi, self-hosted fonts, screenshots)
 
 ## Modules
 
@@ -200,6 +201,36 @@ Every value in the seeded rule packs is a placeholder until it is checked agains
 
 Versions 2 and 3 of 2026–27 are labelled "modelled on" the December 2025 addendum and the February 2026 revised public notice as publicly reported. They are not copies of those documents.
 
+## Interface
+
+The interface follows the visual language of Indian government portals built to GIGW 3.0. It does not use their identity.
+
+**Layout.** Public pages (home and sign in, Approval process, What changed, Track application, Help, Contact and the policy pages) have:
+- a slim dark utility bar;
+- a white header with the bilingual name block ("एआईसीटीई डेमो वेबसाइट / AICTE Demo Website") and our own "AD" monogram;
+- a navy navigation bar with a saffron underline on the active item;
+- a static "What's new" strip with the three latest rule notices;
+- a four-column dark footer with a "Last updated" line and the rules version in force.
+
+After sign-in the same utility bar sits above a compact header; the left sidebar and the work screens are unchanged. Every page carries the label "Prototype for Smart India Hackathon 2026 · Not an official AICTE system": in the utility bar, on the sign-in card and in the footer.
+
+**GIGW features.**
+- **Skip link and screen readers:** "Skip to main content" is the first focusable element, and a Screen reader access page lists NVDA, JAWS, VoiceOver, TalkBack and Orca.
+- **Text size:** A- / A / A+ (and A++ on public pages) set the root size to 87.5 / 100 / 112.5 / 125%; the layout is in rem, so everything scales.
+- **High contrast:** the same light layout with black text, darker colours, underlined links and black borders on form controls.
+- **Language:** English | हिंदी. Hindi covers the shell, navigation, public pages, notices, sign in, Rules Center labels, status badges and common buttons; case data stays as entered, and any missing key falls back to English.
+- **Pages GIGW expects:** an accessibility statement, a sitemap generated from the router, and terms, privacy, hyperlinking and copyright policies, each marked "Prototype text".
+
+The text size, contrast and language choices are remembered in the browser.
+
+**Tokens.** Colours are CSS variables (`gov-ink` #0B2545, `gov-nav` #13315C, `gov-saffron` #F59E0B for non-text marks only, `accent` #1B4F9C). Corners are squarer (4px controls, 6px cards), and there are no shadows except dialogs and menus. Fonts are Noto Sans and Noto Sans Devanagari, self-hosted with `@fontsource` and bundled by Vite: no font CDN and no external requests.
+
+**Accessibility checks.** axe reports no serious or critical issue on the 13 public pages (English, Hindi, high contrast and 125% text, at 1440 and 390 px wide, with no horizontal scrolling), nor on the officer, manager, college, Rules Center and admin screens in English, Hindi and high contrast.
+
+**Screenshots.** `npm run screens` captures home, notices, Action Center, case view, team dashboard, Rules Center versions, diff, impact and review at 1440×900 and 390×844, in English and Hindi, into `docs/screens/`. It runs against the compose stack by default (`BASE=http://localhost:5173` for the dev server). It may leave one draft in review for the impact and review shots; `npm run demo:reset` removes it.
+
+**No official marks.** There is no AICTE logo, no State Emblem of India, no national flag as decoration, no ministry or event logos, no "Government of India" identity and no text copied from aicte.gov.in. The name, monogram and all text are our own.
+
 ## Next phases (not built)
 
-Phase 5: rebalancing suggestions and approval, full committee coverage and independence rules, delegation grants, conflict-of-interest editor, case lock. Phase 6 (the rules, policy and letter-template editors with versioning, impact preview and approval are built by the rule pack add-on): model editor, case summary PDF, report export, model shadow mode and feedback export. Phase 7: OCR document cross-check and units selector. Phase 8: PgBouncer, read replica, partitions, row-level security, TOTP, SSO, encryption at rest, virus scan, email and SMS (a `NotificationChannel` interface exists with only the in-app implementation), Hindi labels, integration adapter.
+Phase 5: rebalancing suggestions and approval, full committee coverage and independence rules, delegation grants, conflict-of-interest editor, case lock. Phase 6 (the rules, policy and letter-template editors with versioning, impact preview and approval are built by the rule pack add-on): model editor, case summary PDF, report export, model shadow mode and feedback export. Phase 7: OCR document cross-check and units selector. Phase 8: PgBouncer, read replica, partitions, row-level security, TOTP, SSO, encryption at rest, virus scan, email and SMS (a `NotificationChannel` interface exists with only the in-app implementation), Hindi for the remaining work screens, integration adapter.

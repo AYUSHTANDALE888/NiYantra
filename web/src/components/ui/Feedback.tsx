@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 import { AlertTriangle, ChevronRight, Check, AlertCircle, Info } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { cx, formatDate } from '../../lib/format';
-import { en } from '../../strings/en';
+import { useT } from '../../lib/prefs';
 import { Button } from './Button';
 import { Badge } from './Badge';
 
@@ -26,6 +26,7 @@ export function EmptyState({ message, action }: { message: string; action?: Reac
 }
 
 export function ErrorState({ message, onRetry }: { message?: string; onRetry?: () => void }) {
+  const en = useT();
   return (
     <div role="alert" className="flex flex-col items-start gap-3 px-4 py-6">
       <p className="flex items-center gap-2 text-base font-medium text-danger">
@@ -106,15 +107,15 @@ export function Tracker({ steps, compact }: { steps: TrackerStep[]; compact?: bo
       {steps.map((s, i) => {
         const marker =
           s.state === 'done' ? (
-            <span className="flex h-4 w-4 items-center justify-center rounded-full bg-success text-white">
+            <span className="flex h-4 w-4 items-center justify-center rounded-full bg-success text-on-solid">
               <Check size={12} strokeWidth={2.5} aria-hidden />
             </span>
           ) : s.state === 'returned' ? (
-            <span className="flex h-4 w-4 items-center justify-center rounded-full bg-warning text-white">
+            <span className="flex h-4 w-4 items-center justify-center rounded-full bg-warning text-on-solid">
               <AlertTriangle size={12} strokeWidth={2.5} aria-hidden />
             </span>
           ) : s.state === 'overdue' ? (
-            <span className="flex h-4 w-4 items-center justify-center rounded-full bg-danger text-white">
+            <span className="flex h-4 w-4 items-center justify-center rounded-full bg-danger text-on-solid">
               <AlertTriangle size={12} strokeWidth={2.5} aria-hidden />
             </span>
           ) : s.state === 'current' ? (

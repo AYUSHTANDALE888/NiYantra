@@ -9,6 +9,7 @@ import { Badge, Button, Card, ConfirmDialog, DateInput, Dialog, ErrorState, Fiel
 import { cx, formatDate, formatDateTime } from '../../lib/format';
 import { useTitle } from '../../lib/useTitle';
 import { useMe } from '../../auth/AuthContext';
+import { useT } from '../../lib/prefs';
 import type { VarList } from './ConditionBuilder';
 import { SectionEditor } from './sections';
 import { useToday } from './RulesHome';
@@ -33,6 +34,7 @@ function VersionHeader({ v, current }: { v: VersionDetail; current: 'edit' | 'di
   const navigate = useNavigate();
   const [confirm, setConfirm] = useState<null | 'submit' | 'publish' | 'schedule'>(null);
   const today = useToday();
+  const t = useT();
   const me = useMe();
   const [rollback, setRollback] = useState(false);
   const canRollback = me.role === 'RULE_EDITOR' && v.status === 'SUPERSEDED' && !!v.cyclePublished;
@@ -67,20 +69,20 @@ function VersionHeader({ v, current }: { v: VersionDetail; current: 'edit' | 'di
     </Button>
   ) : null;
   const tabs = [
-    { id: 'edit', label: 'Rules', to: `/rules/versions/${v.id}` },
-    { id: 'diff', label: 'Changes', to: `/rules/versions/${v.id}/diff` },
-    { id: 'impact', label: 'Impact', to: `/rules/versions/${v.id}/impact` },
-    ...(p.canReview || v.permissions.reviewBlockedReason ? [{ id: 'review', label: 'Review', to: `/rules/versions/${v.id}/review` }] : []),
+    { id: 'edit', label: t.rules.rulesTab, to: `/rules/versions/${v.id}` },
+    { id: 'diff', label: t.rules.changes, to: `/rules/versions/${v.id}/diff` },
+    { id: 'impact', label: t.rules.impact, to: `/rules/versions/${v.id}/impact` },
+    ...(p.canReview || v.permissions.reviewBlockedReason ? [{ id: 'review', label: t.rules.review, to: `/rules/versions/${v.id}/review` }] : []),
   ];
   return (
     <div className="flex flex-col gap-3">
       <PageHeader
-        breadcrumb={[{ label: 'Rules Center', to: '/rules' }, { label: `${cycleLabel(v.cycle.code)} v${v.version}` }]}
+        breadcrumb={[{ label: t.rules.center, to: '/rules' }, { label: `${cycleLabel(v.cycle.code)} v${v.version}` }]}
         title={
           <span className="flex flex-wrap items-center gap-3">
             {cycleLabel(v.cycle.code)} · version {v.version}
             <Badge tone={STATUS_TONE[v.status]}>
-              {STATUS_LABEL[v.status]}
+              {t.rules.status[v.status]}
               {v.scheduledPublish ? ' · scheduled' : ''}
             </Badge>
           </span>
@@ -101,7 +103,7 @@ function VersionHeader({ v, current }: { v: VersionDetail; current: 'edit' | 'di
             {primary}
             {canRollback ? <Button onClick={() => setRollback(true)}>Roll back to this version</Button> : null}
             <Button icon={<Download size={18} aria-hidden />} onClick={() => void downloadBlob(`/rules/versions/${v.id}/export`).then((b) => { const u = URL.createObjectURL(b); const a = document.createElement('a'); a.href = u; a.download = `rules-${v.cycle.code}-v${v.version}.json`; a.click(); URL.revokeObjectURL(u); })}>
-              Export
+              {t.rules.export}
             </Button>
           </div>
         }
@@ -205,6 +207,7 @@ export function VersionPage() {
 }
 
 function VersionEditor({ v }: { v: VersionDetail }) {
+  const t = useT();
   const qc = useQueryClient();
   const toast = useToast();
   const vars = useVars();
@@ -250,7 +253,7 @@ function VersionEditor({ v }: { v: VersionDetail }) {
                     }}
                     className={cx('hit flex w-full items-center justify-between gap-2 rounded px-3 py-2 text-left text-base', section === s.id ? 'bg-accent-soft font-semibold text-accent' : 'hover:bg-subtle')}
                   >
-                    <span>{s.label}</span>
+                    <span>{t.rules.sections[s.id] ?? s.label}</span>
                     <span className="flex gap-1">
                       {changed ? <Badge tone="accent">{`${changed} changed`}</Badge> : null}
                       {errs ? <Badge tone="danger">{`${errs} to fix`}</Badge> : null}

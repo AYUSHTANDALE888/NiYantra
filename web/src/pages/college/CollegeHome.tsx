@@ -17,7 +17,7 @@ export function CollegeHomePage() {
         title="My applications"
         description="Your institution's applications, where each one is, and what AICTE needs from you."
         actions={
-          <Link to="/college/apply" className="hit inline-flex h-control items-center gap-2 rounded border border-accent bg-accent px-4 text-base font-medium text-white hover:bg-accent-hover">
+          <Link to="/college/apply" className="hit inline-flex h-control items-center gap-2 rounded border border-accent bg-accent px-4 text-base font-medium text-on-solid hover:bg-accent-hover">
             <FilePlus2 size={16} strokeWidth={1.75} aria-hidden />
             Start a new application
           </Link>

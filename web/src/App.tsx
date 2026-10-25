@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import type { Role } from './api/types';
-import { homeFor, useAuth } from './auth/AuthContext';
+import { useAuth } from './auth/AuthContext';
 import { Layout } from './components/Layout';
 import { Skeleton } from './components/ui';
 import { LoginPage } from './pages/Login';
@@ -21,6 +21,38 @@ import { CompliancePage } from './pages/college/Compliance';
 import { RulesHomePage } from './pages/rules/RulesHome';
 import { DiffPage, ImpactPage, ReviewPage, VersionPage } from './pages/rules/VersionPage';
 import { NoticesInAppPage, NoticesPage } from './pages/public/Notices';
+import { PublicShell } from './components/shell/Shell';
+import { PUBLIC_PAGES } from './sitemap';
+import {
+  AccessibilityPage,
+  ContactPage,
+  CopyrightPage,
+  HelpPage,
+  HyperlinkingPage,
+  PrivacyPage,
+  ProcessPage,
+  ScreenReaderPage,
+  SitemapPage,
+  TermsPage,
+  TrackPage,
+} from './pages/public/PublicPages';
+
+/** Elements of the public pages, keyed by the paths in sitemap.ts. */
+const PUBLIC_ELEMENTS: Record<string, ReactNode> = {
+  '/': <LoginPage />,
+  '/process': <ProcessPage />,
+  '/notices': <NoticesPage />,
+  '/track': <TrackPage />,
+  '/help': <HelpPage />,
+  '/contact': <ContactPage />,
+  '/screen-reader': <ScreenReaderPage />,
+  '/accessibility': <AccessibilityPage />,
+  '/sitemap': <SitemapPage />,
+  '/terms': <TermsPage />,
+  '/privacy': <PrivacyPage />,
+  '/hyperlinking': <HyperlinkingPage />,
+  '/copyright': <CopyrightPage />,
+};
 
 const MANAGERS: Role[] = ['SENIOR', 'SUPER_SENIOR', 'HOD'];
 // Rules Center: editors and approvers work there; admin, HoD and Bureau read it.
@@ -42,22 +74,20 @@ function Protected() {
       </div>
     );
   }
-  if (!user) return <Navigate to="/login" replace />;
+  if (!user) return <Navigate to="/" replace />;
   return <Layout />;
-}
-
-function Home() {
-  const { user } = useAuth();
-  return <Navigate to={user ? homeFor(user) : '/login'} replace />;
 }
 
 export function App() {
   return (
     <Routes>
-      <Route path="/login" element={<LoginPage />} />
-      <Route path="/notices" element={<NoticesPage />} />
+      <Route element={<PublicShell />}>
+        <Route path="/login" element={<LoginPage />} />
+        {PUBLIC_PAGES.map((p) => (
+          <Route key={p.path} path={p.path} element={PUBLIC_ELEMENTS[p.path]} />
+        ))}
+      </Route>
       <Route element={<Protected />}>
-        <Route index element={<Home />} />
         <Route path="/college" element={<RequireRole roles={['COLLEGE']}><CollegeHomePage /></RequireRole>} />
         <Route path="/college/apply" element={<RequireRole roles={['COLLEGE']}><ApplyPage /></RequireRole>} />
         <Route path="/college/applications/:id" element={<RequireRole roles={['COLLEGE']}><CollegeCasePage /></RequireRole>} />

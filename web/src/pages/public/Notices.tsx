@@ -6,6 +6,7 @@ import { api } from '../../api/client';
 import { Badge, Card, ErrorState, IconButton, PageHeader, Skeleton, Table } from '../../components/ui';
 import { formatDate } from '../../lib/format';
 import { useTitle } from '../../lib/useTitle';
+import { useT } from '../../lib/prefs';
 import { KIND_LABEL, cycleLabel, type PublicNotice, type PublicScheduleRow } from '../rules/types';
 
 export function usePublicNotices() {
@@ -15,6 +16,7 @@ export function usePublicNotices() {
 const WINDOW_LABEL: Record<string, string> = { APPLICATION_WINDOW: 'Applications', LATE_FEE_WINDOW: 'With late fee', PAYMENT_DEADLINE: 'Payment', DECISION_LAST_DATE: 'Last date for decisions' };
 
 export function NoticesView() {
+  const t = useT();
   const q = usePublicNotices();
   if (q.isLoading) return <Skeleton lines={6} />;
   if (!q.data) return <ErrorState onRetry={() => void q.refetch()} />;
@@ -22,25 +24,27 @@ export function NoticesView() {
     <div className="flex flex-col gap-6">
       <section aria-labelledby="changes" className="flex flex-col gap-3">
         <h2 id="changes" className="text-xl font-semibold">
-          Changes to the rules
+          {t.notices.changes}
         </h2>
         {q.data.notices.map((n) => (
           <Card key={n.versionId} as="div">
             <div className="flex flex-wrap items-center gap-2">
               <Badge tone="neutral">{KIND_LABEL[n.kind] ?? n.kind}</Badge>
-              <Badge tone={n.current ? 'success' : 'neutral'}>{`${cycleLabel(n.cycle)} · rules v${n.version}${n.current ? ' · in force' : ''}`}</Badge>
+              <Badge tone={n.current ? 'success' : 'neutral'}>{`${cycleLabel(n.cycle)} · v${n.version}${n.current ? ` · ${t.notices.inForce}` : ''}`}</Badge>
             </div>
             <h3 className="mt-2 text-lg font-semibold">{n.title}</h3>
             <p className="mt-1 text-sm text-secondary">
-              {n.refNo} · issued {formatDate(n.issuedOn)} · effective {formatDate(n.effectiveFrom)}
+              {n.refNo} · {t.notices.issued} {formatDate(n.issuedOn)} · {t.notices.effective} {formatDate(n.effectiveFrom)}
             </p>
             <p className="mt-2 text-base">{n.summary}</p>
-            <p className="mt-2 text-sm text-secondary">Affects: {n.affectedTypes.join(', ')}</p>
+            <p className="mt-2 text-sm text-secondary">
+              {t.notices.affects}: {n.affectedTypes.join(', ')}
+            </p>
           </Card>
         ))}
       </section>
       <Table
-        caption="Application schedule"
+        caption={t.notices.schedule}
         rows={q.data.schedule}
         rowKey={(s) => `${s.cycle}-${s.id}`}
         emptyMessage="No windows are published."
@@ -53,16 +57,17 @@ export function NoticesView() {
           { key: 'scope', header: 'Who', wrap: true, render: (s) => s.scope },
         ]}
       />
-      <p className="text-sm text-muted">Values in this prototype are placeholders or modelled on public documents; check the official notices before acting on them.</p>
+      <p className="text-sm text-muted">{t.notices.disclaimer}</p>
     </div>
   );
 }
 
 export function NoticesPage() {
-  useTitle('What changed this cycle');
+  const t = useT();
+  useTitle(t.notices.title);
   return (
-    <div className="mx-auto flex max-w-5xl flex-col gap-6 px-4 py-8">
-      <PageHeader title="What changed this cycle" description="Published amendments to the approval rules of the current cycles, newest first, and the application schedule." actions={<Link className="text-accent underline" to="/login">Sign in</Link>} />
+    <div className="mx-auto flex max-w-content flex-col gap-6 px-4 py-6">
+      <PageHeader title={t.notices.title} description={t.notices.description} breadcrumb={[{ label: t.publicNav.home, to: '/' }, { label: t.publicNav.changed }]} />
       <NoticesView />
     </div>
   );
@@ -70,10 +75,11 @@ export function NoticesPage() {
 
 /** Logged-in variant, inside the application layout. */
 export function NoticesInAppPage() {
-  useTitle('What changed this cycle');
+  const t = useT();
+  useTitle(t.notices.title);
   return (
     <div className="flex flex-col gap-6">
-      <PageHeader title="What changed this cycle" description="Published amendments to the approval rules of the current cycles, newest first, and the application schedule." />
+      <PageHeader title={t.notices.title} description={t.notices.description} />
       <NoticesView />
     </div>
   );
@@ -81,6 +87,7 @@ export function NoticesInAppPage() {
 
 /** "1 change to the 2027–28 rules since your last visit · View", dismissible per user (kept on the server). */
 export function NoticesBanner() {
+  const t = useT();
   const qc = useQueryClient();
   const q = useQuery({ queryKey: ['notices', 'unseen'], queryFn: () => api.get<{ count: number; cycles: string[] }>('/rules/notices/unseen') });
   const seen = useMutation({
@@ -92,12 +99,12 @@ export function NoticesBanner() {
   return (
     <div role="status" className="flex items-center justify-between gap-3 rounded-lg border border-accent bg-accent-soft px-4 py-2 text-base">
       <p>
-        {n} {n === 1 ? 'change' : 'changes'} to the {q.data!.cycles.map(cycleLabel).join(' and ')} rules since your last visit ·{' '}
+        {t.notices.banner(n, q.data!.cycles.map(cycleLabel).join(', '))} ·{' '}
         <Link to="/college/notices" className="font-medium text-accent underline" onClick={() => seen.mutate()}>
-          View
+          {t.common.view}
         </Link>
       </p>
-      <IconButton label="Dismiss" icon={<X size={18} aria-hidden />} onClick={() => seen.mutate()} />
+      <IconButton label={t.common.dismiss} icon={<X size={18} aria-hidden />} onClick={() => seen.mutate()} />
     </div>
   );
 }

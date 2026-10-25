@@ -1,7 +1,7 @@
 import { useMemo, useState, type ReactNode } from 'react';
 import { ArrowDown, ArrowUp, ArrowUpDown, ChevronLeft, ChevronRight } from 'lucide-react';
 import { cx } from '../../lib/format';
-import { en } from '../../strings/en';
+import { useT } from '../../lib/prefs';
 import { EmptyState, ErrorState, Skeleton } from './Feedback';
 
 export interface Column<T> {
@@ -39,6 +39,7 @@ export interface TableProps<T> {
 
 /** Records are always tables: 44px rows, sticky header, numbers right-aligned, whole row clickable. */
 export function Table<T>({ caption, columns, rows, rowKey, onRowClick, rowLabel, loading, error, onRetry, emptyMessage, emptyAction, toolbar, pageSize = 25, selectedKey, expandedKey, renderExpanded }: TableProps<T>) {
+  const en = useT();
   const [sort, setSort] = useState<{ key: string; dir: 'asc' | 'desc' } | null>(null);
   const [page, setPage] = useState(1);
 

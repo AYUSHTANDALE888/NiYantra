@@ -199,13 +199,19 @@ async function connectListener(url: string): Promise<void> {
   const c = new pg.Client({ connectionString: url });
   c.on('notification', () => void onPublished().catch((e) => console.error('[rules] refresh failed', (e as Error).message)));
   c.on('error', (e) => {
-    console.error('[rules] listener lost; the 30 s poll continues and reconnects', e.message);
-    if (listener === c) listener = null;
+    console.error('[rules] listener lost; reconnecting', e.message);
+    if (listener !== c) return;
+    listener = null;
+    // The usual cause is a demo reset dropping the database: cached version ids may no longer exist, so forget
+    // them now rather than serving them until the next poll.
+    clearRulesCache();
+    if (poll) setTimeout(() => void (listener ? undefined : connectListener(url)), 1000).unref();
   });
   try {
     await c.connect();
     await c.query('LISTEN rules_published');
     listener = c;
+    await refreshPublished();
   } catch (e) {
     console.error('[rules] LISTEN unavailable; using the 30 s poll', (e as Error).message);
     await c.end().catch(() => undefined);

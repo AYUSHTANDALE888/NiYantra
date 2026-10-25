@@ -1,9 +1,10 @@
 import { useEffect } from 'react';
-import { en } from '../strings/en';
+import { useT } from './prefs';
 
-/** Per-route document title: "Action Center · AICTE Approvals". */
+/** Per-route document title: "Action Center · AICTE Demo Website" (follows the language). */
 export function useTitle(title: string): void {
+  const t = useT();
   useEffect(() => {
-    document.title = `${title} · ${en.app.name}`;
-  }, [title]);
+    document.title = `${title} · ${t.app.name}`;
+  }, [title, t]);
 }
