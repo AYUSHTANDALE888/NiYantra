@@ -154,3 +154,10 @@ Choices made where the build spec was silent, plus the design review recorded at
 | Status never colour-only | Verified, waiting for verification, overdue, expiring, valid: all badges with icons and labels; countdowns in text. |
 | Plain language | "Upload evidence", "Upload renewal", "Verify", "Reject with remarks"; the form check is "Check my entries", never "AI". |
 | axe | Compliance, college home and case, officer Action Center and case (with verification), style guide, admin: 0 serious or critical issues. |
+
+## Add-on A1: rule pack schema and expressions
+
+- Expressions are a JSON-logic subset (`var == != < <= > >= and or ! in if + - * / min max`), written twice: `api/src/rules/expr.ts` and `formcheck/app/expr.py`. No type coercion; a missing variable or division by zero gives `null`; depth is capped at 8 and size at 2048 bytes. Both suites run the same `shared/expr-conformance.json` (77 cases, 6 invalid).
+- Known variables live in `shared/expr-vars.json`; `norms.<key>` resolves only to norms defined in the same pack.
+- `api/src/rules/schema.ts` holds the zod pack schema plus cross-field checks (types referenced by documents and fees exist, routes end with DECISION and repeat no stage, windows run forwards, score weights add up to 1, escalation thresholds increase, holidays fall inside the cycle span 1 July to 30 June, letter placeholders come from a fixed list, no duplicate keys). Errors are `[{path, message}]` for the editor.
+- `shared/rulepack.schema.json` is generated (`npm run rules:schema --workspace api`) for external editors; the zod schema is the source of truth.
