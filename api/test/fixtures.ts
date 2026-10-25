@@ -5,7 +5,7 @@ import { prisma } from '../src/lib/db.js';
 import { placeholderPdf } from '../src/lib/storage.js';
 import { addDays, isoDate } from '../src/lib/dates.js';
 import * as clock from '../src/lib/clock.js';
-import { rules } from '../src/config/index.js';
+import { newestRules } from '../src/rules/service.js';
 import { bearer } from './helpers.js';
 
 export const PDF = placeholderPdf(['Test document']);
@@ -28,8 +28,9 @@ export function defaultForm(type: AppType, overrides: Record<string, unknown> = 
   };
 }
 
-export function criticalKinds(type: AppType): string[] {
-  return rules.types[type].documents.filter((d) => d.critical).map((d) => d.kind);
+/** Critical documents under the rules a filing today falls under (the newest cycle in tests). */
+export async function criticalKinds(type: AppType): Promise<string[]> {
+  return (await newestRules()).criticalKinds(type);
 }
 
 let draftNo = 0;
@@ -40,9 +41,10 @@ export async function submitApp(
   opts: { type?: AppType; form?: Record<string, unknown>; docs?: string[]; justification?: string; draftId?: string } = {},
 ) {
   const type = opts.type ?? 'NEW_INSTITUTION';
-  const docs = opts.docs ?? criticalKinds(type);
+  const docs = opts.docs ?? (await criticalKinds(type));
   const expiry = isoDate(addDays(clock.today(), 365 * 2));
-  const meta = docs.map((kind) => ({ kind, expiryDate: rules.types[type].documents.find((d) => d.kind === kind)?.hasExpiry ? expiry : null }));
+  const docRules = (await newestRules()).documents(type);
+  const meta = docs.map((kind) => ({ kind, expiryDate: docRules.find((d) => d.kind === kind)?.hasExpiry ? expiry : null }));
   let req = request(app)
     .post('/api/applications')
     .set(...bearer(user))
@@ -63,6 +65,12 @@ export async function act(app: Express, user: { id: string; role: string }, id: 
 }
 
 /** Test fixture only: mark an institution as previously approved so EXTENSION-type applications are eligible. */
+/** Test fixture: the newest cycle's published version, for rows created directly. */
+export async function currentPin(): Promise<{ cycleId: string; rulePackVersionId: string }> {
+  const v = await prisma.rulePackVersion.findFirstOrThrow({ where: { status: 'PUBLISHED' }, orderBy: { cycle: { code: 'desc' } } });
+  return { cycleId: v.cycleId, rulePackVersionId: v.id };
+}
+
 export async function grantPriorApproval(institutionId: string) {
   const inst = await prisma.institution.findUniqueOrThrow({ where: { id: institutionId } });
   const at = addDays(clock.today(), -400);
@@ -72,6 +80,7 @@ export async function grantPriorApproval(institutionId: string) {
       institutionId,
       regionId: inst.regionId,
       type: 'NEW_INSTITUTION',
+      ...(await currentPin()),
       category: 'NEW',
       categoryRank: 0,
       route: ['SCRUTINY', 'EVC', 'DECISION'],

@@ -25,7 +25,7 @@ export function Tabs<T extends string>({ tabs, value, onChange, label, children 
               role="tab"
               type="button"
               aria-selected={selected}
-              aria-controls={`${base}-panel`}
+              aria-controls={children !== undefined ? `${base}-panel` : undefined}
               tabIndex={selected ? 0 : -1}
               onClick={() => onChange(t.id)}
               onKeyDown={(e) => {

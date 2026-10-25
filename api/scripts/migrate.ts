@@ -14,15 +14,20 @@ export async function migrate(url: string): Promise<void> {
     stdio: 'inherit',
     env: { ...process.env, DATABASE_URL: url },
   });
-  const sql = fs.readFileSync(path.join(apiDir, 'prisma/sql/001_audit_guard.sql'), 'utf8');
+  const sql = (f: string) => fs.readFileSync(path.join(apiDir, 'prisma/sql', f), 'utf8');
   const c = new pg.Client({ connectionString: url });
   await c.connect();
   try {
-    await c.query(sql);
+    await c.query(sql('001_audit_guard.sql'));
+    // Databases created before the rule pack add-on: pin existing cases to 2026-27 v1 before the NOT NULL guard.
+    const { backfillExisting } = await import('../src/rules/migrate-from-json.js');
+    const { backfilled } = await backfillExisting(c);
+    if (backfilled) console.log(`[migrate] back-filled ${backfilled} rows to rules 2026-27 v1`);
+    await c.query(sql('002_rulepack_guard.sql'));
   } finally {
     await c.end();
   }
-  console.log('[migrate] schema and audit guard applied');
+  console.log('[migrate] schema, audit guard and rule pack guard applied');
 }
 
 const isMain = process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url);

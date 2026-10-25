@@ -3,7 +3,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { validatePack, type PackContent } from '../src/rules/schema.js';
 
-const policy = JSON.parse(fs.readFileSync(path.join(process.env.SHARED_DIR!, 'assignment-policy.json'), 'utf8'));
+const policy = JSON.parse(fs.readFileSync(path.join(process.env.SHARED_DIR!, 'seed', 'assignment-policy.json'), 'utf8'));
 delete policy.version;
 delete policy.note;
 

@@ -11,6 +11,7 @@ const auditQuery = z.object({
   applicationNo: z.string().max(40).optional(),
   action: z.string().max(40).optional(),
   actor: z.string().max(100).optional(),
+  chain: z.enum(['rules', 'global']).optional(),
   page: z.coerce.number().int().min(1).max(10_000).default(1),
   pageSize: z.coerce.number().int().min(10).max(200).default(50),
 });
@@ -29,6 +30,7 @@ export function adminRouter(): Router {
         where.OR = [{ applicationId: app?.id ?? '-' }, { meta: { path: ['applicationId'], equals: app?.id ?? '-' } }];
       }
       if (q.action) where.action = q.action;
+      if (q.chain) where.chainKey = q.chain;
       if (q.actor) {
         const actors = await prisma.user.findMany({
           where: { OR: [{ name: { contains: q.actor, mode: 'insensitive' } }, { email: { contains: q.actor, mode: 'insensitive' } }] },

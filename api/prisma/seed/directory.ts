@@ -55,6 +55,16 @@ export function holidaysAfter(from: Date): { date: Date; name: string }[] {
   return [...weekday, ...weekend].slice(0, 6).sort((a, b) => a.date.getTime() - b.date.getTime());
 }
 
+/** Institution facts used by purview and schedule expressions, from the (fictional) name. */
+export function institutionKind(name: string): { kind: string; isTechnical: boolean } {
+  if (name.endsWith('Polytechnic College')) return { kind: 'POLYTECHNIC', isTechnical: true };
+  if (name.endsWith('Institute of Management Studies')) return { kind: 'MANAGEMENT_INSTITUTE', isTechnical: true };
+  if (name.endsWith('School of Architecture')) return { kind: 'ARCHITECTURE_SCHOOL', isTechnical: true };
+  if (name.endsWith('College of Pharmacy')) return { kind: 'PHARMACY_COLLEGE', isTechnical: true };
+  if (name.endsWith('College of Computer Applications')) return { kind: 'ARTS_SCIENCE_COLLEGE', isTechnical: false };
+  return { kind: 'ENGINEERING_COLLEGE', isTechnical: true };
+}
+
 function permanentId(n: number): string {
   // AICTE-style permanent IDs: 1-XXXXXXXXXX (fictional, deterministic).
   return `1-${String(4400000000 + n * 7919).padStart(10, '0')}`;
@@ -191,6 +201,8 @@ export async function seedDirectory(db: PrismaClient, opts: { today: Date }): Pr
   }
 
   await user({ name: 'System Administrator', email: 'admin@demo.in', role: 'ADMIN', regionId: null, title: 'Administrator' });
+  await user({ name: 'Ravi Narayanan', email: 'rules.editor@demo.in', role: 'RULE_EDITOR', regionId: null, title: 'Deputy Director, Regulation Bureau' });
+  await user({ name: 'Dr. Kavita Rao', email: 'rules.approver@demo.in', role: 'RULE_APPROVER', regionId: null, title: 'Director, Regulation Bureau' });
 
   // ---- Institutions and college users ----
   const institutions: Directory['institutions'] = [];
@@ -198,7 +210,7 @@ export async function seedDirectory(db: PrismaClient, opts: { today: Date }): Pr
   async function institution(name: string, regionId: string, portfolioOfficerId: string, collegeEmail?: string) {
     instNo++;
     const inst = await db.institution.create({
-      data: { permanentId: permanentId(instNo), name, regionId, portfolioOfficerId },
+      data: { permanentId: permanentId(instNo), name, regionId, portfolioOfficerId, ...institutionKind(name) },
     });
     const email = collegeEmail ?? `college.${String(instNo).padStart(3, '0')}@demo.in`;
     const collegeUserId = await user({ name: `${name} (nodal officer)`, email, role: 'COLLEGE', regionId, institutionId: inst.id, title: 'Nodal officer' });

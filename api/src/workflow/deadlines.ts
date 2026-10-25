@@ -1,7 +1,7 @@
 // Deadline items: created, paused, resumed and closed inside the case transaction (section 2.4 / 7.1).
 import type { ItemType, Stage, Unit } from '@prisma/client';
 import type { Tx } from '../lib/db.js';
-import { rules } from '../config/index.js';
+import { rulesForApp } from '../rules/service.js';
 import { now, today } from '../lib/clock.js';
 import { toDateOnly } from '../lib/dates.js';
 import { addWorkingDays, workingDaysBetween } from '../lib/workdays.js';
@@ -81,11 +81,12 @@ export async function openItem(
 
 /** Stage clock on entering a stage: STAGE_SLA for SCRUTINY, SAC_SHC, DECISION; EVC_SCHEDULE for EVC. */
 export async function startStageClock(tx: Tx, applicationId: string, stage: Stage) {
+  const sla = (await rulesForApp(applicationId, tx)).timelines;
   if (stage === 'EVC') {
-    const days = rules.sla.EVC_SCHEDULE;
+    const days = sla.EVC_SCHEDULE;
     return openItem(tx, { applicationId, type: 'EVC_SCHEDULE', dueDate: addWorkingDays(today(), days), unit: 'WORKING', totalDays: days });
   }
-  const days = rules.sla[stage];
+  const days = sla[stage];
   return openItem(tx, { applicationId, type: 'STAGE_SLA', sourceId: stage, dueDate: addWorkingDays(today(), days), unit: 'WORKING', totalDays: days });
 }
 

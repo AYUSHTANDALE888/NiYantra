@@ -31,8 +31,9 @@ describe('audit chain [31]', () => {
   it('verifies every chain', async () => {
     const r = await verifyChains();
     expect(r.ok).toBe(true);
-    expect(r.chainsChecked).toBe(2);
-    expect(r.rowsChecked).toBe(7);
+    const seeded = await prisma.auditLog.count({ where: { chainKey: 'rules' } });
+    expect(r.chainsChecked).toBe(3); // the application chain, global and the seeded rules chain
+    expect(r.rowsChecked).toBe(7 + seeded);
   });
 
   it('rejects an UPDATE by the app role', async () => {

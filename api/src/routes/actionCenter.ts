@@ -6,7 +6,7 @@ import { h, parse } from '../lib/http.js';
 import { today } from '../lib/clock.js';
 import { addWorkingDays, workingDaysBetween } from '../lib/workdays.js';
 import { toDateOnly } from '../lib/dates.js';
-import { rules } from '../config/index.js';
+import { typeLabels } from '../rules/service.js';
 import { currentUser, type AuthUser } from '../auth/middleware.js';
 import { scopeWhere } from '../policy/scope.js';
 import { compareSortKeys, REASON_LABEL, type SortKeys } from '../engine/flags.js';
@@ -56,6 +56,7 @@ export function actionCenterRouter(): Router {
       const t = today();
       const byApp = new Map<string, (ExceptionFlag & { application: (typeof flags)[number]['application'] })[]>();
       for (const f of flags) byApp.set(f.applicationId, [...(byApp.get(f.applicationId) ?? []), f]);
+      const labels = await typeLabels([...byApp.values()].map((fs) => fs[0]!.application));
       let rows = [...byApp.values()].map((fs) => {
         fs.sort((a, b) => compareSortKeys(a.sortKeys as unknown as SortKeys, b.sortKeys as unknown as SortKeys));
         const p = fs[0]!;
@@ -66,7 +67,7 @@ export function actionCenterRouter(): Router {
           applicationId: a.id,
           applicationNo: a.applicationNo,
           institutionName: a.institution.name,
-          typeLabel: rules.types[a.type].label,
+          typeLabel: labels.get(a.id) ?? a.type,
           stage: a.stage,
           stageLabel: STAGE_LABEL[a.stage],
           status: a.status,

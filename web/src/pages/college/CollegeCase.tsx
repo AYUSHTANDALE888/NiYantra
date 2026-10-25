@@ -89,7 +89,8 @@ export function CollegeCasePage() {
         title={<span className="id-text text-xl">{d.application.applicationNo}</span>}
         description={
           <span className="flex flex-wrap items-center gap-2">
-            {d.application.typeLabel} · submitted {formatDate(d.application.submittedAt)} <StatusBadge kind={s.kind} label={s.label} />
+            {d.application.typeLabel} · submitted {formatDate(d.application.submittedAt)}
+            {d.rules ? ` · rules ${d.rules.cycle.replace('-', '–')} v${d.rules.version}` : ''} <StatusBadge kind={s.kind} label={s.label} />
           </span>
         }
       />

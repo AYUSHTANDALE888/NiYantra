@@ -2,7 +2,8 @@
 // and is the only place (with workflow/actions.ts) that creates or releases assignments.
 import { Prisma, type AvailabilityKind, type Category, type Role, type TaskType } from '@prisma/client';
 import { prisma, TX_OPTIONS, type Db, type Tx } from '../lib/db.js';
-import { policy, rules } from '../config/index.js';
+import { rulesForApp } from '../rules/service.js';
+import type { PackContent } from '../rules/schema.js';
 import { now, today } from '../lib/clock.js';
 import { addDays, formatDate, toDateOnly } from '../lib/dates.js';
 import { addWorkingDays, nextWorkingDayFrom, workingDaysBetween } from '../lib/workdays.js';
@@ -23,6 +24,38 @@ export interface Task {
   urgent?: boolean;
   previousOfficerId?: string | null;
   excludeOfficerIds?: string[];
+  /** Resolved on first use from the case's rules (policyFor). */
+  p?: TaskPolicy;
+}
+
+/** The assignment policy for a case: operational section of its cycle's published version, category from its pinned type. */
+export interface TaskPolicy {
+  policy: PackContent['assignment'];
+  categoryWeight: number;
+  categoryRank: number;
+  urgentDays: number;
+  /** The published version whose policy applied (stored on the assignment). */
+  versionId: string;
+  label: string;
+}
+
+export async function policyFor(db: Db, applicationId: string): Promise<TaskPolicy> {
+  const app = await db.application.findUniqueOrThrow({ where: { id: applicationId }, select: { type: true, cycleId: true, rulePackVersionId: true } });
+  const r = await rulesForApp(app, db);
+  const t = r.type(app.type);
+  return {
+    policy: r.assignment,
+    categoryWeight: t.categoryWeight,
+    categoryRank: t.categoryRank,
+    urgentDays: r.reminders.urgentDays,
+    versionId: r.operational.id,
+    label: `${r.operational.cycleCode} v${r.operational.version}`,
+  };
+}
+
+async function pol(db: Db, task: Task): Promise<TaskPolicy> {
+  task.p ??= await policyFor(db, task.applicationId);
+  return task.p;
 }
 
 export interface Candidate {
@@ -65,8 +98,8 @@ export function taskLabel(t: TaskType): string {
 const ROLE_LABEL: Partial<Record<Role, string>> = { OFFICER: 'Officer', BUREAU: 'Bureau' };
 const KIND_LABEL: Record<AvailabilityKind, string> = { LEAVE: 'on leave', TRAINING: 'in training', FIELD_VISIT: 'on a field visit', OFFLINE: 'offline' };
 
-export function taskWeight(taskType: TaskType, category: Category): number {
-  return round2(policy.stageWeight[taskType] * rules.categories[category].categoryWeight);
+export function taskWeight(p: TaskPolicy, taskType: TaskType): number {
+  return round2(p.policy.stageWeight[taskType] * p.categoryWeight);
 }
 
 function round2(n: number): number {
@@ -80,6 +113,7 @@ function regionName(code: string | null): string {
 
 /** Load tier candidates with live load (from the Assignment table, never a cached counter). */
 export async function loadCandidates(db: Db, task: Task, tier: number, institutionId: string): Promise<Candidate[]> {
+  const { policy } = await pol(db, task);
   const rule = policy.eligibility[task.taskType].find((r) => r.tier === tier);
   if (!rule) return [];
   const exclude = new Set(task.excludeOfficerIds ?? []);
@@ -183,14 +217,14 @@ function passesWithCap(c: Candidate, weight: number, institutionId: string, cap:
   return (c.openPoints + weight) / c.capacity <= cap + 1e-9;
 }
 
-export function score(c: Candidate, weight: number): number {
-  const w = policy.scoreWeights;
+export function score(p: TaskPolicy, c: Candidate, weight: number): number {
+  const w = p.policy.scoreWeights;
   return w.projectedUtil * ((c.openPoints + weight) / c.capacity) + w.recent * (c.recent / c.capacity) + w.mismatch * c.mismatch;
 }
 
-function byScore(weight: number) {
+function byScore(p: TaskPolicy, weight: number) {
   return (a: Candidate, b: Candidate) => {
-    const d = score(a, weight) - score(b, weight);
+    const d = score(p, a, weight) - score(p, b, weight);
     if (Math.abs(d) > 1e-9) return d;
     const la = a.lastAssignedAt?.getTime() ?? 0;
     const lb = b.lastAssignedAt?.getTime() ?? 0;
@@ -231,7 +265,9 @@ export async function selectOfficer(
   task: Task,
   ctx: { institutionId: string; institutionName: string; portfolioOfficerId: string | null; regionCode?: string | null },
 ) {
-  const weight = taskWeight(task.taskType, task.category);
+  const p = await pol(db, task);
+  const { policy } = p;
+  const weight = taskWeight(p, task.taskType);
   const tiers = [...new Set(policy.eligibility[task.taskType].map((r) => r.tier))].sort();
   const maxUtilFor = (c: Candidate) => (task.urgent ? Math.max(policy.urgentMaxUtil, c.maxUtil) : c.maxUtil);
   const exclusionsByTier: { tier: number; total: number; ex: Exclusions }[] = [];
@@ -258,8 +294,8 @@ export async function selectOfficer(
       chosen = preferred;
       why = preferredWhy;
     } else if (pass.length) {
-      chosen = [...pass].sort(byScore(weight))[0]!;
-      why = `lowest load score (${score(chosen, weight).toFixed(2)}) among eligible ${tier === 0 ? 'officers' : 'Bureau officers'}`;
+      chosen = [...pass].sort(byScore(p, weight))[0]!;
+      why = `lowest load score (${score(p, chosen, weight).toFixed(2)}) among eligible ${tier === 0 ? 'officers' : 'Bureau officers'}`;
     }
     if (chosen) {
       const eligibleCount = new Set([...pass.map((p) => p.id), chosen.id]).size;
@@ -270,7 +306,7 @@ export async function selectOfficer(
           : `Tier ${tier} (Bureau overflow: no eligible officer in ${regionName(ctx.regionCode ?? null)}).`;
       const reasonText =
         `Assigned to ${chosen.name} (${ROLE_LABEL[chosen.role] ?? chosen.role}, ${regionName(chosen.regionCode)}): ${why}; ` +
-        `utilisation ${util.toFixed(2)} after this task. ${eligibleCount} eligible; ${exclusionText(ex)}. ${tierNote} Policy v${policy.version}.`;
+        `utilisation ${util.toFixed(2)} after this task. ${eligibleCount} eligible; ${exclusionText(ex)}. ${tierNote} Rules ${p.label}.`;
       return { pick: { officer: chosen, tier, projectedUtil: util, reasonText, eligibleCount } as Pick, weight, exclusionsByTier };
     }
   }
@@ -280,9 +316,10 @@ export async function selectOfficer(
 async function institutionCtx(db: Db, applicationId: string) {
   const app = await db.application.findUniqueOrThrow({
     where: { id: applicationId },
-    select: { applicationNo: true, region: { select: { code: true } }, institution: { select: { id: true, name: true, portfolioOfficerId: true } } },
+    select: { applicationNo: true, cycleId: true, region: { select: { code: true } }, institution: { select: { id: true, name: true, portfolioOfficerId: true } } },
   });
   return {
+    cycleId: app.cycleId,
     regionCode: app.region.code,
     applicationNo: app.applicationNo,
     institutionId: app.institution.id,
@@ -302,8 +339,9 @@ function movesHolder(t: TaskType): boolean {
 
 export async function assign(tx: Tx, task: Task, actor?: { id: string; role: string } | null): Promise<Pick | null> {
   await advisoryXactLock(tx, lockKey(task));
+  const p = await pol(tx, task);
   // The Bureau pool is shared across regions; overflow tiers take its lock as well.
-  if (task.taskType !== 'SAC_SHC_FORWARD' && policy.eligibility[task.taskType].some((r) => r.role === 'BUREAU')) {
+  if (task.taskType !== 'SAC_SHC_FORWARD' && p.policy.eligibility[task.taskType].some((r) => r.role === 'BUREAU')) {
     await advisoryXactLock(tx, 'assign:bureau');
   }
   const ctx = await institutionCtx(tx, task.applicationId);
@@ -337,7 +375,7 @@ export async function assign(tx: Tx, task: Task, actor?: { id: string; role: str
         reasonText: `Blocked — no eligible officer for ${TASK_LABEL[task.taskType].toLowerCase()} (${detail}); owner: head of department; next: assign by hand from the no-eligible-officer queue`,
         nextAction: `Supply or assign: ${TASK_LABEL[task.taskType].toLowerCase()} officer`,
         escalationLevel: 0,
-        sortKeys: { escalationLevel: 0, daysOverdue: 0, categoryRank: rules.categories[task.category].categoryRank, daysToDue: 0, submittedAt: now().toISOString() },
+        sortKeys: { escalationLevel: 0, daysOverdue: 0, categoryRank: p.categoryRank, daysToDue: 0, submittedAt: now().toISOString() },
         raisedAt: now(),
       },
       update: { resolvedAt: null },
@@ -370,7 +408,7 @@ export async function assign(tx: Tx, task: Task, actor?: { id: string; role: str
       weight: new Prisma.Decimal(weight),
       tier: pick.tier,
       reasonText: pick.reasonText,
-      policyVersion: policy.version,
+      rulePackVersionId: p.versionId,
       recommendedOfficerId: pick.officer.id,
       assignedAt: at,
     },
@@ -390,7 +428,7 @@ export async function assign(tx: Tx, task: Task, actor?: { id: string; role: str
     action: 'ASSIGN',
     applicationId: task.applicationId,
     reason: pick.reasonText,
-    meta: { assignmentId: created.id, taskType: task.taskType, taskRefId, officerId: pick.officer.id, tier: pick.tier, weight, policyVersion: policy.version },
+    meta: { assignmentId: created.id, taskType: task.taskType, taskRefId, officerId: pick.officer.id, tier: pick.tier, weight, rulePackVersionId: created.rulePackVersionId },
   });
   await notify(tx, [pick.officer.id], {
     applicationId: task.applicationId,
@@ -422,7 +460,7 @@ export async function isTaskUrgent(db: Db, applicationId: string, taskType: Task
     orderBy: { id: 'desc' },
   });
   if (!item) return false;
-  return workingDaysBetween(today(), item.dueDate) <= rules.urgentDays;
+  return workingDaysBetween(today(), item.dueDate) <= (await rulesForApp(applicationId, db)).reminders.urgentDays;
 }
 
 async function taskFor(db: Db, assignmentId: string): Promise<{ a: Awaited<ReturnType<typeof db.assignment.findUniqueOrThrow>>; task: Task }> {
@@ -507,7 +545,9 @@ export async function reassignManual(actor: AuthUser, assignmentId: string, toOf
     const recommendedId = rec.pick?.officer.id ?? null;
 
     // Target must be eligible for the task and pass every hard filter.
-    const weight = taskWeight(a.taskType, app.category);
+    const p = await pol(tx, task);
+    const { policy } = p;
+    const weight = taskWeight(p, a.taskType);
     let targetCand: Candidate | undefined;
     for (const tier of [...new Set(policy.eligibility[a.taskType].map((r) => r.tier))]) {
       targetCand = (await loadCandidates(tx, task, tier, app.institutionId)).find((c) => c.id === toOfficerId);
@@ -525,7 +565,7 @@ export async function reassignManual(actor: AuthUser, assignmentId: string, toOf
     const recName = recommendedId ? (await tx.user.findUnique({ where: { id: recommendedId }, select: { name: true } }))?.name : null;
     const reasonText =
       `Reassigned to ${target.name} (${ROLE_LABEL[target.role] ?? target.role}, ${regionName(target.region?.code ?? null)}) by ${actor.name}: ${reason}. ` +
-      `Utilisation ${util.toFixed(2)} after this task. System recommended: ${recName ?? 'no eligible officer'}. Policy v${policy.version}.`;
+      `Utilisation ${util.toFixed(2)} after this task. System recommended: ${recName ?? 'no eligible officer'}. Rules ${p.label}.`;
     const created = await tx.assignment.create({
       data: {
         applicationId: a.applicationId,
@@ -535,7 +575,7 @@ export async function reassignManual(actor: AuthUser, assignmentId: string, toOf
         weight: new Prisma.Decimal(weight),
         tier: target.role === 'BUREAU' && a.taskType !== 'SAC_SHC_FORWARD' ? 1 : 0,
         reasonText,
-        policyVersion: policy.version,
+        rulePackVersionId: p.versionId,
         recommendedOfficerId: recommendedId,
         assignedAt: now(),
         overriddenById: actor.id,
@@ -579,16 +619,17 @@ export async function assignManual(actor: AuthUser, input: { applicationId: stri
     if (!target || !target.profile || (target.role !== 'OFFICER' && target.role !== 'BUREAU')) throw badRequest('Choose an officer or Bureau member.');
     const task: Task = { applicationId: app.id, regionId: app.regionId, taskType: input.taskType, category: app.category, taskRefId: input.taskRefId };
     await advisoryXactLock(tx, lockKey(task));
+    const p = await pol(tx, task);
     let cand: Candidate | undefined;
-    for (const tier of [...new Set(policy.eligibility[input.taskType].map((r) => r.tier))]) {
+    for (const tier of [...new Set(p.policy.eligibility[input.taskType].map((r) => r.tier))]) {
       cand = (await loadCandidates(tx, task, tier, app.institutionId)).find((c) => c.id === input.toOfficerId);
       if (cand) break;
     }
     if (!cand) throw badRequest(`${target.name} is not eligible for ${TASK_LABEL[input.taskType].toLowerCase()} tasks.`);
     if (cand.unavailable) throw badRequest(`${target.name} is ${KIND_LABEL[cand.unavailable.kind]} until ${formatDate(cand.unavailable.until)}.`);
-    const weight = taskWeight(input.taskType, app.category);
+    const weight = taskWeight(p, input.taskType);
     const util = (cand.openPoints + weight) / cand.capacity;
-    const reasonText = `Assigned by hand to ${target.name} by ${actor.name}: ${input.reason}. Utilisation ${util.toFixed(2)} after this task. Policy v${policy.version}.`;
+    const reasonText = `Assigned by hand to ${target.name} by ${actor.name}: ${input.reason}. Utilisation ${util.toFixed(2)} after this task. Rules ${p.label}.`;
     await tx.assignment.create({
       data: {
         applicationId: app.id,
@@ -598,7 +639,7 @@ export async function assignManual(actor: AuthUser, input: { applicationId: stri
         weight: new Prisma.Decimal(weight),
         tier: target.role === 'BUREAU' ? 1 : 0,
         reasonText,
-        policyVersion: policy.version,
+        rulePackVersionId: p.versionId,
         recommendedOfficerId: null,
         assignedAt: now(),
         overriddenById: actor.id,

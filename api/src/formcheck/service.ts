@@ -5,10 +5,11 @@ import { prisma, type Db } from '../lib/db.js';
 import { isoDate } from '../lib/dates.js';
 import { now, today } from '../lib/clock.js';
 import { appendAuditStandalone } from '../lib/audit.js';
-import { computeFeatures, requiredDocKinds, requiredMissing, type FormValues } from './features.js';
+import { computeFeatures, requiredMissing, type FormValues } from './features.js';
 import { evaluateRules, type Warning } from './rules.js';
 import { postJson } from './client.js';
-import { formcheckRules } from '../config/index.js';
+import type { EvalContext, ResolvedRules } from '../rules/resolved.js';
+import { filingContext } from '../rules/filing.js';
 
 export interface ValidateResponse {
   id: string;
@@ -31,15 +32,18 @@ interface ScoreResponse {
   warnings: Warning[];
 }
 
-export async function scoreForm(type: AppType, values: FormValues) {
+/** Score with the case's rules: the Python service gets the pack's formCheckRules and norms; Node evaluates them on fallback. */
+export async function scoreForm(rules: ResolvedRules, type: AppType, values: FormValues, ctx: EvalContext = {}) {
   const todayIso = isoDate(today());
+  const requiredDocs = rules.criticalKinds(type, ctx);
+  const norms = rules.norms(rules.programme(values.programme));
   try {
-    const r = await postJson<ScoreResponse>('/score', { type, values, today: todayIso, requiredDocs: requiredDocKinds(type) });
+    const r = await postJson<ScoreResponse>('/score', { type, values, today: todayIso, requiredDocs, rules: rules.formCheckRules, norms });
     return { ...r, modelAvailable: true };
   } catch {
-    const warnings = evaluateRules(computeFeatures(type, values, todayIso));
+    const warnings = evaluateRules(computeFeatures(values, todayIso, requiredDocs), rules.formCheckRules, norms);
     return {
-      modelVersion: `rules-v${formcheckRules.version}`,
+      modelVersion: `rules-${rules.label}`,
       modelAvailable: false,
       severity: (warnings.length ? 'HIGH' : 'NONE') as Severity,
       score: null,
@@ -49,9 +53,11 @@ export async function scoreForm(type: AppType, values: FormValues) {
   }
 }
 
-export async function validateForm(user: AuthUser, input: { draftId: string; type: AppType; values: FormValues }, db: Db = prisma): Promise<ValidateResponse> {
-  const missing = requiredMissing(input.type, input.values);
-  const r = await scoreForm(input.type, input.values);
+export async function validateForm(user: AuthUser, input: { draftId: string; type: AppType; values: FormValues }, db: Db = prisma, rules?: ResolvedRules): Promise<ValidateResponse> {
+  const fc = await filingContext(user.institutionId!, input.type, input.values as Record<string, unknown>, {}, db);
+  const resolved = rules ?? fc.rules;
+  const missing = requiredMissing(resolved, input.type, input.values, fc.facts);
+  const r = await scoreForm(resolved, input.type, input.values, fc.facts);
   const row = await db.formCheckResult.create({
     data: {
       institutionId: user.institutionId!,

@@ -4,7 +4,7 @@ import type { Prisma } from '@prisma/client';
 import { prisma } from '../lib/db.js';
 import * as clock from '../lib/clock.js';
 import { isoDate } from '../lib/dates.js';
-import { policy } from '../config/index.js';
+import { newestRules } from '../rules/service.js';
 import { getSubtreeUserIds } from '../policy/subtree.js';
 import type { AuthUser } from '../auth/middleware.js';
 import { taskLabel } from '../assignment/engine.js';
@@ -27,6 +27,8 @@ export async function workloadFor(user: AuthUser) {
     },
     orderBy: [{ reportsToId: 'asc' }, { name: 'asc' }],
   });
+  // Team-level thresholds are not tied to one case: the newest cycle's published assignment policy.
+  const policy = (await newestRules()).assignment;
   const rows = officers.map((o) => {
     const capacity = Number(o.profile?.capacityPoints ?? policy.defaultCapacityPoints);
     const openPoints = Math.round(o.assignments.reduce((s, a) => s + Number(a.weight), 0) * 100) / 100;

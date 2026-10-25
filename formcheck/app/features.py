@@ -62,6 +62,7 @@ class FormValues(BaseModel):
     proposedName: Optional[str] = Field(default=None, max_length=200)
     fillSeconds: Optional[float] = Field(default=None, ge=0, le=1_000_000)
     documents: Optional[list[str]] = Field(default=None, max_length=30)
+    programme: Optional[str] = Field(default=None, pattern=r"^[A-Z0-9_]{2,20}$")
 
 
 def _div(a: Optional[float], b: Optional[float]) -> Optional[float]:

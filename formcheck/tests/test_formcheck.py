@@ -138,3 +138,27 @@ def test_500_normal_forms_warning_rate_at_most_5_percent():
             warned += 1
             assert all(w["message"] for w in warnings)
     assert warned / len(rows) <= 0.05
+
+
+def test_pack_rules_and_norms_from_the_request():
+    from app.config import DEFAULTS
+
+    f = feats(facultyCount=10)  # 72 students per faculty member
+    assert "R4" in rule_hits(f)
+    relaxed = dict(DEFAULTS.norms, maxStudentsPerFaculty=80)
+    assert "R4" not in rule_hits(f, DEFAULTS.formCheckRules, relaxed)
+
+
+@needs_model
+def test_score_uses_rules_sent_by_the_api_and_refuses_unknown_vars():
+    from app.config import DEFAULTS
+    from app.main import app
+
+    client = TestClient(app)
+    rules = [r.model_dump(exclude_none=True) for r in DEFAULTS.formCheckRules]
+    body = {"type": "NEW_INSTITUTION", "values": values(facultyCount=10).model_dump(exclude_none=True), "today": TODAY, "rules": rules, "norms": dict(DEFAULTS.norms, maxStudentsPerFaculty=80)}
+    j = client.post("/score", json=body).json()
+    assert not any(w.get("ruleId") == "R4" for w in j["warnings"])
+    bad = dict(body, rules=[dict(rules[0], when={">": [{"var": "formData.secret"}, 1]})])
+    r = client.post("/score", json=bad)
+    assert r.status_code == 422 and r.json()["errors"][0]["path"].startswith("rules[0].when")

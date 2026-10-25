@@ -12,13 +12,15 @@ import { notify } from '../lib/notify.js';
 import { badRequest, conflict, forbidden, HttpError, notFound } from '../lib/errors.js';
 import { parse } from '../lib/http.js';
 import { removeStored, saveBuffer, type StoredFile } from '../lib/storage.js';
-import { rules } from '../config/index.js';
+import { forApplication, rulesForApp } from '../rules/service.js';
+import { filingContext } from '../rules/filing.js';
+import type { EvalContext, ResolvedRules } from '../rules/resolved.js';
 import { assign, release, taskLabel } from '../assignment/engine.js';
 import { proposeCommittee } from '../assignment/committee.js';
 import { can } from '../policy/can.js';
 import { logAccessDenied } from '../policy/roles.js';
 import { regionAuthority } from '../policy/subtree.js';
-import { categoryOf, nextStage, resolveRoute, STAGE_LABEL } from './routing.js';
+import { nextStage, STAGE_LABEL } from './routing.js';
 import { closeItems, openItem, pauseStageItem, resumeStageItem, startStageClock, syncResponsible } from './deadlines.js';
 import { nextApplicationNo } from './appno.js';
 import { type CaseAction, transitionFor } from './transitions.js';
@@ -127,35 +129,64 @@ export const submitSchema = z.object({
   justification: z.string().trim().max(4000).optional(),
 });
 
-export async function submitApplication(user: AuthUser, input: z.infer<typeof submitSchema>, files: UploadInput[]) {
+/** Server-side options (never from a request body): seed history pins to a given version. */
+export interface SubmitOptions {
+  pin?: { cycleId: string; rulePackVersionId: string };
+  ignoreSchedule?: boolean;
+}
+
+export async function submitApplication(user: AuthUser, input: z.infer<typeof submitSchema>, files: UploadInput[], opts: SubmitOptions = {}) {
   if (user.role !== 'COLLEGE' || !user.institutionId) {
     await logAccessDenied(user, { action: 'SUBMIT', reason: 'Only colleges can submit applications.' });
     throw forbidden('Only colleges can submit applications.');
   }
   const type = input.type as AppType;
-  const cfg = rules.types[type];
   const institution = await prisma.institution.findUniqueOrThrow({ where: { id: user.institutionId } });
 
-  // Eligibility.
-  if (cfg.requiresPriorApproval) {
-    const past = await prisma.application.count({ where: { institutionId: institution.id, status: { in: ['APPROVED', 'APPROVED_WITH_CONDITIONS', 'CLOSED'] } } });
-    if (past === 0) throw badRequest(`${cfg.label} needs at least one earlier approval for your institution.`);
+  // The cycle and rule pack version this filing is pinned to for its whole life.
+  const fc = await filingContext(institution.id, type, input.formData as Record<string, unknown>, { ignoreSchedule: opts.ignoreSchedule });
+  let r: ResolvedRules;
+  let pin = opts.pin;
+  if (pin) {
+    r = await forApplication(pin);
+  } else {
+    if (!fc.filing.ok) throw badRequest(fc.filing.message);
+    r = fc.filing.rules;
+    pin = { cycleId: fc.filing.cycleId, rulePackVersionId: r.pinned.id };
+  }
+  if (!r.hasType(type)) throw badRequest(`This application type is not accepted under rules ${r.label}.`);
+  const cfg = r.type(type);
+  const ctx: EvalContext = { ...fc.facts, programme: r.programme(fc.facts.programmeCode) };
+
+  // Purview and eligibility (expressions of the pinned version).
+  if (fc.facts.programmeCode) {
+    const p = r.programme(fc.facts.programmeCode);
+    if (!p) throw badRequest(`Programme ${fc.facts.programmeCode} is not offered under rules ${r.label}.`);
+    if (!r.test(p.inPurview, ctx)) throw badRequest(`${p.label} at your institution is outside the purview of rules ${r.label}.`);
+  }
+  if (!r.test(cfg.eligibility, ctx)) {
+    throw badRequest(
+      !fc.hasPriorApproval && JSON.stringify(cfg.eligibility).includes('hasPriorApproval')
+        ? `${cfg.label} needs at least one earlier approval for your institution.`
+        : `Your institution is not eligible for ${cfg.label.toLowerCase()} under rules ${r.label}.`,
+    );
   }
   const openSame = await prisma.application.count({ where: { institutionId: institution.id, type, status: { in: ['IN_STAGE', 'RETURNED'] } } });
   if (openSame > 0) throw conflict(`Your institution already has an open ${cfg.label.toLowerCase()} application.`);
 
   // Hard validation and critical documents.
   const values: FormValues = { ...input.formData, documents: files.map((f) => f.kind) };
-  const missing = requiredMissing(type, values);
+  const missing = requiredMissing(r, type, values, ctx);
   if (missing.length) throw badRequest(missing.map((m) => m.message).join(' '), { fields: missing });
-  const known = new Map(cfg.documents.map((d) => [d.kind, d]));
+  const docRules = r.documents(type, ctx);
+  const known = new Map(docRules.map((d) => [d.kind, d]));
   for (const f of files) {
     const d = known.get(f.kind);
     if (!d) throw badRequest(`${f.originalname}: ${f.kind} is not a document for this application type.`);
     if (d.hasExpiry && d.critical && !f.expiryDate) throw badRequest(`Enter the expiry date for the ${d.label.toLowerCase()}.`);
     if (f.expiryDate) parse(isoDate, f.expiryDate);
   }
-  const missingCritical = cfg.documents.filter((d) => d.critical && !files.some((f) => f.kind === d.kind));
+  const missingCritical = docRules.filter((d) => d.critical && !files.some((f) => f.kind === d.kind));
   if (missingCritical.length) {
     throw badRequest(`Attach the missing critical documents: ${missingCritical.map((d) => d.label).join(', ')}.`, { missingDocuments: missingCritical.map((d) => d.kind) });
   }
@@ -163,8 +194,8 @@ export async function submitApplication(user: AuthUser, input: z.infer<typeof su
   // Latest form check for this draft (run one now if the client never did).
   let check = await prisma.formCheckResult.findFirst({ where: { draftId: input.draftId, institutionId: institution.id }, orderBy: { createdAt: 'desc' } });
   if (!check) {
-    const r = await validateForm(user, { draftId: input.draftId, type, values });
-    check = await prisma.formCheckResult.findUniqueOrThrow({ where: { id: r.id } });
+    const v = await validateForm(user, { draftId: input.draftId, type, values }, prisma, r);
+    check = await prisma.formCheckResult.findUniqueOrThrow({ where: { id: v.id } });
   }
   const justification = input.justification?.trim() || null;
   if (check.severity !== 'NONE' && !justification) {
@@ -174,8 +205,8 @@ export async function submitApplication(user: AuthUser, input: z.infer<typeof su
   const stored = storeUploads(files);
   try {
     return await prisma.$transaction(async (tx) => {
-      const route = resolveRoute(type, values);
-      const { category, categoryRank } = categoryOf(type);
+      const route = r.route(type, { ...ctx, formData: values as Record<string, unknown> }) as Stage[];
+      const { category, categoryRank } = cfg;
       const at = now();
       const applicationNo = await nextApplicationNo(tx, institution.regionId);
       const { documents: _docs, ...formData } = values;
@@ -185,6 +216,8 @@ export async function submitApplication(user: AuthUser, input: z.infer<typeof su
           institutionId: institution.id,
           regionId: institution.regionId,
           type,
+          cycleId: pin.cycleId,
+          rulePackVersionId: pin.rulePackVersionId,
           category,
           categoryRank,
           route,
@@ -225,7 +258,7 @@ export async function submitApplication(user: AuthUser, input: z.infer<typeof su
         applicationId: app.id,
         fromState: null,
         toState: { stage: app.stage, status: app.status },
-        meta: { applicationNo, type, route, formCheckId: check!.id, severity: check!.severity, documents: files.map((f) => f.kind) },
+        meta: { applicationNo, type, route, formCheckId: check!.id, severity: check!.severity, documents: files.map((f) => f.kind), rules: r.label, rulePackVersionId: r.pinned.id },
       });
       if (justification) {
         await appendAudit(tx, {
@@ -382,7 +415,7 @@ const handlers: Record<CaseAction, Handler> = {
     const current = await currentDocuments(tx, app.id);
     const byKind = new Map(current.map((d) => [d.kind, d]));
     const newIds: string[] = [];
-    const known = new Map(rules.types[app.type].documents.map((d) => [d.kind, d]));
+    const known = new Map((await rulesForApp(app, tx)).documents(app.type, { formData: app.formData as Record<string, unknown> }).map((d) => [d.kind, d]));
     for (let i = 0; i < files.length; i++) {
       const f = files[i]!;
       const s = stored[i]!;
@@ -434,18 +467,21 @@ const handlers: Record<CaseAction, Handler> = {
       throw badRequest(`${names.join(', ')} ${names.length === 1 ? 'is' : 'are'} not available on ${formatDate(visitDate)}.`);
     }
     const { proposal } = await proposeCommittee(app.id, visitDate, tx);
+    const r = await rulesForApp(app, tx);
+    const evc = r.committee('EVC');
+    const appointedUnder = `${evc?.appointingAuthority ?? 'Appointing authority not set'} · rules ${r.operational.cycleCode} v${r.operational.version}`;
     await tx.evcVisit.update({
       where: { applicationId: app.id },
-      data: { proposedMemberIds: proposal.map((p) => p.userId), memberIds, visitDate, mode: input.payload.mode, status: 'SCHEDULED' },
+      data: { proposedMemberIds: proposal.map((p) => p.userId), memberIds, visitDate, mode: input.payload.mode, status: 'SCHEDULED', appointedUnder },
     });
     await tx.application.update({ where: { id: app.id }, data: { evcScheduled: true, holderType: 'COMMITTEE', holderUserId: null } });
     await closeItems(tx, app.id, ['EVC_SCHEDULE'], 'outcome');
     await releaseOpen(tx, app.id, ['EVC_DESK'], 'COMPLETED', actor);
-    const days = rules.sla.EVC_REPORT;
+    const days = r.timelines.EVC_REPORT;
     await openItem(tx, { applicationId: app.id, type: 'EVC_REPORT', dueDate: addWorkingDays(visitDate, days), unit: 'WORKING', totalDays: days });
     const changed = proposal.map((p) => p.userId).join() !== memberIds.join();
     return {
-      meta: { visitDate: input.payload.visitDate, mode: input.payload.mode, memberIds, proposedMemberIds: proposal.map((p) => p.userId), changedFromProposal: changed },
+      meta: { visitDate: input.payload.visitDate, mode: input.payload.mode, memberIds, proposedMemberIds: proposal.map((p) => p.userId), changedFromProposal: changed, appointedUnder },
       notifications: [
         { userIds: memberIds, message: `EVC visit for ${app.applicationNo} on ${formatDate(visitDate)} (${input.payload.mode === 'ONLINE' ? 'online' : 'physical'}). Submit the report within ${days} working days of the visit.` },
         { userIds: await collegeUserIds(tx, app.institutionId), message: `The expert visit for ${app.applicationNo} is scheduled for ${formatDate(visitDate)} (${input.payload.mode === 'ONLINE' ? 'online' : 'physical'}).` },
@@ -573,7 +609,7 @@ export async function uploadEvidence(user: AuthUser, undertakingId: string, file
       });
       await tx.undertaking.update({ where: { id: u.id }, data: { status: 'SUBMITTED', evidenceDocId: doc.id, remarks: null } });
       await assign(tx, { applicationId: app.id, regionId: app.regionId, taskType: 'VERIFY', category: app.category, taskRefId: u.id }, user);
-      const days = rules.sla.VERIFICATION;
+      const days = (await rulesForApp(app, tx)).timelines.VERIFICATION;
       await openItem(tx, { applicationId: app.id, type: 'VERIFICATION', sourceId: u.id, dueDate: addWorkingDays(today(), days), unit: 'WORKING', totalDays: days });
       await tx.application.update({ where: { id: app.id }, data: { lastActionAt: now() } });
       await appendAudit(tx, { actorId: user.id, actorRole: user.role, action: 'UPLOAD_EVIDENCE', applicationId: app.id, reason: note ?? null, meta: { undertakingId: u.id, condition: u.condition, documentId: doc.id } });
@@ -654,7 +690,7 @@ export async function uploadRenewal(user: AuthUser, documentId: string, file: Up
         data: { applicationId: app.id, institutionId: old.institutionId, kind: old.kind, ...s, uploadedById: user.id, uploadedAt: now(), expiryDate: expiry, supersedesId: old.id },
       });
       await assign(tx, { applicationId: app.id, regionId: app.regionId, taskType: 'VERIFY', category: app.category, taskRefId: doc.id }, user);
-      const days = rules.sla.VERIFICATION;
+      const days = (await rulesForApp(app, tx)).timelines.VERIFICATION;
       await openItem(tx, { applicationId: app.id, type: 'VERIFICATION', sourceId: doc.id, dueDate: addWorkingDays(today(), days), unit: 'WORKING', totalDays: days });
       await tx.application.update({ where: { id: app.id }, data: { lastActionAt: now() } });
       await appendAudit(tx, { actorId: user.id, actorRole: user.role, action: 'UPLOAD_RENEWAL', applicationId: app.id, meta: { documentId: doc.id, supersedesId: old.id, kind: old.kind, expiryDate } });
@@ -694,7 +730,7 @@ export async function verifyRenewal(user: AuthUser, documentId: string, input: {
       reason: input.remarks ?? null,
       meta: { documentId: doc.id, supersedesId: doc.supersedesId, accept: input.accept },
     });
-    const label = rules.types[app.type].documents.find((d) => d.kind === doc.kind)?.label ?? doc.kind;
+    const label = (await rulesForApp(app, tx)).content.documents.find((d) => d.kind === doc.kind)?.label ?? doc.kind;
     await notify(tx, await collegeUserIds(tx, app.institutionId), {
       applicationId: app.id,
       kind: input.accept ? 'RENEWAL_VERIFIED' : 'RENEWAL_REJECTED',

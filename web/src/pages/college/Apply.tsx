@@ -1,13 +1,12 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { Plus, Trash2 } from 'lucide-react';
 import { api, ApiError } from '../../api/client';
-import type { AppType, CaseDetail, ValidateResponse } from '../../api/types';
+import type { AppType, CaseDetail, DocCfg, FilingContext, ValidateResponse } from '../../api/types';
 import { useMe } from '../../auth/AuthContext';
-import { Badge, Button, Card, DateInput, ErrorSummary, Field, FileUpload, IconButton, Input, PageHeader, Textarea, WarningList, useToast } from '../../components/ui';
-import { cx, formatNumber } from '../../lib/format';
-import { needsSite, TYPE_ORDER, TYPES } from '../../lib/rules';
+import { Badge, Button, Card, DateInput, ErrorSummary, Field, FileUpload, IconButton, Input, PageHeader, Select, Textarea, WarningList, useToast } from '../../components/ui';
+import { cx, formatDate, formatNumber } from '../../lib/format';
 import { useTitle } from '../../lib/useTitle';
 
 interface Course {
@@ -57,8 +56,12 @@ export function ApplyPage() {
   const [checkError, setCheckError] = useState<string | null>(null);
   const [errors, setErrors] = useState<{ field: string; message: string }[]>([]);
   const summaryRef = useRef<HTMLDivElement>(null);
-  const cfg = TYPES[type];
-  const site = needsSite(type);
+  const [programme, setProgramme] = useState('');
+  // The cycle and rules a filing today falls under; documents and form check come from that version.
+  const filing = useQuery({ queryKey: ['filing', programme], queryFn: () => api.get<FilingContext>(`/rules/filing${programme ? `?programme=${programme}` : ''}`) });
+  const cfg = filing.data?.types.find((t) => t.type === type);
+  const cfgDocs: DocCfg[] = cfg?.documents ?? [];
+  const site = cfgDocs.some((d) => d.kind === 'LAND_LEASE');
 
   const values = useMemo(
     () => ({
@@ -72,11 +75,12 @@ export function ApplyPage() {
       labCount: num(labs) !== undefined ? Math.round(num(labs)!) : undefined,
       ...(type === 'INTAKE_INCREASE' ? { intakeIncreasePct: num(increase) } : {}),
       ...(type === 'NAME_CHANGE' ? { proposedName: proposedName.trim() || undefined } : {}),
+      ...(programme ? { programme } : {}),
       fillSeconds: Math.round((Date.now() - started.current) / 1000),
       // Documents count only once the applicant has reached the documents step.
       documents: step >= 3 ? Object.entries(docs).filter(([, d]) => d.file).map(([k]) => k) : undefined,
     }),
-    [land, built, leaseExpiry, courses, faculty, labs, increase, proposedName, docs, type, step],
+    [land, built, leaseExpiry, courses, faculty, labs, increase, proposedName, programme, docs, type, step],
   );
 
   async function runCheck() {
@@ -101,8 +105,8 @@ export function ApplyPage() {
     if (errors.length) summaryRef.current?.focus();
   }, [errors]);
 
-  const missingCritical = cfg.documents.filter((d) => d.critical && !docs[d.kind]?.file);
-  const missingExpiry = cfg.documents.filter((d) => d.hasExpiry && docs[d.kind]?.file && !docs[d.kind]?.expiryDate);
+  const missingCritical = cfgDocs.filter((d) => d.critical && !docs[d.kind]?.file);
+  const missingExpiry = cfgDocs.filter((d) => d.hasExpiry && docs[d.kind]?.file && !docs[d.kind]?.expiryDate);
   const warningsNeedJustification = !!check && check.severity !== 'NONE';
 
   function stepErrors(s: number): { field: string; message: string }[] {
@@ -166,6 +170,7 @@ export function ApplyPage() {
   return (
     <div>
       <PageHeader title="New application" description={`${me.institutionName ?? 'Your institution'} · one step at a time. Your entries are checked as you go; the check never blocks you.`} breadcrumb={[{ label: 'My applications', to: '/college' }, { label: 'New application' }]} />
+      {filing.data ? <FilingHeader f={filing.data} /> : null}
       <ol className="mb-6 flex flex-wrap gap-2" aria-label="Steps">
         {STEPS.map((s, i) => (
           <li key={s} aria-current={i === step ? 'step' : undefined} className={cx('rounded px-3 py-1 text-sm', i === step ? 'bg-accent-soft font-semibold text-accent' : i < step ? 'text-primary' : 'text-muted')}>
@@ -187,21 +192,36 @@ export function ApplyPage() {
           <Card title={STEPS[step]}>
             <div className="flex max-w-prose flex-col gap-4">
               {step === 0 ? (
-                <fieldset className="flex flex-col gap-2">
-                  <legend className="mb-2 text-base text-secondary">What are you applying for?</legend>
-                  {TYPE_ORDER.map((t) => (
-                    <label key={t} className={cx('hit flex cursor-pointer items-start gap-3 rounded-lg border p-3', type === t ? 'border-accent bg-accent-soft' : 'hover:bg-subtle')}>
-                      <input type="radio" name="type" value={t} checked={type === t} onChange={() => setType(t)} className="mt-1 accent-accent" />
-                      <span>
-                        <span className="block text-base font-medium">{TYPES[t].label}</span>
-                        <span className="block text-xs text-muted">
-                          Route: {TYPES[t].route.map((r) => (r.stage === 'SAC_SHC' ? 'SAC/SHC' : r.stage === 'EVC' ? (r.when ? 'EVC if intake rises over 50%' : 'EVC') : r.stage.charAt(0) + r.stage.slice(1).toLowerCase())).join(' → ')}
-                          {TYPES[t].requiresPriorApproval ? ' · needs an earlier approval' : ''}
+                <>
+                  <Field label="Programme" hint="The programme decides which rules, windows and norms apply." optional>
+                    {({ id, describedBy }) => (
+                      <Select id={id} aria-describedby={describedBy} value={programme} onChange={(e) => setProgramme(e.target.value)}>
+                        <option value="">Not specified</option>
+                        {(filing.data?.programmes ?? []).map((p) => (
+                          <option key={p.code} value={p.code} disabled={!p.inPurview}>
+                            {p.label}
+                            {p.inPurview ? '' : ' (outside purview for your institution)'}
+                          </option>
+                        ))}
+                      </Select>
+                    )}
+                  </Field>
+                  <fieldset className="flex flex-col gap-2">
+                    <legend className="mb-2 text-base text-secondary">What are you applying for?</legend>
+                    {(filing.data?.types ?? []).map((t) => (
+                      <label key={t.type} className={cx('hit flex cursor-pointer items-start gap-3 rounded-lg border p-3', type === t.type ? 'border-accent bg-accent-soft' : 'hover:bg-subtle')}>
+                        <input type="radio" name="type" value={t.type} checked={type === t.type} onChange={() => setType(t.type)} className="mt-1 accent-accent" />
+                        <span>
+                          <span className="block text-base font-medium">{t.label}</span>
+                          <span className="block text-xs text-muted">
+                            Route: {t.route.join(' → ')}
+                            {t.eligible ? '' : ' · needs an earlier approval'}
+                          </span>
                         </span>
-                      </span>
-                    </label>
-                  ))}
-                </fieldset>
+                      </label>
+                    ))}
+                  </fieldset>
+                </>
               ) : null}
 
               {step === 1 ? (
@@ -265,7 +285,7 @@ export function ApplyPage() {
 
               {step === 3 ? (
                 <ul className="flex flex-col gap-4">
-                  {cfg.documents.map((d) => (
+                  {cfgDocs.map((d) => (
                     <li key={d.kind} className="flex flex-col gap-2 rounded-lg border p-3">
                       <div className="flex flex-wrap items-center gap-2">
                         <span className="text-base font-medium">{d.label}</span>
@@ -287,7 +307,7 @@ export function ApplyPage() {
                   <dl className="grid grid-cols-1 gap-2 sm:grid-cols-2">
                     <div>
                       <dt className="text-sm text-secondary">Type</dt>
-                      <dd>{cfg.label}</dd>
+                      <dd>{cfg?.label ?? type}</dd>
                     </div>
                     <div>
                       <dt className="text-sm text-secondary">Land / built-up area</dt>
@@ -306,7 +326,7 @@ export function ApplyPage() {
                     <div>
                       <dt className="text-sm text-secondary">Documents attached</dt>
                       <dd className="tnum">
-                        {(values.documents ?? []).length} of {cfg.documents.length}
+                        {(values.documents ?? []).length} of {cfgDocs.length}
                       </dd>
                     </div>
                   </dl>
@@ -384,6 +404,25 @@ export function ApplyPage() {
           </div>
         </aside>
       </div>
+    </div>
+  );
+}
+
+/** "Filing under approval cycle 2027–28 · rules v1 (effective 18 Oct 2026)", the window and the late fee. */
+function FilingHeader({ f }: { f: FilingContext }) {
+  const cycle = f.rules.cycle.replace('-', '–');
+  return (
+    <div role="status" className={cx('mb-4 rounded-lg border px-4 py-3 text-sm', f.open ? 'border-border bg-subtle' : 'border-warning bg-warning-soft')}>
+      <p className="font-medium">
+        Filing under approval cycle {cycle} · rules v{f.rules.version} (effective {formatDate(f.rules.effectiveFrom)})
+      </p>
+      {f.open && f.window ? (
+        <p className="text-secondary">
+          {f.window.label} closes on {formatDate(f.window.to)}.{f.lateFeeInr !== null ? ` Late fee applicable: ₹${formatNumber(f.lateFeeInr)}.` : ' No late fee.'}
+        </p>
+      ) : (
+        <p className="text-secondary">{f.message} You can prepare the application now; it can be submitted once a window opens.</p>
+      )}
     </div>
   );
 }

@@ -131,7 +131,7 @@ describe('form check through the API', () => {
     const college = await userByEmail('college.abc@demo.in');
     const v = await request(app).post('/api/forms/validate').set(...bearer(college)).send({ draftId: 'd-down', type: 'NEW_INSTITUTION', values: defaultForm('NEW_INSTITUTION') });
     expect(v.body.modelAvailable).toBe(false);
-    expect(v.body.modelVersion).toBe('rules-v1');
+    expect(v.body.modelVersion).toBe('rules-2027-28 v1');
     expect(v.body.canSubmit).toBe(true);
     expect((await submitApp(app, college, { draftId: 'd-down' })).status).toBe(201);
   });

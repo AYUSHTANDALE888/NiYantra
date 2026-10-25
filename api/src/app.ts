@@ -19,6 +19,7 @@ import { actionCenterRouter } from './routes/actionCenter.js';
 import { reportsRouter } from './routes/reports.js';
 import { institutionsRouter } from './routes/institutions.js';
 import { complianceRouter } from './routes/compliance.js';
+import { publicRulesRouter, rulesRouter } from './routes/rules.js';
 
 export function createApp() {
   const app = express();
@@ -35,6 +36,8 @@ export function createApp() {
   const api = express.Router();
   api.use(healthRouter());
   api.use('/auth', authRouter());
+  // Public, no login: what changed this cycle and the current windows (portal home page).
+  api.use('/rules/public', publicRulesRouter());
   api.use(requireAuth);
   api.use('/demo', demoRouter());
   api.use('/admin', adminRouter());
@@ -46,6 +49,7 @@ export function createApp() {
   api.use('/action-center', actionCenterRouter());
   api.use('/reports', reportsRouter());
   api.use('/institutions', institutionsRouter());
+  api.use('/rules', rulesRouter());
   api.use(complianceRouter());
   api.use(formsRouter());
   api.use(queuesRouter());

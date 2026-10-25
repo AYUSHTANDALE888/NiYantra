@@ -18,8 +18,13 @@ import { AdminPage } from './pages/admin/Admin';
 import { TeamPage } from './pages/manager/Team';
 import { WorkforcePage } from './pages/manager/Workforce';
 import { CompliancePage } from './pages/college/Compliance';
+import { RulesHomePage } from './pages/rules/RulesHome';
+import { DiffPage, ImpactPage, ReviewPage, VersionPage } from './pages/rules/VersionPage';
+import { NoticesInAppPage, NoticesPage } from './pages/public/Notices';
 
 const MANAGERS: Role[] = ['SENIOR', 'SUPER_SENIOR', 'HOD'];
+// Rules Center: editors and approvers work there; admin, HoD and Bureau read it.
+const RULES: Role[] = ['RULE_EDITOR', 'RULE_APPROVER', 'ADMIN', 'HOD', 'BUREAU'];
 
 function RequireRole({ roles, children }: { roles: Role[]; children: ReactNode }) {
   const { user } = useAuth();
@@ -50,6 +55,7 @@ export function App() {
   return (
     <Routes>
       <Route path="/login" element={<LoginPage />} />
+      <Route path="/notices" element={<NoticesPage />} />
       <Route element={<Protected />}>
         <Route index element={<Home />} />
         <Route path="/college" element={<RequireRole roles={['COLLEGE']}><CollegeHomePage /></RequireRole>} />
@@ -65,6 +71,12 @@ export function App() {
         <Route path="/team" element={<RequireRole roles={MANAGERS}><TeamPage /></RequireRole>} />
         <Route path="/workforce" element={<RequireRole roles={[...MANAGERS, 'BUREAU']}><WorkforcePage /></RequireRole>} />
         <Route path="/availability" element={<RequireRole roles={['OFFICER', 'COMMITTEE', ...MANAGERS]}><AvailabilityPage /></RequireRole>} />
+        <Route path="/college/notices" element={<RequireRole roles={['COLLEGE']}><NoticesInAppPage /></RequireRole>} />
+        <Route path="/rules" element={<RequireRole roles={RULES}><RulesHomePage /></RequireRole>} />
+        <Route path="/rules/versions/:id" element={<RequireRole roles={RULES}><VersionPage /></RequireRole>} />
+        <Route path="/rules/versions/:id/diff" element={<RequireRole roles={RULES}><DiffPage /></RequireRole>} />
+        <Route path="/rules/versions/:id/impact" element={<RequireRole roles={RULES}><ImpactPage /></RequireRole>} />
+        <Route path="/rules/versions/:id/review" element={<RequireRole roles={['RULE_APPROVER']}><ReviewPage /></RequireRole>} />
         <Route path="/admin" element={<RequireRole roles={['ADMIN']}><AdminPage /></RequireRole>} />
         <Route path="/styleguide" element={<RequireRole roles={['ADMIN']}><StyleguidePage /></RequireRole>} />
         <Route path="*" element={<NoAccessPage />} />

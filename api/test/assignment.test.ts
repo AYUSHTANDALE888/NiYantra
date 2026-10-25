@@ -5,9 +5,9 @@ import { createApp } from '../src/app.js';
 import { prisma } from '../src/lib/db.js';
 import * as clock from '../src/lib/clock.js';
 import { addDays } from '../src/lib/dates.js';
-import { policy } from '../src/config/index.js';
+import { newestRules } from '../src/rules/service.js';
 import { bearer, resetDb, userByEmail } from './helpers.js';
-import { act, collegeOf, openAssignment, submitApp } from './fixtures.js';
+import { act, collegeOf, currentPin, openAssignment, submitApp } from './fixtures.js';
 
 let app: Express;
 
@@ -20,7 +20,7 @@ async function southInstitutionWithoutPortfolio() {
 async function addOpenLoad(officerId: string, points: number, applicationId: string) {
   // Test fixture: synthetic open load on an officer (one VERIFY assignment with the given weight).
   await prisma.assignment.create({
-    data: { applicationId, taskType: 'VERIFY', taskRefId: `load-${officerId}-${points}`, officerId, weight: points, tier: 0, reasonText: 'fixture', policyVersion: 1, assignedAt: clock.now() },
+    data: { applicationId, taskType: 'VERIFY', taskRefId: `load-${officerId}-${points}`, officerId, weight: points, tier: 0, reasonText: 'fixture', rulePackVersionId: (await currentPin()).rulePackVersionId, assignedAt: clock.now() },
   });
 }
 
@@ -55,7 +55,7 @@ describe('assignment engine', () => {
     expect(a!.reasonText).toMatch(/lowest load score/);
     expect(a!.reasonText).toMatch(/1 on leave until/);
     expect(a!.reasonText).toMatch(/over capacity \(1\.\d\d/);
-    expect(a!.reasonText).toMatch(/Tier 0\. Policy v1\.$/);
+    expect(a!.reasonText).toMatch(/Tier 0\. Rules 2027-28 v1\.$/);
   });
 
   it('releases and reassigns open tasks when leave covering today is added; due dates are kept [22]', async () => {
@@ -133,7 +133,7 @@ describe('assignment engine', () => {
       e.points += Number(a.weight);
       byOfficer.set(a.officerId, e);
     }
-    for (const [, e] of byOfficer) expect(e.points / e.cap).toBeLessThanOrEqual(Math.max(e.max, policy.continuityUtilCap) + 1e-9);
+    for (const [, e] of byOfficer) expect(e.points / e.cap).toBeLessThanOrEqual(Math.max(e.max, (await newestRules()).assignment.continuityUtilCap) + 1e-9);
     const sum = await prisma.assignment.aggregate({ where: { releasedAt: null }, _sum: { weight: true } });
     expect(Number(sum._sum.weight)).toBeCloseTo(50 * 1.5, 5);
     expect([...byOfficer.values()].reduce((s, e) => s + e.points, 0)).toBeCloseTo(75, 5);

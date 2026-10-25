@@ -10,7 +10,7 @@ import { roleLabel } from '../lib/format';
 import { useTitle } from '../lib/useTitle';
 import { Button, ErrorSummary, Field, Input } from '../components/ui';
 
-const ROLE_ORDER: Role[] = ['COLLEGE', 'OFFICER', 'SENIOR', 'SUPER_SENIOR', 'HOD', 'BUREAU', 'COMMITTEE', 'AUTHORITY', 'ADMIN'];
+const ROLE_ORDER: Role[] = ['COLLEGE', 'OFFICER', 'SENIOR', 'SUPER_SENIOR', 'HOD', 'BUREAU', 'COMMITTEE', 'AUTHORITY', 'ADMIN', 'RULE_EDITOR', 'RULE_APPROVER'];
 
 export function LoginPage() {
   useTitle('Sign in');

@@ -6,6 +6,7 @@ async function main() {
   const clock = await import('../src/lib/clock.js');
   const { seedDirectory } = await import('./seed/directory.js');
   const { seedHistory } = await import('./seed/history.js');
+  const { seedRulePacks } = await import('./seed/rulepacks.js');
   const { printSummary } = await import('./seed/summary.js');
 
   const existing = await prisma.user.count();
@@ -14,6 +15,8 @@ async function main() {
   const realToday = clock.today();
   console.log('[seed] directory');
   const dir = await seedDirectory(prisma, { today: realToday });
+  console.log('[seed] rule packs');
+  await seedRulePacks(prisma, { today: realToday });
   console.log('[seed] history');
   await seedHistory(dir);
   clock.setOverride(null);

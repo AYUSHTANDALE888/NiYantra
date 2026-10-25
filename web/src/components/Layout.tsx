@@ -18,6 +18,8 @@ import {
   UsersRound,
   Video,
   Briefcase,
+  BookOpen,
+  Megaphone,
 } from 'lucide-react';
 import { api } from '../api/client';
 import type { ClockInfo, Me, NotificationItem } from '../api/types';
@@ -42,6 +44,7 @@ export function navFor(user: Me): NavItem[] {
         { to: '/college', label: en.nav.applications, icon: I(Inbox), end: true },
         { to: '/college/apply', label: en.nav.apply, icon: I(FilePlus2) },
         { to: '/college/compliance', label: en.nav.compliance, icon: I(ShieldCheck) },
+        { to: '/college/notices', label: en.nav.notices, icon: I(Megaphone) },
       ];
     case 'OFFICER':
       return [
@@ -54,6 +57,7 @@ export function navFor(user: Me): NavItem[] {
         { to: '/bureau', label: en.nav.bureau, icon: I(Briefcase) },
         { to: '/officer', label: en.nav.actionCenter, icon: I(LayoutDashboard) },
         { to: '/workforce', label: en.nav.workforce, icon: I(UsersRound) },
+        { to: '/rules', label: en.nav.rules, icon: I(BookOpen) },
       ];
     case 'SENIOR':
     case 'SUPER_SENIOR':
@@ -62,6 +66,7 @@ export function navFor(user: Me): NavItem[] {
         { to: '/team', label: en.nav.team, icon: I(Users) },
         { to: '/workforce', label: en.nav.workforce, icon: I(UsersRound) },
         { to: '/availability', label: en.nav.availability, icon: I(CalendarDays) },
+        ...(user.role === 'HOD' ? [{ to: '/rules', label: en.nav.rules, icon: I(BookOpen) }] : []),
       ];
     case 'COMMITTEE':
       return [
@@ -70,9 +75,13 @@ export function navFor(user: Me): NavItem[] {
       ];
     case 'AUTHORITY':
       return [{ to: '/authority', label: en.nav.authority, icon: I(Gavel) }];
+    case 'RULE_EDITOR':
+    case 'RULE_APPROVER':
+      return [{ to: '/rules', label: en.nav.rules, icon: I(BookOpen) }];
     case 'ADMIN':
       return [
         { to: '/admin', label: en.nav.admin, icon: I(Settings) },
+        { to: '/rules', label: en.nav.rules, icon: I(BookOpen) },
         { to: '/styleguide', label: en.nav.styleguide, icon: I(Palette) },
       ];
     default:

@@ -5,7 +5,7 @@ import { prisma } from '../lib/db.js';
 import { today } from '../lib/clock.js';
 import { calendarDaysBetween, isoDate, toDateOnly } from '../lib/dates.js';
 import { workingDaysBetween } from '../lib/workdays.js';
-import { rules } from '../config/index.js';
+import { rulesForApp, typeLabels } from '../rules/service.js';
 import { permittedActions } from '../policy/can.js';
 import { STAGE_LABEL } from './routing.js';
 import { taskLabel } from '../assignment/engine.js';
@@ -123,6 +123,7 @@ export async function listRows(user: AuthUser, apps: (Application & { institutio
     }),
   ]);
   const holderMap = new Map(holders.map((h) => [h.id, h]));
+  const labels = await typeLabels(apps);
   const t = today();
   return apps.map((a) => {
     const mine = assignments.filter((x) => x.applicationId === a.id);
@@ -135,7 +136,7 @@ export async function listRows(user: AuthUser, apps: (Application & { institutio
       institutionName: a.institution.name,
       permanentId: a.institution.permanentId,
       type: a.type,
-      typeLabel: rules.types[a.type].label,
+      typeLabel: labels.get(a.id) ?? a.type,
       category: a.category,
       stage: a.stage,
       stageLabel: STAGE_LABEL[a.stage],
@@ -153,6 +154,14 @@ export async function listRows(user: AuthUser, apps: (Application & { institutio
           : null,
     };
   });
+}
+
+/** DECIDE's default undertaking due date: today plus norms.deficiencyCompliancePeriod (months) of the pinned rules. */
+function undertakingDefault(r: Awaited<ReturnType<typeof rulesForApp>>, formData: Record<string, unknown>): string {
+  const months = r.norm('deficiencyCompliancePeriod', r.programme(formData.programme as string | undefined)) ?? 3;
+  const t = today();
+  const d = new Date(Date.UTC(t.getUTCFullYear(), t.getUTCMonth() + months, t.getUTCDate()));
+  return isoDate(d);
 }
 
 export async function caseDetail(user: AuthUser, applicationId: string) {
@@ -189,8 +198,10 @@ export async function caseDetail(user: AuthUser, applicationId: string) {
 
   const docs = await prisma.document.findMany({ where: { applicationId }, orderBy: { uploadedAt: 'asc' } });
   const current = new Set((await currentDocuments(prisma, applicationId)).map((d) => d.id));
-  const cfg = rules.types[app.type];
-  const docCfg = new Map(cfg.documents.map((d) => [d.kind, d]));
+  const r = await rulesForApp(app);
+  const cfg = r.type(app.type);
+  const requiredDocuments = r.documents(app.type, { formData: app.formData as Record<string, unknown>, institution: { isTechnical: app.institution.isTechnical, kind: app.institution.kind } });
+  const docCfg = new Map(requiredDocuments.map((d) => [d.kind, d]));
   const openStageItem = app.deadlineItems.filter((i) => i.status === 'OPEN' && (STAGE_ITEM_TYPES as readonly string[]).includes(i.type)).pop() ?? null;
   const openAssignments = app.assignments.filter((a) => !a.releasedAt);
   const currentAssignment = openAssignments.find((a) => a.taskType !== 'VERIFY') ?? openAssignments[0] ?? null;
@@ -227,7 +238,9 @@ export async function caseDetail(user: AuthUser, applicationId: string) {
       portfolioOfficer: isCollege ? null : app.institution.portfolioOfficer,
     },
     routeSteps: routeSteps(app, audit, openStageItem),
-    requiredDocuments: cfg.documents,
+    requiredDocuments: requiredDocuments.map((d) => ({ kind: d.kind, label: d.label, critical: d.critical, hasExpiry: d.hasExpiry, source: d.source ?? null })),
+    ruleDefaults: { undertakingDueDate: undertakingDefault(r, app.formData as Record<string, unknown>) },
+    rules: { versionId: r.pinned.id, cycle: r.pinned.cycleCode, version: r.pinned.version, label: r.label, effectiveFrom: r.pinned.effectiveFrom, contentHash: r.pinned.contentHash },
     documents: docs.map((d) => ({
       id: d.id,
       kind: d.kind,

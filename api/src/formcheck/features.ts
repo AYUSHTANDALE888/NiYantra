@@ -1,7 +1,7 @@
 // Form check features (section 9.2). Computed identically in Python (formcheck/app/features.py).
 import { z } from 'zod';
 import type { AppType } from '@prisma/client';
-import { rules } from '../config/index.js';
+import type { ResolvedRules, EvalContext } from '../rules/resolved.js';
 import { parseDateOnly } from '../lib/dates.js';
 
 const isoDate = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Use the format YYYY-MM-DD');
@@ -20,6 +20,8 @@ export const formValuesSchema = z.object({
   proposedName: z.string().trim().max(200).optional(),
   fillSeconds: z.number().min(0).max(1_000_000).optional(),
   documents: z.array(z.string().max(60)).max(30).optional(),
+  /** Programme code from the cycle's rule pack (add-on): drives purview, schedule scope and norms. */
+  programme: z.string().regex(/^[A-Z0-9_]{2,20}$/).optional(),
 });
 export type FormValues = z.infer<typeof formValuesSchema>;
 
@@ -62,15 +64,12 @@ export const FIELD_LABEL: Record<string, string> = {
   log_fill_seconds: 'Time spent filling the form',
 };
 
-/** Critical documents count as the required set for docs_ratio. */
-export function requiredDocKinds(type: AppType): string[] {
-  return rules.types[type].documents.filter((d) => d.critical).map((d) => d.kind);
-}
 
 const num = (v: number | undefined | null): number | null => (v === undefined || v === null || !Number.isFinite(v) ? null : v);
 const div = (a: number | null, b: number | null): number | null => (a === null || b === null || b === 0 ? null : a / b);
 
-export function computeFeatures(type: AppType, v: FormValues, todayIso: string): Features {
+/** `required`: the critical document kinds of the case's rules (the required set for docs_ratio). */
+export function computeFeatures(v: FormValues, todayIso: string, required: string[]): Features {
   const courses = v.courses ?? [];
   const land = num(v.landAreaSqm);
   const built = num(v.builtupAreaSqm);
@@ -83,7 +82,6 @@ export function computeFeatures(type: AppType, v: FormValues, todayIso: string):
     const days = (parseDateOnly(v.leaseExpiry).getTime() - parseDateOnly(todayIso).getTime()) / 86_400_000;
     leaseYears = days / 365.25;
   }
-  const required = requiredDocKinds(type);
   // docs_ratio is unknown until the applicant reaches the documents step (documents omitted).
   const uploaded = new Set(v.documents ?? []);
   const docsRatio = v.documents === undefined ? null : required.length ? required.filter((k) => uploaded.has(k)).length / required.length : 1;
@@ -103,9 +101,9 @@ export function computeFeatures(type: AppType, v: FormValues, todayIso: string):
 }
 
 /** Required-field validation per type (the form check itself never blocks). */
-export function requiredMissing(type: AppType, v: FormValues): { field: string; message: string }[] {
+export function requiredMissing(r: ResolvedRules, type: AppType, v: FormValues, ctx: EvalContext = {}): { field: string; message: string }[] {
   const out: { field: string; message: string }[] = [];
-  const needsSite = rules.types[type].documents.some((d) => d.kind === 'LAND_LEASE');
+  const needsSite = r.documents(type, ctx).some((d) => d.kind === 'LAND_LEASE');
   if (!v.courses || v.courses.length === 0 || v.courses.every((c) => c.intake <= 0)) out.push({ field: 'courses', message: 'Add at least one course with its intake.' });
   if (!v.facultyCount) out.push({ field: 'facultyCount', message: 'Enter the number of faculty members.' });
   if (needsSite) {

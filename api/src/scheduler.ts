@@ -5,6 +5,7 @@ import type { Prisma } from '@prisma/client';
 import { prisma } from './lib/db.js';
 import * as clock from './lib/clock.js';
 import { loadHolidays } from './lib/workdays.js';
+import { startRulesListener } from './rules/service.js';
 import { SCHEDULER_LOCK_ID } from './lib/locks.js';
 import { runCycleWithLock, type CycleResult } from './engine/cycle.js';
 
@@ -50,6 +51,7 @@ async function main(): Promise<void> {
     process.exit(1);
   });
   await lockConn.connect();
+  await startRulesListener();
   console.log(`[scheduler] ${instanceId} started`);
 
   // Standby: retry the lock every 10 s, heartbeat as non-leader.

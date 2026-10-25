@@ -18,6 +18,8 @@ enum Role {
   COMMITTEE
   AUTHORITY
   ADMIN
+  RULE_EDITOR
+  RULE_APPROVER
 }
 
 enum Stage {
@@ -126,6 +128,27 @@ enum UndertakingStatus {
   VERIFIED
 }
 
+enum RulePackStatus {
+  DRAFT
+  IN_REVIEW
+  APPROVED
+  PUBLISHED
+  SUPERSEDED
+  REJECTED
+}
+
+enum AmendmentKind {
+  APH
+  ADDENDUM
+  CORRIGENDUM
+  PUBLIC_NOTICE
+  REVISED_PUBLIC_NOTICE
+  CIRCULAR
+  ACADEMIC_CALENDAR
+  FEE_NOTIFICATION
+  PROTOTYPE_PLACEHOLDER
+}
+
 enum Severity {
   NONE
   MEDIUM
@@ -156,6 +179,8 @@ model User {
   institution   Institution? @relation("CollegeUsers", fields: [institutionId], references: [id])
   title         String?
   active        Boolean      @default(true)
+  /// Rule change notices published after this are "new since your last visit" (college banner).
+  noticesSeenAt DateTime?
 
   profile       OfficerProfile?
   availability  OfficerAvailability[] @relation("AvailabilityUser")
@@ -199,6 +224,8 @@ model Institution {
   region             Region        @relation(fields: [regionId], references: [id])
   portfolioOfficerId String?
   portfolioOfficer   User?         @relation("Portfolio", fields: [portfolioOfficerId], references: [id])
+  kind               String        @default("ENGINEERING_COLLEGE")
+  isTechnical        Boolean       @default(true)
   collegeUsers       User[]        @relation("CollegeUsers")
   applications       Application[]
   documents          Document[]
@@ -215,13 +242,17 @@ model PortfolioHistory {
 }
 
 model Application {
-  id                String     @id @default(uuid())
-  applicationNo     String     @unique
+  id                String          @id @default(uuid())
+  applicationNo     String          @unique
   institutionId     String
-  institution       Institution @relation(fields: [institutionId], references: [id])
+  institution       Institution     @relation(fields: [institutionId], references: [id])
   regionId          String
-  region            Region     @relation(fields: [regionId], references: [id])
+  region            Region          @relation(fields: [regionId], references: [id])
   type              AppType
+  cycleId           String
+  cycle             ApprovalCycle   @relation(fields: [cycleId], references: [id])
+  rulePackVersionId String
+  rulePackVersion   RulePackVersion @relation(fields: [rulePackVersionId], references: [id])
   category          Category
   categoryRank      Int
   route             Json
@@ -229,8 +260,8 @@ model Application {
   status            Status
   holderType        HolderType
   holderUserId      String?
-  evcScheduled      Boolean    @default(false)
-  sacForwarded      Boolean    @default(false)
+  evcScheduled      Boolean         @default(false)
+  sacForwarded      Boolean         @default(false)
   previousOfficerId String?
   submittedAt       DateTime
   stageEnteredAt    DateTime
@@ -250,6 +281,7 @@ model Application {
 
   @@index([regionId, stage])
   @@index([institutionId])
+  @@index([rulePackVersionId])
 }
 
 model Assignment {
@@ -263,7 +295,7 @@ model Assignment {
   weight               Decimal
   tier                 Int
   reasonText           String
-  policyVersion        Int
+  rulePackVersionId    String
   recommendedOfficerId String?
   assignedAt           DateTime
   releasedAt           DateTime?
@@ -297,16 +329,16 @@ model Document {
 }
 
 model Deficiency {
-  id            String      @id @default(uuid())
-  applicationId String
-  application   Application @relation(fields: [applicationId], references: [id])
-  items         Json
-  reason        String
-  raisedById    String
-  raisedAt      DateTime
-  resolvedAt    DateTime?
-  replyNote     String?
-  replyDocumentIds Json     @default("[]")
+  id               String      @id @default(uuid())
+  applicationId    String
+  application      Application @relation(fields: [applicationId], references: [id])
+  items            Json
+  reason           String
+  raisedById       String
+  raisedAt         DateTime
+  resolvedAt       DateTime?
+  replyNote        String?
+  replyDocumentIds Json        @default("[]")
 }
 
 model EvcVisit {
@@ -321,6 +353,7 @@ model EvcVisit {
   checklist         Json?
   recommendation    String?
   reportText        String?
+  appointedUnder    String?
   reportedById      String?
   reportedAt        DateTime?
 }
@@ -466,8 +499,10 @@ model Holiday {
 }
 
 model SimClock {
-  id         Int @id @default(1)
-  offsetDays Int @default(0)
+  id             Int     @id @default(1)
+  offsetDays     Int     @default(0)
+  /// Demo only (DEMO_MODE=true): file outside the application windows. Set by the admin; audited.
+  ignoreSchedule Boolean @default(false)
 }
 
 model SchedulerHeartbeat {
@@ -475,4 +510,53 @@ model SchedulerHeartbeat {
   isLeader   Boolean
   lastRunAt  DateTime
   lastResult Json
+}
+
+model ApprovalCycle {
+  id           String            @id @default(uuid())
+  code         String            @unique
+  label        String
+  baseRef      String
+  createdAt    DateTime
+  versions     RulePackVersion[]
+  applications Application[]
+}
+
+model RulePackVersion {
+  id               String         @id @default(uuid())
+  cycleId          String
+  cycle            ApprovalCycle  @relation(fields: [cycleId], references: [id])
+  version          Int
+  status           RulePackStatus
+  content          Json
+  contentHash      String
+  parentVersionId  String?
+  createdById      String
+  createdAt        DateTime
+  submittedById    String?
+  submittedAt      DateTime?
+  approvedById     String?
+  approvedAt       DateTime?
+  publishedById    String?
+  publishedAt      DateTime?
+  rejectedRemarks  String?
+  effectiveFrom    DateTime       @db.Date
+  scheduledPublish Boolean        @default(false)
+  amendment        Amendment?
+  applications     Application[]
+
+  @@unique([cycleId, version])
+}
+
+model Amendment {
+  id          String          @id @default(uuid())
+  versionId   String          @unique
+  version     RulePackVersion @relation(fields: [versionId], references: [id], onDelete: Cascade)
+  kind        AmendmentKind
+  refNo       String
+  issuedOn    DateTime        @db.Date
+  title       String
+  summary     String
+  sourceDocId String?
+  applyScope  Json            @default("{}")
 }

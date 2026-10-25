@@ -7,7 +7,8 @@ import * as clock from '../../src/lib/clock.js';
 import { addDays, isoDate, toDateOnly } from '../../src/lib/dates.js';
 import { addWorkingDays, isWorkingDay, loadHolidays } from '../../src/lib/workdays.js';
 import { placeholderPdf } from '../../src/lib/storage.js';
-import { rules } from '../../src/config/index.js';
+import { forApplication, newestRules } from '../../src/rules/service.js';
+import type { ResolvedRules } from '../../src/rules/resolved.js';
 import { performAction, submitApplication, type UploadInput } from '../../src/workflow/actions.js';
 import { validateForm } from '../../src/formcheck/service.js';
 import { runEngineCycle } from '../../src/engine/cycle.js';
@@ -29,6 +30,15 @@ function rng(seed: number) {
 const COURSES = ['B.Tech Computer Science', 'B.Tech Electronics and Communication', 'B.Tech Mechanical', 'B.Tech Civil', 'B.Tech Electrical', 'MBA', 'MCA', 'B.Pharm', 'B.Arch', 'Diploma in Mechanical'];
 const COMMITTEE_EMAILS = ['committee1@demo.in', 'committee2@demo.in', 'committee3@demo.in', 'committee4@demo.in', 'committee5@demo.in', 'committee6@demo.in'];
 
+/** Programme code for the first course (no code for courses outside the prototype's programmes). */
+function programmeOf(course: string): string | undefined {
+  if (course.startsWith('B.Tech')) return 'BTECH';
+  if (course.startsWith('Diploma')) return 'DIPLOMA_ENGG';
+  if (course === 'MBA') return 'MBA';
+  if (course === 'MCA') return 'MCA';
+  return undefined;
+}
+
 interface Fault {
   builtupOverLand?: boolean;
   facultyShortage?: boolean;
@@ -40,7 +50,8 @@ export async function seedHistory(dir: Directory): Promise<void> {
   const rand = rng(20261024);
   const wd = (n: number) => addWorkingDays(T0, -n);
   /** Filing date that leaves exactly `left` working days on a 15-day scrutiny clock today. */
-  const filedWithLeft = (left: number) => addWorkingDays(addWorkingDays(T0, left), -rules.sla.SCRUTINY);
+  const sla = (await newestRules()).timelines;
+  const filedWithLeft = (left: number) => addWorkingDays(addWorkingDays(T0, left), -sla.SCRUTINY);
   const users = new Map<string, AuthUser>();
   async function user(id: string): Promise<AuthUser> {
     if (!users.has(id)) {
@@ -107,11 +118,13 @@ export async function seedHistory(dir: Directory): Promise<void> {
       fillSeconds: Math.round(900 + rand() * 2400),
       ...(type === 'INTAKE_INCREASE' ? { intakeIncreasePct: Math.round(10 + rand() * 30) } : {}),
       ...(type === 'NAME_CHANGE' ? { proposedName: 'Sri Venkateswara Institute of Technology' } : {}),
+      ...(programmeOf(courses[0]!.name) ? { programme: programmeOf(courses[0]!.name) } : {}),
     };
   }
 
-  function docsFor(type: AppType, inst: Inst, leaseExpiry: string, withOptional: boolean): UploadInput[] {
-    return rules.types[type].documents
+  function docsFor(r: ResolvedRules, type: AppType, inst: Inst, leaseExpiry: string, withOptional: boolean): UploadInput[] {
+    return r
+      .documents(type)
       .filter((d) => d.critical || withOptional)
       .map((d) => ({
         buffer: placeholderPdf([d.label, inst.name, `Placeholder document generated for the demo seed`]),
@@ -122,17 +135,30 @@ export async function seedHistory(dir: Directory): Promise<void> {
       }));
   }
 
+  // Back-dated filings are pinned to the version published on their filing date: the 2027-28 version once its
+  // window has opened, otherwise the 2026-27 version in force on that date.
+  async function pinFor(at: Date): Promise<{ cycleId: string; rulePackVersionId: string }> {
+    const v = await prisma.rulePackVersion.findFirst({
+      where: { publishedAt: { lte: at }, status: { in: ['PUBLISHED', 'SUPERSEDED'] } },
+      orderBy: [{ cycle: { code: 'desc' } }, { publishedAt: 'desc' }],
+    });
+    if (!v) throw new Error(`No rules were published by ${at.toISOString()}`);
+    return { cycleId: v.cycleId, rulePackVersionId: v.id };
+  }
+
   const appIds = new Map<string, string>();
   async function file(key: string, inst: Inst, type: AppType, opts: { fault?: Fault; lease?: number; optional?: boolean; justification?: string } = {}) {
     tick();
     const leaseExpiry = opts.fault?.expiredLeaseDays !== undefined ? isoDate(addDays(T0, -opts.fault.expiredLeaseDays)) : opts.lease !== undefined ? isoDate(addDays(T0, opts.lease)) : isoDate(addDays(T0, 900 + Math.floor(rand() * 2000)));
     const values = formValues(type, opts.fault, leaseExpiry);
-    const files = docsFor(type, inst, leaseExpiry, opts.optional ?? rand() < 0.5);
+    const pin = await pinFor(clock.now());
+    const pinned = await forApplication(pin);
+    const files = docsFor(pinned, type, inst, leaseExpiry, opts.optional ?? rand() < 0.5);
     const college = await user(inst.collegeUserId);
     const draftId = `seed-${key}`;
-    const check = await validateForm(college, { draftId, type, values: { ...values, documents: files.map((f) => f.kind) } });
+    const check = await validateForm(college, { draftId, type, values: { ...values, documents: files.map((f) => f.kind) } }, prisma, pinned);
     const justification = check.severity !== 'NONE' ? opts.justification ?? 'The figures are correct; the plan approval letter is attached for reference.' : undefined;
-    const id = await submitApplication(college, { type, formData: values, draftId, justification }, files);
+    const id = await submitApplication(college, { type, formData: values, draftId, justification }, files, { pin });
     appIds.set(key, id);
     return id;
   }
