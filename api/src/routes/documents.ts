@@ -10,7 +10,7 @@ import { parseDateOnly } from '../lib/dates.js';
 import { currentUser, type AuthUser } from '../auth/middleware.js';
 import { inScope } from '../policy/scope.js';
 import { logAccessDenied } from '../policy/roles.js';
-import { rules } from '../config/index.js';
+import { rulesForApp } from '../rules/service.js';
 
 /** A document is readable when its application is in scope, or (institution documents) by the college itself. */
 export async function canReadDocument(user: AuthUser, doc: { applicationId: string | null; institutionId: string }): Promise<boolean> {
@@ -37,7 +37,7 @@ export function documentsRouter(): Router {
       if (!req.file) throw badRequest('Choose a file to upload.');
       const app = await prisma.application.findUnique({ where: { id: body.applicationId } });
       if (!app || app.institutionId !== user.institutionId) throw notFound();
-      if (!rules.types[app.type].documents.some((d) => d.kind === body.kind)) throw badRequest(`${body.kind} is not a document for this application type.`);
+      if (!(await rulesForApp(app)).documents(app.type, { formData: app.formData as Record<string, unknown> }).some((d) => d.kind === body.kind)) throw badRequest(`${body.kind} is not a document for this application type.`);
       const s = saveBuffer(req.file.buffer, req.file.originalname, req.file.mimetype);
       const doc = await prisma.document.create({
         data: {

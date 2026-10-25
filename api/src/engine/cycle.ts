@@ -9,7 +9,8 @@ import { addDays, calendarDaysBetween, formatDate, isoDate, toDateOnly } from '.
 import { loadHolidays, nextWorkingDayFrom, workingDaysBetween } from '../lib/workdays.js';
 import { appendAudit } from '../lib/audit.js';
 import { notify } from '../lib/notify.js';
-import { rules } from '../config/index.js';
+import { refreshPublished, rulesForApp } from '../rules/service.js';
+import { publishScheduled } from '../rules/versions.js';
 import { getSubtreeUserIds, managerAtLevel, regionAuthority, regionHod } from '../policy/subtree.js';
 import { isTaskUrgent, releaseForAvailability } from '../assignment/engine.js';
 import { buildFlags } from './flags.js';
@@ -48,7 +49,7 @@ function userKey(userId: string): bigint {
 }
 
 type ItemWithApp = DeadlineItem & {
-  application: { id: string; applicationNo: string; regionId: string; institutionId: string; institution: { name: string } };
+  application: { id: string; applicationNo: string; regionId: string; institutionId: string; cycleId: string; rulePackVersionId: string; institution: { name: string } };
 };
 
 async function itemSubject(tx: Tx, it: ItemWithApp): Promise<string> {
@@ -58,7 +59,7 @@ async function itemSubject(tx: Tx, it: ItemWithApp): Promise<string> {
   }
   if (it.type === 'DOC_EXPIRY') {
     const d = await tx.document.findUnique({ where: { id: it.sourceId } });
-    const label = d ? rules.types[(await tx.application.findUniqueOrThrow({ where: { id: it.applicationId }, select: { type: true } })).type].documents.find((x) => x.kind === d.kind)?.label : null;
+    const label = d ? (await rulesForApp(it.application, tx)).content.documents.find((x) => x.kind === d.kind)?.label : null;
     return `${(label ?? d?.kind ?? 'document').toLowerCase()} expiry`;
   }
   return ITEM_LABEL[it.type];
@@ -89,13 +90,15 @@ interface Counters {
 async function processItem(it: ItemWithApp, today: Date, c: Counters): Promise<void> {
   const d = daysToDueOf(it, today);
   const isCompliance = COMPLIANCE.includes(it.type);
+  // Reminders and escalation are operational: read from the cycle's current published version each cycle.
+  const r = await rulesForApp(it.application);
   await prisma.$transaction(async (tx) => {
     const subject = await itemSubject(tx, it);
     const no = it.application.applicationNo;
 
     // Reminders (compliance) at 30/15/7/0 calendar days before due; late when the offset's date passed more than a day ago.
     if (isCompliance) {
-      for (const offset of rules.complianceReminderOffsets) {
+      for (const offset of r.reminders.complianceOffsets) {
         if (d > offset) continue;
         const trigger = addDays(it.dueDate, -offset);
         const late = calendarDaysBetween(trigger, today) > 1;
@@ -113,8 +116,8 @@ async function processItem(it: ItemWithApp, today: Date, c: Counters): Promise<v
     } else if (it.totalDays) {
       // At risk: 80% of a stage SLA used, not yet overdue.
       const used = it.totalDays - d;
-      if (d >= 0 && used / it.totalDays >= rules.atRiskPct / 100) {
-        if (await alertOnce(tx, it.id, 'AT_RISK', rules.atRiskPct, today, false)) {
+      if (d >= 0 && used / it.totalDays >= r.reminders.atRiskPct / 100) {
+        if (await alertOnce(tx, it.id, 'AT_RISK', r.reminders.atRiskPct, today, false)) {
           c.atRisk++;
           c.notifications += await notify(tx, [it.responsibleUserId], {
             applicationId: it.applicationId,
@@ -139,7 +142,7 @@ async function processItem(it: ItemWithApp, today: Date, c: Counters): Promise<v
     }
 
     // Escalation: overdue by ≥ 3 / 7 / 14 → level 1 / 2 / 3, each level once, in order.
-    const thresholds = rules.escalationThresholds;
+    const thresholds = r.escalation.thresholds;
     let level = it.escalationLevel;
     for (let n = 1; n <= thresholds.length; n++) {
       if (overdueBy < thresholds[n - 1]! || n <= level) continue;
@@ -226,24 +229,30 @@ async function digests(today: Date, c: Counters): Promise<void> {
 export async function stalledApplications(today: Date) {
   const apps = await prisma.application.findMany({
     where: { status: 'IN_STAGE' },
-    select: { id: true, lastActionAt: true, holderUserId: true, deadlineItems: { where: { status: 'OPEN', type: { in: ['STAGE_SLA', 'EVC_SCHEDULE', 'EVC_REPORT'] } } } },
+    select: { id: true, cycleId: true, rulePackVersionId: true, lastActionAt: true, holderUserId: true, deadlineItems: { where: { status: 'OPEN', type: { in: ['STAGE_SLA', 'EVC_SCHEDULE', 'EVC_REPORT'] } } } },
   });
-  return apps.filter((a) => {
-    if (workingDaysBetween(toDateOnly(a.lastActionAt), today) < rules.stalledWorkingDays) return false;
-    return a.deadlineItems.length > 0 && a.deadlineItems.every((i) => daysToDueOf(i, today) >= 0);
-  });
+  const out: typeof apps = [];
+  for (const a of apps) {
+    const r = await rulesForApp(a);
+    if (workingDaysBetween(toDateOnly(a.lastActionAt), today) < r.reminders.stalledWorkingDays) continue;
+    if (a.deadlineItems.length > 0 && a.deadlineItems.every((i) => daysToDueOf(i, today) >= 0)) out.push(a);
+  }
+  return out;
 }
 
 /** One full cycle. Callers hold the cycle lock (runCycleWithLock). */
 export async function runEngineCycle(meta: Record<string, string> = {}, opts: { flags?: boolean; digests?: boolean } = {}): Promise<CycleResult> {
   await clock.refresh().catch(() => undefined);
+  // Fresh rules each cycle; versions scheduled for publication take effect first.
+  await refreshPublished();
+  const published = await publishScheduled();
   await loadHolidays(prisma);
   const today = clock.today();
   const c: Counters = { reminders: 0, lateReminders: 0, atRisk: 0, overdue: 0, escalations: 0, released: 0, digests: 0, notifications: 0 };
 
   const items = (await prisma.deadlineItem.findMany({
     where: { status: 'OPEN' },
-    include: { application: { select: { id: true, applicationNo: true, regionId: true, institutionId: true, institution: { select: { name: true } } } } },
+    include: { application: { select: { id: true, applicationNo: true, regionId: true, institutionId: true, cycleId: true, rulePackVersionId: true, institution: { select: { name: true } } } } },
     orderBy: { id: 'asc' },
   })) as ItemWithApp[];
   for (const it of items) await processItem(it, today, c);
@@ -263,7 +272,7 @@ export async function runEngineCycle(meta: Record<string, string> = {}, opts: { 
       }),
     );
   }
-  return { ...c, itemsChecked: items.length, ...flags, today: isoDate(today) };
+  return { ...c, itemsChecked: items.length, rulesPublished: published, ...flags, today: isoDate(today) };
 }
 
 /**

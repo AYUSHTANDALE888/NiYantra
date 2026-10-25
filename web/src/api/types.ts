@@ -178,6 +178,8 @@ export interface CaseDetail {
   institution: { id: string; name: string; permanentId: string; regionCode: string; regionName: string; portfolioOfficer: { id: string; name: string } | null };
   routeSteps: RouteStep[];
   requiredDocuments: DocCfg[];
+  rules?: RulesRef;
+  ruleDefaults?: { undertakingDueDate: string };
   documents: CaseDocument[];
   deficiencies: { id: string; items: string[]; reason: string; raisedBy: string | null; raisedAt: string; resolvedAt: string | null; replyNote: string | null; replyDocumentIds: string[] }[];
   evcVisit: {
@@ -307,4 +309,23 @@ export interface UnassignedRow {
 export interface ComplianceView {
   undertakings: { id: string; applicationId: string; applicationNo: string; condition: string; dueDate: string; daysToDue: number; status: string; remarks: string | null }[];
   documents: { id: string; applicationId: string; applicationNo: string; kind: string; label: string; fileName: string; expiryDate: string; daysToExpiry: number; renewalPending: { id: string; expiryDate: string } | null }[];
+}
+
+export interface RulesRef {
+  versionId: string;
+  cycle: string;
+  version: number;
+  label: string;
+  effectiveFrom: string;
+  contentHash?: string;
+}
+
+export interface FilingContext {
+  open: boolean;
+  message: string | null;
+  window: { id: string; label: string; kind: string; from: string; to: string } | null;
+  lateFeeInr: number | null;
+  rules: RulesRef;
+  programmes: { code: string; label: string; level: string; discipline: string; inPurview: boolean }[];
+  types: { type: AppType; label: string; category: string; channel: string; eligible: boolean; route: string[]; documents: DocCfg[] }[];
 }

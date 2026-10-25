@@ -5,7 +5,7 @@ import { h, parse } from '../lib/http.js';
 import { today } from '../lib/clock.js';
 import { calendarDaysBetween, isoDate } from '../lib/dates.js';
 import { upload } from '../lib/storage.js';
-import { rules } from '../config/index.js';
+import { rulesForApp } from '../rules/service.js';
 import { currentUser } from '../auth/middleware.js';
 import { requireRole } from '../policy/roles.js';
 import { uploadEvidence, uploadRenewal, verifyEvidence, verifyRenewal, type UploadInput } from '../workflow/actions.js';
@@ -44,6 +44,8 @@ export function complianceRouter(): Router {
           remarks: u.remarks,
         })),
       );
+      const docLabels = new Map<string, Map<string, string>>();
+      for (const a of apps) docLabels.set(a.id, new Map((await rulesForApp(a)).content.documents.map((d) => [d.kind, d.label])));
       const documents = apps.flatMap((a) => {
         const superseded = new Set(a.documents.map((d) => d.supersedesId).filter(Boolean));
         return a.documents
@@ -55,7 +57,7 @@ export function complianceRouter(): Router {
               applicationId: a.id,
               applicationNo: a.applicationNo,
               kind: d.kind,
-              label: rules.types[a.type].documents.find((c) => c.kind === d.kind)?.label ?? d.kind,
+              label: docLabels.get(a.id)?.get(d.kind) ?? d.kind,
               fileName: d.fileName,
               expiryDate: isoDate(d.expiryDate!),
               daysToExpiry: calendarDaysBetween(t, d.expiryDate!),

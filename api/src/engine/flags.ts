@@ -6,7 +6,7 @@ import * as clock from '../lib/clock.js';
 import { addDays, calendarDaysBetween, formatDate, toDateOnly } from '../lib/dates.js';
 import { addWorkingDays, nextWorkingDayFrom, workingDaysBetween } from '../lib/workdays.js';
 import { appendAudit } from '../lib/audit.js';
-import { rules } from '../config/index.js';
+import { rulesForApp } from '../rules/service.js';
 import { managerAtLevel, regionHod } from '../policy/subtree.js';
 import { proposeCommittee } from '../assignment/committee.js';
 import { parseAssignSource } from '../assignment/unassigned.js';
@@ -107,7 +107,8 @@ export async function buildDesiredFlags(today: Date, db: Db = prisma): Promise<D
   const out: DesiredFlag[] = [];
 
   for (const app of apps) {
-    const cfgDocs = rules.types[app.type].documents;
+    const pack = await rulesForApp(app, db);
+    const cfgDocs = pack.documents(app.type, { formData: app.formData as Record<string, unknown> });
     const regionLabel = REGION[app.region.code] ?? app.region.code;
     const daysInStage = Math.max(0, workingDaysBetween(toDateOnly(app.stageEnteredAt), today));
     const base = { categoryRank: app.categoryRank, submittedAt: app.submittedAt.toISOString() };
@@ -142,7 +143,7 @@ export async function buildDesiredFlags(today: Date, db: Db = prisma): Promise<D
     };
     /** Next escalation: the first threshold above the current level, its date and the manager's title. */
     const nextEscalation = async (it: DeadlineItem): Promise<{ text: string; at: Date | null }> => {
-      const th = rules.escalationThresholds;
+      const th = pack.escalation.thresholds;
       const next = it.escalationLevel + 1;
       if (next > th.length) return { text: '', at: null };
       const t = th[next - 1]!;
@@ -186,7 +187,7 @@ export async function buildDesiredFlags(today: Date, db: Db = prisma): Promise<D
               escalationLevel: it.escalationLevel,
               sortKeys: sort,
             });
-          } else if (it.totalDays && (it.totalDays - d) / it.totalDays >= rules.atRiskPct / 100) {
+          } else if (it.totalDays && (it.totalDays - d) / it.totalDays >= pack.reminders.atRiskPct / 100) {
             const pct = Math.round(((it.totalDays - d) / it.totalDays) * 100);
             push({
               reasonCode: 'STAGE_AT_RISK',
@@ -216,7 +217,7 @@ export async function buildDesiredFlags(today: Date, db: Db = prisma): Promise<D
               sortKeys: sort,
             });
           }
-          if (!app.evcScheduled && d <= rules.urgentDays) {
+          if (!app.evcScheduled && d <= pack.reminders.urgentDays) {
             const { proposal } = await proposeCommittee(app.id, nextDay, db);
             if (proposal.length < 3) {
               push({
@@ -274,7 +275,7 @@ export async function buildDesiredFlags(today: Date, db: Db = prisma): Promise<D
           if (!collegeActs) break;
           const next = isU ? (overdue ? 'Upload evidence; officer to follow up' : 'Upload evidence') : 'Upload renewed document';
           const code: ReasonCode = isU ? (overdue ? 'UNDERTAKING_OVERDUE' : 'UNDERTAKING_DUE_SOON') : overdue ? 'DOC_EXPIRED' : 'DOC_EXPIRING';
-          if (!overdue && d > rules.dueSoonDays) break;
+          if (!overdue && d > pack.reminders.dueSoonDays) break;
           push({
             reasonCode: code,
             sourceItemId: it.id.toString(),
@@ -297,7 +298,7 @@ export async function buildDesiredFlags(today: Date, db: Db = prisma): Promise<D
       }
 
       // URGENT: any open item due within 3 days or today.
-      if (d >= 0 && d <= rules.urgentDays && collegeActs) {
+      if (d >= 0 && d <= pack.reminders.urgentDays && collegeActs) {
         const ownerRole: Role = isCompliance ? 'COLLEGE' : it.type === 'EVC_REPORT' ? 'COMMITTEE' : respRole;
         push({
           reasonCode: 'URGENT',
@@ -363,7 +364,7 @@ export async function buildDesiredFlags(today: Date, db: Db = prisma): Promise<D
       const stageItems = app.deadlineItems.filter((i) => i.status === 'OPEN' && ['STAGE_SLA', 'EVC_SCHEDULE', 'EVC_REPORT'].includes(i.type));
       // STALLED: no audit action for 10 working days while the SLA has not passed.
       const idle = workingDaysBetween(toDateOnly(app.lastActionAt), today);
-      if (idle >= rules.stalledWorkingDays && stageItems.length && stageItems.every((i) => dtd(i) >= 0)) {
+      if (idle >= pack.reminders.stalledWorkingDays && stageItems.length && stageItems.every((i) => dtd(i) >= 0)) {
         const holder = app.holderUserId ?? stageItems[0]!.responsibleUserId;
         const it = stageItems[0]!;
         push({

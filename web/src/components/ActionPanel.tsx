@@ -345,14 +345,16 @@ function DecideDialog({ open, detail, today, pending, error, onClose, onSubmit }
   const [reason, setReason] = useState('');
   const [rows, setRows] = useState<{ condition: string; dueDate: string }[]>([]);
   const [tried, setTried] = useState(false);
+  // Default due date from the case's rules (norms.deficiencyCompliancePeriod).
+  const defaultDue = detail.ruleDefaults?.undertakingDueDate ?? addDaysIso(today, 90);
   useEffect(() => {
     if (open) {
       setOutcome('APPROVED');
       setReason('');
-      setRows([{ condition: '', dueDate: addDaysIso(today, 90) }]);
+      setRows([{ condition: '', dueDate: defaultDue }]);
       setTried(false);
     }
-  }, [open, today]);
+  }, [open, defaultDue]);
   const conditions = useMemo(() => rows.filter((r) => r.condition.trim()), [rows]);
   const needConditions = outcome === 'APPROVED_WITH_CONDITIONS' && conditions.length === 0;
   const evc = detail.evcVisit?.recommendation;
@@ -408,7 +410,7 @@ function DecideDialog({ open, detail, today, pending, error, onClose, onSubmit }
               </div>
             ))}
             <div>
-              <Button size="sm" variant="tertiary" icon={<Plus size={16} aria-hidden />} onClick={() => setRows((xs) => [...xs, { condition: '', dueDate: addDaysIso(today, 90) }])}>
+              <Button size="sm" variant="tertiary" icon={<Plus size={16} aria-hidden />} onClick={() => setRows((xs) => [...xs, { condition: '', dueDate: defaultDue }])}>
                 Add condition
               </Button>
             </div>

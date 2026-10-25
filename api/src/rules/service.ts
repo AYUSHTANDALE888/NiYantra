@@ -209,3 +209,26 @@ export function clearRulesCache(): void {
   cycles = new Map();
   loadedAt = 0;
 }
+
+/** Rules for a case by id (or a row that already carries its pin). */
+export async function rulesForApp(appOrId: string | { cycleId: string; rulePackVersionId: string }, db: Db = prisma): Promise<ResolvedRules> {
+  const app = typeof appOrId === 'string' ? await db.application.findUniqueOrThrow({ where: { id: appOrId }, select: { cycleId: true, rulePackVersionId: true } }) : appOrId;
+  return forApplication(app, db);
+}
+
+/** Operational rules not tied to one case (workload report, team views): the newest cycle's published version. */
+export async function newestRules(db: Db = prisma): Promise<ResolvedRules> {
+  const all = await allCurrent(db);
+  if (!all.length) throw new Error('No published rules');
+  return all[0]!;
+}
+
+/** Type labels for a list of cases, each from its pinned version. */
+export async function typeLabels(apps: { id: string; type: string; cycleId: string; rulePackVersionId: string }[], db: Db = prisma): Promise<Map<string, string>> {
+  const out = new Map<string, string>();
+  for (const a of apps) {
+    const r = await forApplication(a, db);
+    out.set(a.id, r.hasType(a.type) ? r.type(a.type as never).label : a.type);
+  }
+  return out;
+}

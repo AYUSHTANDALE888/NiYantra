@@ -1,5 +1,7 @@
-// Node evaluation of shared/formcheck-rules.json (fallback when the form check service is down).
-import { formcheckRules } from '../config/index.js';
+// Node evaluation of the case's form check rules (the pack's formCheckRules, expressions over features and norms).
+// Used when the form check service is down; the Python service evaluates the same rules with expr.py.
+import { evaluate, truthy, getPath, type Expr } from '../rules/expr.js';
+import type { PackContent } from '../rules/schema.js';
 import { FIELD_LABEL, type Features } from './features.js';
 
 export interface Warning {
@@ -13,40 +15,24 @@ export interface Warning {
   severity: 'HIGH' | 'MEDIUM';
 }
 
+export type FormCheckRules = PackContent['formCheckRules'];
+
 const round = (v: number | null) => (v === null ? null : Math.round(v * 100) / 100);
 
-export function evaluateRules(f: Features): Warning[] {
+export function evaluateRules(f: Features, rules: FormCheckRules, norms: Record<string, number>): Warning[] {
+  const data = { features: f, norms };
   const out: Warning[] = [];
-  for (const r of formcheckRules.rules) {
-    const v = f[r.feature];
-    if (v === null || v === undefined) continue;
-    let hit = false;
-    switch (r.op) {
-      case 'gt':
-        hit = v > r.value!;
-        break;
-      case 'gte':
-        hit = v >= r.value!;
-        break;
-      case 'lt':
-        hit = v < r.value!;
-        break;
-      case 'lte':
-        hit = v <= r.value!;
-        break;
-      case 'gt_feature': {
-        const other = f[r.compare!];
-        hit = other !== null && other !== undefined && v > other;
-        break;
-      }
-    }
-    // Ratios are shown as percentages.
-    const shown = r.feature === 'docs_ratio' ? Math.round(v * 100) : round(v);
-    if (hit) out.push({ source: 'rule', ruleId: r.id, field: FIELD_LABEL[r.field] ?? r.field, value: shown, message: r.message, severity: r.severity });
+  for (const r of rules) {
+    if (!truthy(evaluate(r.when as Expr, data))) continue;
+    const raw = r.valueVar ? getPath(data, r.valueVar) : null;
+    const v = typeof raw === 'number' ? raw : null;
+    const shown = v === null ? null : r.valueAsPercent ? Math.round(v * 100) : round(v);
+    const field = r.fields[0]!;
+    out.push({ source: 'rule', ruleId: r.id, field: FIELD_LABEL[field] ?? field, value: shown, message: r.message, severity: r.severity });
   }
   return out;
 }
 
-export function ruleHits(f: Features): string[] {
-  return evaluateRules(f).map((w) => w.ruleId!);
+export function ruleHits(f: Features, rules: FormCheckRules, norms: Record<string, number>): string[] {
+  return evaluateRules(f, rules, norms).map((w) => w.ruleId!);
 }

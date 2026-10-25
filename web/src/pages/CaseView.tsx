@@ -28,6 +28,7 @@ function Facts({ d }: { d: CaseDetail }) {
   const rows: [string, string][] = [
     ['Application type', d.application.typeLabel],
     ['Submitted', formatDate(d.application.submittedAt)],
+    ['Rules', d.rules ? `${d.rules.cycle.replace('-', '–')} v${d.rules.version} (effective ${formatDate(d.rules.effectiveFrom)})` : '—'],
     ['Land area', f.landAreaSqm ? `${formatNumber(Number(f.landAreaSqm))} sq m` : '—'],
     ['Built-up area', f.builtupAreaSqm ? `${formatNumber(Number(f.builtupAreaSqm))} sq m` : '—'],
     ['Faculty', f.facultyCount ? formatNumber(Number(f.facultyCount)) : '—'],

@@ -6,11 +6,10 @@ import { prisma } from '../lib/db.js';
 import { currentUser } from '../auth/middleware.js';
 import { requireRole } from '../policy/roles.js';
 import { listUnassigned } from '../assignment/unassigned.js';
-import { assignManual, loadCandidates, reassignManual, selectOfficer, taskWeight } from '../assignment/engine.js';
+import { assignManual, loadCandidates, policyFor, reassignManual, selectOfficer, taskWeight, type Task } from '../assignment/engine.js';
 import { workloadFor } from '../reports/workload.js';
 import { getSubtreeUserIds } from '../policy/subtree.js';
 import { notFound } from '../lib/errors.js';
-import { policy } from '../config/index.js';
 import { formatDate } from '../lib/dates.js';
 
 export function assignmentsRouter(): Router {
@@ -47,7 +46,8 @@ export function assignmentsRouter(): Router {
       const a = await prisma.assignment.findUnique({ where: { id }, include: { application: { include: { institution: true, region: true } } } });
       if (!a || a.releasedAt) throw notFound();
       const app = a.application;
-      const task = { applicationId: app.id, regionId: app.regionId, taskType: a.taskType, category: app.category, taskRefId: a.taskRefId, previousOfficerId: app.previousOfficerId, excludeOfficerIds: [a.officerId] };
+      const p = await policyFor(prisma, app.id);
+      const task: Task = { applicationId: app.id, regionId: app.regionId, taskType: a.taskType, category: app.category, taskRefId: a.taskRefId, previousOfficerId: app.previousOfficerId, excludeOfficerIds: [a.officerId], p };
       const ctx = { institutionId: app.institutionId, institutionName: app.institution.name, portfolioOfficerId: app.institution.portfolioOfficerId, regionCode: app.region.code };
       // Only officers this manager may reassign to: their team (senior, super senior), their region (HoD), anyone (Bureau).
       const actor = currentUser(req);
@@ -55,9 +55,9 @@ export function assignmentsRouter(): Router {
       const allowed = (c: { id: string; role: string; regionCode: string | null }) =>
         team ? team.has(c.id) : actor.role === 'HOD' ? c.role === 'BUREAU' || c.regionCode === app.region.code : true;
       const rec = await selectOfficer(prisma, task, ctx);
-      const weight = taskWeight(a.taskType, app.category);
+      const weight = taskWeight(p, a.taskType);
       const eligible = [];
-      for (const tier of [...new Set(policy.eligibility[a.taskType].map((e) => e.tier))]) {
+      for (const tier of [...new Set(p.policy.eligibility[a.taskType].map((e) => e.tier))]) {
         for (const c of (await loadCandidates(prisma, task, tier, app.institutionId)).filter(allowed)) {
           const util = (c.openPoints + weight) / c.capacity;
           const blocked = c.unavailable

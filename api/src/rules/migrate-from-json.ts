@@ -228,3 +228,10 @@ export async function backfillExisting(c: import('pg').Client): Promise<{ backfi
     throw e;
   }
 }
+
+/** The base pack as resolved rules, for offline tools (sample generation) that run without a database. */
+export async function baseRules() {
+  const { ResolvedRules } = await import('./resolved.js');
+  const ref = { id: 'base', cycleId: 'base', cycleCode: BASE_CYCLE.code, version: 1, effectiveFrom: BASE_EFFECTIVE_FROM, contentHash: '' };
+  return new ResolvedRules(ref, ref, buildBasePack());
+}
