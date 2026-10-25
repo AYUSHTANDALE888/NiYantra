@@ -1,4 +1,5 @@
 import type { Role } from '@prisma/client';
+import { clearRulesCache } from '../src/rules/service.js';
 import { prisma, reconnect } from '../src/lib/db.js';
 import * as clock from '../src/lib/clock.js';
 import { loadHolidays } from '../src/lib/workdays.js';
@@ -27,6 +28,7 @@ export async function resetDb(): Promise<void> {
   await prisma.$disconnect().catch(() => undefined);
   await recreateFromTemplate();
   await reconnect();
+  clearRulesCache();
   await loadHolidays(prisma);
   setToday();
 }

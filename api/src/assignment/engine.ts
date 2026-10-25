@@ -3,6 +3,7 @@
 import { Prisma, type AvailabilityKind, type Category, type Role, type TaskType } from '@prisma/client';
 import { prisma, TX_OPTIONS, type Db, type Tx } from '../lib/db.js';
 import { policy, rules } from '../config/index.js';
+import { currentPublished } from '../rules/service.js';
 import { now, today } from '../lib/clock.js';
 import { addDays, formatDate, toDateOnly } from '../lib/dates.js';
 import { addWorkingDays, nextWorkingDayFrom, workingDaysBetween } from '../lib/workdays.js';
@@ -280,9 +281,10 @@ export async function selectOfficer(
 async function institutionCtx(db: Db, applicationId: string) {
   const app = await db.application.findUniqueOrThrow({
     where: { id: applicationId },
-    select: { applicationNo: true, region: { select: { code: true } }, institution: { select: { id: true, name: true, portfolioOfficerId: true } } },
+    select: { applicationNo: true, cycleId: true, region: { select: { code: true } }, institution: { select: { id: true, name: true, portfolioOfficerId: true } } },
   });
   return {
+    cycleId: app.cycleId,
     regionCode: app.region.code,
     applicationNo: app.applicationNo,
     institutionId: app.institution.id,
@@ -370,7 +372,7 @@ export async function assign(tx: Tx, task: Task, actor?: { id: string; role: str
       weight: new Prisma.Decimal(weight),
       tier: pick.tier,
       reasonText: pick.reasonText,
-      policyVersion: policy.version,
+      rulePackVersionId: (await currentPublished(ctx.cycleId, tx)).ref.id,
       recommendedOfficerId: pick.officer.id,
       assignedAt: at,
     },
@@ -390,7 +392,7 @@ export async function assign(tx: Tx, task: Task, actor?: { id: string; role: str
     action: 'ASSIGN',
     applicationId: task.applicationId,
     reason: pick.reasonText,
-    meta: { assignmentId: created.id, taskType: task.taskType, taskRefId, officerId: pick.officer.id, tier: pick.tier, weight, policyVersion: policy.version },
+    meta: { assignmentId: created.id, taskType: task.taskType, taskRefId, officerId: pick.officer.id, tier: pick.tier, weight, rulePackVersionId: created.rulePackVersionId },
   });
   await notify(tx, [pick.officer.id], {
     applicationId: task.applicationId,
@@ -535,7 +537,7 @@ export async function reassignManual(actor: AuthUser, assignmentId: string, toOf
         weight: new Prisma.Decimal(weight),
         tier: target.role === 'BUREAU' && a.taskType !== 'SAC_SHC_FORWARD' ? 1 : 0,
         reasonText,
-        policyVersion: policy.version,
+        rulePackVersionId: (await currentPublished(app.cycleId, tx)).ref.id,
         recommendedOfficerId: recommendedId,
         assignedAt: now(),
         overriddenById: actor.id,
@@ -598,7 +600,7 @@ export async function assignManual(actor: AuthUser, input: { applicationId: stri
         weight: new Prisma.Decimal(weight),
         tier: target.role === 'BUREAU' ? 1 : 0,
         reasonText,
-        policyVersion: policy.version,
+        rulePackVersionId: (await currentPublished(app.cycleId, tx)).ref.id,
         recommendedOfficerId: null,
         assignedAt: now(),
         overriddenById: actor.id,

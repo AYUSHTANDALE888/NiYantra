@@ -46,6 +46,8 @@ export function roleLabel(role: string): string {
     COMMITTEE: 'Committee member',
     AUTHORITY: 'Competent authority',
     ADMIN: 'Administrator',
+    RULE_EDITOR: 'Rule editor',
+    RULE_APPROVER: 'Rule approver',
   };
   return map[role] ?? role;
 }

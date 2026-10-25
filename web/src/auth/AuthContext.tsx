@@ -103,6 +103,9 @@ export function homeFor(user: Me): string {
       return '/authority';
     case 'ADMIN':
       return '/admin';
+    case 'RULE_EDITOR':
+    case 'RULE_APPROVER':
+      return '/rules';
     default:
       return '/login';
   }

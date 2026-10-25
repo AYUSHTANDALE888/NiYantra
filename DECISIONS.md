@@ -161,3 +161,16 @@ Choices made where the build spec was silent, plus the design review recorded at
 - Known variables live in `shared/expr-vars.json`; `norms.<key>` resolves only to norms defined in the same pack.
 - `api/src/rules/schema.ts` holds the zod pack schema plus cross-field checks (types referenced by documents and fees exist, routes end with DECISION and repeat no stage, windows run forwards, score weights add up to 1, escalation thresholds increase, holidays fall inside the cycle span 1 July to 30 June, letter placeholders come from a fixed list, no duplicate keys). Errors are `[{path, message}]` for the editor.
 - `shared/rulepack.schema.json` is generated (`npm run rules:schema --workspace api`) for external editors; the zod schema is the source of truth.
+
+## Add-on A2: data model, guard, roles, migration, service
+
+- `ApprovalCycle`, `RulePackVersion` and `Amendment` are new tables. `Application.cycleId` and `rulePackVersionId` are added as nullable columns. `scripts/migrate.ts` runs `migrate-from-json.backfillExisting` (an older database gets 2026-27 v1, published by SYSTEM, and every case and assignment is pinned to it). `prisma/sql/002_rulepack_guard.sql` then sets the columns NOT NULL and drops `Assignment.policyVersion`. A fresh `npm run setup` has nothing to back-fill.
+- The guard trigger: versions are inserted as DRAFT only; content and hash change only in DRAFT; status moves only DRAFT→IN_REVIEW→APPROVED/REJECTED, REJECTED→DRAFT, APPROVED→PUBLISHED→SUPERSEDED; only drafts can be deleted; a partial unique index allows one PUBLISHED version per cycle. The trigger sends `NOTIFY rules_published` itself, so every writer notifies listeners.
+- REJECTED goes back to the maker: the next save moves it to DRAFT (the trigger allows REJECTED→DRAFT), so a rejected version is revised in place rather than copied.
+- Separation of duties: the approver must not be the creator or appear on any `RULES_DRAFTED`, `RULES_EDITED` or `RULES_IMPORTED` audit row of the version. Rule events go on a third audit chain, `rules`.
+- Documents: a kind may appear in several entries, for example `BUILDING_PLAN`, which is critical for new institutions and supporting for intake increases. The duplicate check is per application type.
+- Committees gain `APPELLATE` and `HEARING`, so the modelled December 2025 addendum can move expert, appellate and hearing committees to the full council.
+- Institutions gain `kind` and `isTechnical`, derived from the fictional seed names. "College of Computer Applications" is the non-technical kind.
+- Holidays live in each pack's `calendar`. On publish the `Holiday` table is rewritten as the union over all current published versions, and `workdays.ts` reloads it. The seed keeps the v3 placeholder holidays (the six after the seed date).
+- Filing: `forNewFiling` picks the cycle whose APPLICATION_WINDOW (with `appliesTo` true) contains today, then a LATE_FEE_WINDOW, and otherwise names the next window. Back-dated seed history passes an explicit pin to the version published on its filing date (server-side option only; never from a request).
+- The rules cache uses `performance.now()` for its poll timer. That is a timer, not "today", so the clock grep test stays strict.

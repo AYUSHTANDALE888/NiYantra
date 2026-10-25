@@ -128,7 +128,7 @@ export function sharedDir(): string {
 }
 
 function load<T>(file: string, schema: z.ZodType<T>): T {
-  const raw = JSON.parse(fs.readFileSync(path.join(sharedDir(), file), 'utf8'));
+  const raw = JSON.parse(fs.readFileSync(path.join(sharedDir(), 'seed', file), 'utf8'));
   const parsed = schema.safeParse(raw);
   if (!parsed.success) {
     throw new Error(`Invalid ${file}: ${parsed.error.message}`);

@@ -173,7 +173,7 @@ export const packObject = z.object({
   }),
   assignment: assignmentSchema,
   committees: z.array(
-    z.object({ committee: z.enum(['EVC', 'SAC', 'SHC', 'EXPERT']), appointingAuthority: z.string().min(1).max(120), size: z.number().int().positive().max(20), source: sourceSchema.optional() }),
+    z.object({ committee: z.enum(['EVC', 'SAC', 'SHC', 'EXPERT', 'APPELLATE', 'HEARING']), appointingAuthority: z.string().min(1).max(120), size: z.number().int().positive().max(20), source: sourceSchema.optional() }),
   ),
   calendar: z.object({ holidays: z.array(z.object({ date: isoDate, name: z.string().min(1).max(80) })) }),
   changeNotice: z.array(z.object({ title: z.string().min(1).max(200), summary: z.string().min(1).max(2000), audience: z.enum(['COLLEGE', 'STAFF']), amendmentId: z.string().optional() })),
@@ -238,7 +238,10 @@ export function crossValidate(pack: PackContent): ExprError[] {
     t.route.forEach((r, j) => r.when !== undefined && exprAt(r.when, `applicationTypes[${i}].route[${j}].when`));
   });
 
-  for (const d of dupes(pack.documents, (x) => x.kind)) add('documents', `Document kind ${d} is listed twice.`);
+  // A kind may appear in several entries (critical for one type, supporting for another) but once per type.
+  for (const t of types) {
+    for (const d of dupes(pack.documents.filter((x) => x.appliesTo.includes(t)), (x) => x.kind)) add('documents', `Document kind ${d} is listed twice for ${t}.`);
+  }
   pack.documents.forEach((d, i) => {
     d.appliesTo.forEach((t, j) => !types.has(t) && add(`documents[${i}].appliesTo[${j}]`, `Application type ${t} does not exist in this pack.`));
     if (d.when !== undefined) exprAt(d.when, `documents[${i}].when`);

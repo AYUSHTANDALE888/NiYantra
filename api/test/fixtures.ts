@@ -63,6 +63,12 @@ export async function act(app: Express, user: { id: string; role: string }, id: 
 }
 
 /** Test fixture only: mark an institution as previously approved so EXTENSION-type applications are eligible. */
+/** Test fixture: the newest cycle's published version, for rows created directly. */
+export async function currentPin(): Promise<{ cycleId: string; rulePackVersionId: string }> {
+  const v = await prisma.rulePackVersion.findFirstOrThrow({ where: { status: 'PUBLISHED' }, orderBy: { cycle: { code: 'desc' } } });
+  return { cycleId: v.cycleId, rulePackVersionId: v.id };
+}
+
 export async function grantPriorApproval(institutionId: string) {
   const inst = await prisma.institution.findUniqueOrThrow({ where: { id: institutionId } });
   const at = addDays(clock.today(), -400);
@@ -72,6 +78,7 @@ export async function grantPriorApproval(institutionId: string) {
       institutionId,
       regionId: inst.regionId,
       type: 'NEW_INSTITUTION',
+      ...(await currentPin()),
       category: 'NEW',
       categoryRank: 0,
       route: ['SCRUTINY', 'EVC', 'DECISION'],

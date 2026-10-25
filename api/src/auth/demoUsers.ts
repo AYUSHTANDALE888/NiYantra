@@ -18,6 +18,8 @@ export const NAMED_DEMO_EMAILS = [
   'bureau.head@demo.in',
   'officer.west@demo.in',
   'admin@demo.in',
+  'rules.editor@demo.in',
+  'rules.approver@demo.in',
 ] as const;
 
 export const DEMO_PASSWORD = 'demo1234';

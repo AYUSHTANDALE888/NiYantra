@@ -7,7 +7,7 @@ import * as clock from '../src/lib/clock.js';
 import { addDays } from '../src/lib/dates.js';
 import { policy } from '../src/config/index.js';
 import { bearer, resetDb, userByEmail } from './helpers.js';
-import { act, collegeOf, openAssignment, submitApp } from './fixtures.js';
+import { act, collegeOf, currentPin, openAssignment, submitApp } from './fixtures.js';
 
 let app: Express;
 
@@ -20,7 +20,7 @@ async function southInstitutionWithoutPortfolio() {
 async function addOpenLoad(officerId: string, points: number, applicationId: string) {
   // Test fixture: synthetic open load on an officer (one VERIFY assignment with the given weight).
   await prisma.assignment.create({
-    data: { applicationId, taskType: 'VERIFY', taskRefId: `load-${officerId}-${points}`, officerId, weight: points, tier: 0, reasonText: 'fixture', policyVersion: 1, assignedAt: clock.now() },
+    data: { applicationId, taskType: 'VERIFY', taskRefId: `load-${officerId}-${points}`, officerId, weight: points, tier: 0, reasonText: 'fixture', rulePackVersionId: (await currentPin()).rulePackVersionId, assignedAt: clock.now() },
   });
 }
 

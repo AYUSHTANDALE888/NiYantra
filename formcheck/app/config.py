@@ -45,11 +45,11 @@ class TypeCfg(BaseModel):
 
 
 def load_rules() -> FormcheckRules:
-    return FormcheckRules.model_validate(json.loads((SHARED_DIR / "formcheck-rules.json").read_text()))
+    return FormcheckRules.model_validate(json.loads((SHARED_DIR / "seed" / "formcheck-rules.json").read_text()))
 
 
 def load_types() -> dict[str, TypeCfg]:
-    raw = json.loads((SHARED_DIR / "rules.json").read_text())
+    raw = json.loads((SHARED_DIR / "seed" / "rules.json").read_text())
     return {k: TypeCfg.model_validate(v) for k, v in raw["types"].items()}
 
 

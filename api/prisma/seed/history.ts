@@ -122,6 +122,17 @@ export async function seedHistory(dir: Directory): Promise<void> {
       }));
   }
 
+  // Back-dated filings are pinned to the version published on their filing date: the 2027-28 version once its
+  // window has opened, otherwise the 2026-27 version in force on that date.
+  async function pinFor(at: Date): Promise<{ cycleId: string; rulePackVersionId: string }> {
+    const v = await prisma.rulePackVersion.findFirst({
+      where: { publishedAt: { lte: at }, status: { in: ['PUBLISHED', 'SUPERSEDED'] } },
+      orderBy: [{ cycle: { code: 'desc' } }, { publishedAt: 'desc' }],
+    });
+    if (!v) throw new Error(`No rules were published by ${at.toISOString()}`);
+    return { cycleId: v.cycleId, rulePackVersionId: v.id };
+  }
+
   const appIds = new Map<string, string>();
   async function file(key: string, inst: Inst, type: AppType, opts: { fault?: Fault; lease?: number; optional?: boolean; justification?: string } = {}) {
     tick();
@@ -132,7 +143,7 @@ export async function seedHistory(dir: Directory): Promise<void> {
     const draftId = `seed-${key}`;
     const check = await validateForm(college, { draftId, type, values: { ...values, documents: files.map((f) => f.kind) } });
     const justification = check.severity !== 'NONE' ? opts.justification ?? 'The figures are correct; the plan approval letter is attached for reference.' : undefined;
-    const id = await submitApplication(college, { type, formData: values, draftId, justification }, files);
+    const id = await submitApplication(college, { type, formData: values, draftId, justification }, files, { pin: await pinFor(clock.now()) });
     appIds.set(key, id);
     return id;
   }

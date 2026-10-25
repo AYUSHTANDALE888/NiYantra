@@ -2,6 +2,7 @@ import pg from 'pg';
 import { prisma, reconnect } from './db.js';
 import * as clock from './clock.js';
 import { loadHolidays } from './workdays.js';
+import { clearRulesCache } from '../rules/service.js';
 
 function adminUrl(): string {
   const url = process.env.DEMO_ADMIN_URL;
@@ -51,6 +52,7 @@ export async function resetDemoInProcess(): Promise<number> {
   const ms = await recreateFromTemplate();
   await reconnect();
   await clock.refresh();
+  clearRulesCache();
   await loadHolidays(prisma);
   return ms;
 }

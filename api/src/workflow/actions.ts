@@ -13,6 +13,7 @@ import { badRequest, conflict, forbidden, HttpError, notFound } from '../lib/err
 import { parse } from '../lib/http.js';
 import { removeStored, saveBuffer, type StoredFile } from '../lib/storage.js';
 import { rules } from '../config/index.js';
+import { forNewFiling } from '../rules/service.js';
 import { assign, release, taskLabel } from '../assignment/engine.js';
 import { proposeCommittee } from '../assignment/committee.js';
 import { can } from '../policy/can.js';
@@ -127,7 +128,13 @@ export const submitSchema = z.object({
   justification: z.string().trim().max(4000).optional(),
 });
 
-export async function submitApplication(user: AuthUser, input: z.infer<typeof submitSchema>, files: UploadInput[]) {
+/** Server-side options (never from a request body): seed history pins to a given version. */
+export interface SubmitOptions {
+  pin?: { cycleId: string; rulePackVersionId: string };
+  ignoreSchedule?: boolean;
+}
+
+export async function submitApplication(user: AuthUser, input: z.infer<typeof submitSchema>, files: UploadInput[], opts: SubmitOptions = {}) {
   if (user.role !== 'COLLEGE' || !user.institutionId) {
     await logAccessDenied(user, { action: 'SUBMIT', reason: 'Only colleges can submit applications.' });
     throw forbidden('Only colleges can submit applications.');
@@ -137,9 +144,20 @@ export async function submitApplication(user: AuthUser, input: z.infer<typeof su
   const institution = await prisma.institution.findUniqueOrThrow({ where: { id: user.institutionId } });
 
   // Eligibility.
-  if (cfg.requiresPriorApproval) {
-    const past = await prisma.application.count({ where: { institutionId: institution.id, status: { in: ['APPROVED', 'APPROVED_WITH_CONDITIONS', 'CLOSED'] } } });
-    if (past === 0) throw badRequest(`${cfg.label} needs at least one earlier approval for your institution.`);
+  const past = await prisma.application.count({ where: { institutionId: institution.id, status: { in: ['APPROVED', 'APPROVED_WITH_CONDITIONS', 'CLOSED'] } } });
+  if (cfg.requiresPriorApproval && past === 0) throw badRequest(`${cfg.label} needs at least one earlier approval for your institution.`);
+
+  // The cycle and rule pack version this filing is pinned to for its whole life.
+  let pin = opts.pin;
+  if (!pin) {
+    const region = await prisma.region.findUniqueOrThrow({ where: { id: institution.regionId }, select: { code: true } });
+    const filing = await forNewFiling(now(), {
+      formData: input.formData as Record<string, unknown>,
+      institution: { isTechnical: institution.isTechnical, kind: institution.kind, regionCode: region.code, hasPriorApproval: past > 0 },
+      application: { type },
+    }, { ignoreSchedule: opts.ignoreSchedule });
+    if (!filing.ok) throw badRequest(filing.message);
+    pin = { cycleId: filing.cycleId, rulePackVersionId: filing.rules.pinned.id };
   }
   const openSame = await prisma.application.count({ where: { institutionId: institution.id, type, status: { in: ['IN_STAGE', 'RETURNED'] } } });
   if (openSame > 0) throw conflict(`Your institution already has an open ${cfg.label.toLowerCase()} application.`);
@@ -185,6 +203,8 @@ export async function submitApplication(user: AuthUser, input: z.infer<typeof su
           institutionId: institution.id,
           regionId: institution.regionId,
           type,
+          cycleId: pin.cycleId,
+          rulePackVersionId: pin.rulePackVersionId,
           category,
           categoryRank,
           route,

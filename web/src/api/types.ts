@@ -1,4 +1,4 @@
-export type Role = 'COLLEGE' | 'OFFICER' | 'SENIOR' | 'SUPER_SENIOR' | 'HOD' | 'BUREAU' | 'COMMITTEE' | 'AUTHORITY' | 'ADMIN';
+export type Role = 'COLLEGE' | 'OFFICER' | 'SENIOR' | 'SUPER_SENIOR' | 'HOD' | 'BUREAU' | 'COMMITTEE' | 'AUTHORITY' | 'ADMIN' | 'RULE_EDITOR' | 'RULE_APPROVER';
 
 export interface Me {
   id: string;

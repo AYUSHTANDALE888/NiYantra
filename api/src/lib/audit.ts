@@ -7,6 +7,8 @@ import { now } from './clock.js';
 export const GENESIS = '0'.repeat(64);
 
 export interface AuditEntry {
+  /** Defaults to the application id, else "global". Rule pack events use "rules". */
+  chainKey?: string;
   actorId?: string | null;
   actorRole: string;
   action: string;
@@ -73,7 +75,7 @@ function jsonValue(v: unknown): unknown {
 }
 
 export async function appendAudit(tx: Tx, entry: AuditEntry): Promise<void> {
-  const chainKey = entry.applicationId ?? 'global';
+  const chainKey = entry.chainKey ?? entry.applicationId ?? 'global';
   await advisoryXactLock(tx, `audit:${chainKey}`);
   const last = await tx.auditLog.findFirst({
     where: { chainKey },

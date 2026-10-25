@@ -13,7 +13,9 @@ async function main() {
   const { prisma } = await import('../src/lib/db.js');
   const { seedDirectory } = await import('../prisma/seed/directory.js');
   const { parseDateOnly } = await import('../src/lib/dates.js');
+  const { seedRulePacks } = await import('../prisma/seed/rulepacks.js');
   await seedDirectory(prisma, { today: parseDateOnly(process.env.TEST_TODAY!) });
+  await seedRulePacks(prisma, { today: parseDateOnly(process.env.TEST_TODAY!) });
   await prisma.$disconnect();
   await buildTemplate();
 }
