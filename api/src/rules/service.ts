@@ -20,7 +20,7 @@ const versions = new Map<string, CachedVersion>();
 let published = new Map<string, string>(); // cycleId → versionId
 let cycles = new Map<string, { id: string; code: string; label: string }>(); // by id
 let loadedAt = 0;
-const POLL_MS = 30_000;
+const POLL_MS = Number(process.env.RULES_POLL_MS ?? 30_000);
 
 function toCached(v: RulePackVersion & { cycle: { code: string } }): CachedVersion {
   return {
