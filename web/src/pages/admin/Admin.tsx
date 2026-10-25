@@ -25,6 +25,7 @@ interface Verify {
   chainsChecked: number;
   rowsChecked: number;
   firstBroken?: { chainKey: string; id: string };
+  brokenChains: string[];
 }
 
 interface DirUser {
@@ -37,7 +38,7 @@ interface DirUser {
   region: string | null;
 }
 
-const AUDIT_ACTIONS = ['SUBMIT', 'COMPLETE_STAGE', 'RETURN', 'REPLY', 'SCHEDULE_EVC', 'SUBMIT_EVC_REPORT', 'FORWARD_SAC_SHC', 'SUBMIT_RECOMMENDATION', 'REVERT', 'DECIDE', 'ASSIGN', 'RELEASE', 'REASSIGN', 'ASSIGN_OVERRIDE', 'ASSIGN_FAILED', 'AVAILABILITY_SET', 'ESCALATED', 'ALERTS_SENT', 'CLOSED', 'UPLOAD_EVIDENCE', 'VERIFY_EVIDENCE', 'UPLOAD_RENEWAL', 'VERIFY_RENEWAL', 'FORM_CHECK_WARNING', 'FORM_CHECK_JUSTIFIED', 'FORM_CHECK_LABEL', 'TIME_ADVANCED', 'DEMO_RESET', 'ACCESS_DENIED', 'LOGIN', 'LOGIN_FAILED', 'FLAG_RESOLVED'];
+const AUDIT_ACTIONS = ['SUBMIT', 'COMPLETE_STAGE', 'RETURN', 'REPLY', 'SCHEDULE_EVC', 'SUBMIT_EVC_REPORT', 'FORWARD_SAC_SHC', 'SUBMIT_RECOMMENDATION', 'REVERT', 'DECIDE', 'ASSIGN', 'RELEASE', 'REASSIGN', 'ASSIGN_OVERRIDE', 'ASSIGN_FAILED', 'AVAILABILITY_SET', 'ESCALATED', 'ALERTS_SENT', 'CLOSED', 'UPLOAD_EVIDENCE', 'VERIFY_EVIDENCE', 'UPLOAD_RENEWAL', 'VERIFY_RENEWAL', 'FORM_CHECK_WARNING', 'FORM_CHECK_JUSTIFIED', 'FORM_CHECK_LABEL', 'TIME_ADVANCED', 'DEMO_RESET', 'ACCESS_DENIED', 'LOGIN', 'LOGIN_FAILED', 'FLAG_RESOLVED', 'RULES_DRAFTED', 'RULES_EDITED', 'RULES_SUBMITTED', 'RULES_APPROVED', 'RULES_REJECTED', 'RULES_PUBLISHED', 'RULES_ROLLED_BACK', 'RULES_REBASED', 'RULES_IMPORTED', 'RULES_EXPORTED', 'DEMO_IGNORE_SCHEDULE'];
 
 function DemoControls() {
   const clock = useClock();
@@ -134,7 +135,8 @@ function AuditLog() {
   const [applicationNo, setApplicationNo] = useState('');
   const [action, setAction] = useState('');
   const [actor, setActor] = useState('');
-  const [filters, setFilters] = useState({ applicationNo: '', action: '', actor: '' });
+  const [chain, setChain] = useState('');
+  const [filters, setFilters] = useState({ applicationNo: '', action: '', actor: '', chain: '' });
   const q = useQuery({ queryKey: ['audit', filters], queryFn: () => api.get<{ total: number; rows: AuditRow[] }>(`/admin/audit${qs({ ...filters, pageSize: 200 })}`) });
   const verify = useMutation({ mutationFn: () => api.get<Verify>('/admin/audit/verify') });
   return (
@@ -152,6 +154,7 @@ function AuditLog() {
             ) : (
               <p className="flex items-center gap-2 text-base text-danger" role="alert">
                 <XCircle size={16} aria-hidden /> Broken: row {verify.data.firstBroken?.id} in chain {verify.data.firstBroken?.chainKey === 'global' ? 'global' : verify.data.firstBroken?.chainKey} does not match its hash. Every later row in that chain is suspect.
+                {verify.data.brokenChains.length > 1 ? ` ${verify.data.brokenChains.length} chains are broken.` : ' Every other chain verifies.'}
               </p>
             )
           ) : (
@@ -173,7 +176,7 @@ function AuditLog() {
             className="flex flex-wrap items-end gap-3"
             onSubmit={(e) => {
               e.preventDefault();
-              setFilters({ applicationNo: applicationNo.trim(), action, actor: actor.trim() });
+              setFilters({ applicationNo: applicationNo.trim(), action, actor: actor.trim(), chain });
             }}
           >
             <Field label="Application no">{({ id }) => <Input id={id} value={applicationNo} placeholder="S-2026-0001" onChange={(e) => setApplicationNo(e.target.value)} />}</Field>
@@ -190,6 +193,15 @@ function AuditLog() {
               )}
             </Field>
             <Field label="Actor">{({ id }) => <Input id={id} value={actor} placeholder="Name or email" onChange={(e) => setActor(e.target.value)} />}</Field>
+            <Field label="Chain">
+              {({ id }) => (
+                <Select id={id} value={chain} onChange={(e) => setChain(e.target.value)}>
+                  <option value="">All chains</option>
+                  <option value="rules">Rules Center</option>
+                  <option value="global">Global</option>
+                </Select>
+              )}
+            </Field>
             <Button type="submit">Apply filters</Button>
             <span className="tnum pb-2 text-sm text-secondary">{q.data ? `${q.data.total} rows` : ''}</span>
           </form>

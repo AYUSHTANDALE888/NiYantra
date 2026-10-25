@@ -9,7 +9,7 @@ import { isoDate } from '../lib/dates.js';
 import { badRequest } from '../lib/errors.js';
 import { ResolvedRules, type EvalContext } from './resolved.js';
 import { getVersion } from './service.js';
-import { checkApplyScope, isLiveAmendment, type ApplyScope } from './diff.js';
+import { checkApplyScope, rebasesLiveCases, type ApplyScope } from './diff.js';
 import { diffForPublish, plannedMoves } from './rebase.js';
 import type { PackContent } from './schema.js';
 import { computeFeatures, formValuesSchema, type FormValues } from '../formcheck/features.js';
@@ -42,12 +42,12 @@ export async function impactOf(versionId: string) {
     where: { rulePackVersionId: basis.id, status: { in: [...OPEN] } },
     select: { id: true, applicationNo: true, deadlineItems: { where: { status: { in: ['OPEN', 'PAUSED'] } } } },
   });
-  const live = isLiveAmendment(scope);
+  const live = rebasesLiveCases(diff, scope);
   const moves = live ? pinned.flatMap((a) => plannedMoves(diff, a.deadlineItems).map((m) => ({ applicationId: a.id, applicationNo: a.applicationNo, item: ITEM_NAME[m.type] ?? m.type, oldDue: m.oldDue, newDue: m.newDue, pausedDaysAdded: m.oldPausedRemaining !== undefined ? m.addDays : null }))) : [];
   sentences.push(
     live
       ? `${plural(pinned.length, 'open application')} would move to this version; ${plural(moves.length, 'deadline')} would move later and none earlier.`
-      : `This change applies to new filings only; the ${plural(pinned.length, 'open application')} pinned to v${basis.version} keep their rules.`,
+      : `No filed case is affected: the ${plural(pinned.length, 'open application')} pinned to v${basis.version} keep their rules, and new filings use this version.`,
   );
 
   // ---- new filings: the last 50 submitted applications re-evaluated
@@ -172,6 +172,12 @@ export async function impactOf(versionId: string) {
       ? `Today, ${plural(opened.length, 'group')} could newly file and ${plural(closed.length, 'group')} could no longer file.`
       : `Who can file today does not change (${plural(schedule.filter((s) => s.after).length, 'programme and institution group')} can file).`,
   );
+
+  for (const d of diff.filter((x) => x.section === 'schedule' && x.classification === 'relaxing')) {
+    const w = newR.schedule.find((s2) => d.path.startsWith(`schedule.${s2.id}`));
+    const scopeText = w && w.appliesTo === true ? 'for all programme and institution groups' : 'for the groups it applies to';
+    sentences.push(`${d.reason} ${scopeText}.`);
+  }
 
   // ---- refusals
   const refusals = checkApplyScope(diff, scope);

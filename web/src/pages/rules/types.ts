@@ -99,6 +99,7 @@ export interface VersionDetail {
   publishedAt: string | null;
   rejectedRemarks: string | null;
   pinnedOpenCases: number;
+  cyclePublished: { id: string; version: number } | null;
   errors: { path: string; message: string }[];
   changedBySection: Record<string, number>;
   makers: string[];

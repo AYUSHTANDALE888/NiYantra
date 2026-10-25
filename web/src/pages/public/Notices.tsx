@@ -1,7 +1,6 @@
 // /notices: "What changed this cycle". Public (no login) and linked from the college dashboard banner.
-import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { X } from 'lucide-react';
 import { api } from '../../api/client';
 import { Badge, Card, ErrorState, IconButton, PageHeader, Skeleton, Table } from '../../components/ui';
@@ -80,46 +79,25 @@ export function NoticesInAppPage() {
   );
 }
 
-const seenKey = (userId: string) => `aicte.noticesSeen.${userId}`;
-
-/** "2 changes to the 2027–28 rules since your last visit · View", dismissible per user. */
-export function NoticesBanner({ userId }: { userId: string }) {
-  const q = usePublicNotices();
-  const [seen, setSeen] = useState<string>(() => {
-    try {
-      return localStorage.getItem(seenKey(userId)) ?? '';
-    } catch {
-      return '';
-    }
+/** "1 change to the 2027–28 rules since your last visit · View", dismissible per user (kept on the server). */
+export function NoticesBanner() {
+  const qc = useQueryClient();
+  const q = useQuery({ queryKey: ['notices', 'unseen'], queryFn: () => api.get<{ count: number; cycles: string[] }>('/rules/notices/unseen') });
+  const seen = useMutation({
+    mutationFn: () => api.post('/rules/notices/seen'),
+    onSuccess: () => qc.setQueryData(['notices', 'unseen'], { count: 0, cycles: [] }),
   });
-  useEffect(() => {
-    try {
-      setSeen(localStorage.getItem(seenKey(userId)) ?? '');
-    } catch {
-      /* storage unavailable */
-    }
-  }, [userId]);
-  const fresh = (q.data?.notices ?? []).filter((n) => n.publishedAt && n.publishedAt > seen);
-  if (!fresh.length) return null;
-  const cycles = [...new Set(fresh.map((n) => cycleLabel(n.cycle)))];
-  const dismiss = () => {
-    const latest = fresh.map((n) => n.publishedAt!).sort().at(-1)!;
-    try {
-      localStorage.setItem(seenKey(userId), latest);
-    } catch {
-      /* storage unavailable */
-    }
-    setSeen(latest);
-  };
+  const n = q.data?.count ?? 0;
+  if (!n) return null;
   return (
     <div role="status" className="flex items-center justify-between gap-3 rounded-lg border border-accent bg-accent-soft px-4 py-2 text-base">
       <p>
-        {fresh.length} {fresh.length === 1 ? 'change' : 'changes'} to the {cycles.join(' and ')} rules since your last visit ·{' '}
-        <Link to="/college/notices" className="font-medium text-accent underline" onClick={dismiss}>
+        {n} {n === 1 ? 'change' : 'changes'} to the {q.data!.cycles.map(cycleLabel).join(' and ')} rules since your last visit ·{' '}
+        <Link to="/college/notices" className="font-medium text-accent underline" onClick={() => seen.mutate()}>
           View
         </Link>
       </p>
-      <IconButton label="Dismiss" icon={<X size={18} aria-hidden />} onClick={dismiss} />
+      <IconButton label="Dismiss" icon={<X size={18} aria-hidden />} onClick={() => seen.mutate()} />
     </div>
   );
 }

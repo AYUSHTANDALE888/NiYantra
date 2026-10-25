@@ -5,16 +5,14 @@ import { CaseTable } from '../../components/CaseTable';
 import { PageHeader } from '../../components/ui';
 import { useTitle } from '../../lib/useTitle';
 import { NeedsFromYou } from './NeedsFromYou';
-import { useMe } from '../../auth/AuthContext';
 import { NoticesBanner } from '../public/Notices';
 
 export function CollegeHomePage() {
   useTitle('My applications');
   const q = useApplications();
-  const me = useMe();
   return (
     <div className="flex flex-col gap-6">
-      <NoticesBanner userId={me.id} />
+      <NoticesBanner />
       <PageHeader
         title="My applications"
         description="Your institution's applications, where each one is, and what AICTE needs from you."

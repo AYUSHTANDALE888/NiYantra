@@ -8,6 +8,7 @@ import { api, ApiError, downloadBlob } from '../../api/client';
 import { Badge, Button, Card, ConfirmDialog, DateInput, Dialog, ErrorState, Field, Input, PageHeader, ReasonDialog, Select, Skeleton, Tabs, Textarea, useToast } from '../../components/ui';
 import { cx, formatDate, formatDateTime } from '../../lib/format';
 import { useTitle } from '../../lib/useTitle';
+import { useMe } from '../../auth/AuthContext';
 import type { VarList } from './ConditionBuilder';
 import { SectionEditor } from './sections';
 import { useToday } from './RulesHome';
@@ -32,6 +33,9 @@ function VersionHeader({ v, current }: { v: VersionDetail; current: 'edit' | 'di
   const navigate = useNavigate();
   const [confirm, setConfirm] = useState<null | 'submit' | 'publish' | 'schedule'>(null);
   const today = useToday();
+  const me = useMe();
+  const [rollback, setRollback] = useState(false);
+  const canRollback = me.role === 'RULE_EDITOR' && v.status === 'SUPERSEDED' && !!v.cyclePublished;
   const refresh = () => {
     void qc.invalidateQueries({ queryKey: ['rules'] });
   };
@@ -95,6 +99,7 @@ function VersionHeader({ v, current }: { v: VersionDetail; current: 'edit' | 'di
         actions={
           <div className="flex flex-wrap gap-2">
             {primary}
+            {canRollback ? <Button onClick={() => setRollback(true)}>Roll back to this version</Button> : null}
             <Button icon={<Download size={18} aria-hidden />} onClick={() => void downloadBlob(`/rules/versions/${v.id}/export`).then((b) => { const u = URL.createObjectURL(b); const a = document.createElement('a'); a.href = u; a.download = `rules-${v.cycle.code}-v${v.version}.json`; a.click(); URL.revokeObjectURL(u); })}>
               Export
             </Button>
@@ -113,6 +118,7 @@ function VersionHeader({ v, current }: { v: VersionDetail; current: 'edit' | 'di
           </NavLink>
         ))}
       </nav>
+      <RollbackDialog open={rollback} v={v} onClose={() => setRollback(false)} onCreated={(nid) => navigate(`/rules/versions/${nid}`)} />
       <ConfirmDialog
         open={confirm !== null}
         title={confirm === 'submit' ? 'Submit this version for review?' : confirm === 'schedule' ? 'Schedule this version?' : 'Publish this version?'}
@@ -130,6 +136,50 @@ function VersionHeader({ v, current }: { v: VersionDetail; current: 'edit' | 'di
         onClose={() => setConfirm(null)}
       />
     </div>
+  );
+}
+
+function RollbackDialog({ open, v, onClose, onCreated }: { open: boolean; v: VersionDetail; onClose: () => void; onCreated: (id: string) => void }) {
+  const today = useToday();
+  const [effectiveFrom, setEffectiveFrom] = useState(today);
+  const [summary, setSummary] = useState('');
+  const qc = useQueryClient();
+  useEffect(() => {
+    if (open) {
+      setEffectiveFrom(today);
+      setSummary(`The rules of ${cycleLabel(v.cycle.code)} return to those of version ${v.version}.`);
+    }
+  }, [open, today, v]);
+  const create = useMutation({
+    mutationFn: () => api.post<{ id: string }>(`/rules/versions/${v.cyclePublished!.id}/rollback-to/${v.id}`, { effectiveFrom, summary }),
+    onSuccess: (r) => {
+      void qc.invalidateQueries({ queryKey: ['rules'] });
+      onCreated(r.id);
+    },
+  });
+  return (
+    <Dialog
+      open={open}
+      title={`Roll back ${cycleLabel(v.cycle.code)} to version ${v.version}?`}
+      onClose={onClose}
+      footer={
+        <>
+          <Button onClick={onClose}>Cancel</Button>
+          <Button variant="primary" pending={create.isPending} onClick={() => create.mutate()}>
+            Create the rollback draft
+          </Button>
+        </>
+      }
+    >
+      <div className="flex flex-col gap-3">
+        <p className="text-base text-secondary">
+          A new draft is created with the content of version {v.version}. History is not edited: v{v.cyclePublished?.version} stays on record, and a rule approver must still approve and publish the rollback. Open cases keep their pinned version unless the rollback is marked for live cases.
+        </p>
+        <Field label="Effective from">{({ id }) => <DateInput id={id} value={effectiveFrom} onChange={(e) => setEffectiveFrom(e.target.value)} />}</Field>
+        <Field label="Summary for colleges">{({ id }) => <Textarea id={id} rows={3} value={summary} onChange={(e) => setSummary(e.target.value)} />}</Field>
+        {create.error ? <p role="alert" className="text-sm text-danger">{errMsg(create.error)}</p> : null}
+      </div>
+    </Dialog>
   );
 }
 

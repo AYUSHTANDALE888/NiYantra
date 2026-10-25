@@ -179,6 +179,8 @@ model User {
   institution   Institution? @relation("CollegeUsers", fields: [institutionId], references: [id])
   title         String?
   active        Boolean      @default(true)
+  /// Rule change notices published after this are "new since your last visit" (college banner).
+  noticesSeenAt DateTime?
 
   profile       OfficerProfile?
   availability  OfficerAvailability[] @relation("AvailabilityUser")

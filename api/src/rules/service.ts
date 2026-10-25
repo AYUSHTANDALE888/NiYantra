@@ -74,7 +74,17 @@ export async function currentPublished(cycleId: string, db: Db = prisma): Promis
     id = published.get(cycleId);
   }
   if (!id) throw new Error(`Cycle ${cycleId} has no published rules`);
-  return getVersion(id, db);
+  try {
+    return await getVersion(id, db);
+  } catch (e) {
+    // The database was recreated under us (demo reset from the command line): forget the cache and look again.
+    if ((e as { code?: string }).code !== 'P2025') throw e;
+    clearRulesCache();
+    await refreshPublished(db);
+    const again = published.get(cycleId);
+    if (!again) throw new Error(`Cycle ${cycleId} has no published rules`);
+    return getVersion(again, db);
+  }
 }
 
 /** Rules for a case: pinned sections from its version, operational sections from its cycle's published version. */
@@ -177,21 +187,28 @@ let poll: NodeJS.Timeout | null = null;
 /** API and scheduler: LISTEN rules_published on a dedicated connection, plus the 30-second poll. */
 export async function startRulesListener(url = process.env.DATABASE_URL): Promise<void> {
   await refreshPublished();
-  poll = setInterval(() => void onPublished().catch((e) => console.error('[rules] poll failed', e)), POLL_MS);
+  poll = setInterval(() => {
+    void onPublished().catch((e) => console.error('[rules] poll failed', (e as Error).message));
+    if (!listener && url) void connectListener(url);
+  }, POLL_MS);
   poll.unref();
-  if (!url) return;
+  if (url) await connectListener(url);
+}
+
+async function connectListener(url: string): Promise<void> {
+  const c = new pg.Client({ connectionString: url });
+  c.on('notification', () => void onPublished().catch((e) => console.error('[rules] refresh failed', (e as Error).message)));
+  c.on('error', (e) => {
+    console.error('[rules] listener lost; the 30 s poll continues and reconnects', e.message);
+    if (listener === c) listener = null;
+  });
   try {
-    listener = new pg.Client({ connectionString: url });
-    listener.on('notification', () => void onPublished().catch((e) => console.error('[rules] refresh failed', e)));
-    listener.on('error', (e) => {
-      console.error('[rules] listener lost; the 30 s poll continues', e.message);
-      listener = null;
-    });
-    await listener.connect();
-    await listener.query('LISTEN rules_published');
+    await c.connect();
+    await c.query('LISTEN rules_published');
+    listener = c;
   } catch (e) {
     console.error('[rules] LISTEN unavailable; using the 30 s poll', (e as Error).message);
-    listener = null;
+    await c.end().catch(() => undefined);
   }
 }
 

@@ -7,6 +7,7 @@ import type { Role, RulePackVersion } from '@prisma/client';
 import { prisma } from '../lib/db.js';
 import { h, parse } from '../lib/http.js';
 import { isoDate } from '../lib/dates.js';
+import { now } from '../lib/clock.js';
 import { badRequest, notFound } from '../lib/errors.js';
 import { currentUser, type AuthUser } from '../auth/middleware.js';
 import { requireRole } from '../policy/roles.js';
@@ -191,6 +192,28 @@ export function rulesRouter(): Router {
     }),
   );
 
+  // College banner: rule changes published since the user last looked at the notices.
+  r.get(
+    '/notices/unseen',
+    requireRole('COLLEGE'),
+    h(async (req, res) => {
+      const user = await prisma.user.findUniqueOrThrow({ where: { id: currentUser(req).id }, select: { noticesSeenAt: true } });
+      const fresh = await prisma.rulePackVersion.findMany({
+        where: { status: { in: ['PUBLISHED', 'SUPERSEDED'] }, amendment: { isNot: null }, ...(user.noticesSeenAt ? { publishedAt: { gt: user.noticesSeenAt } } : {}) },
+        select: { cycle: { select: { code: true } } },
+      });
+      res.json({ count: fresh.length, cycles: [...new Set(fresh.map((f) => f.cycle.code))].sort().reverse() });
+    }),
+  );
+  r.post(
+    '/notices/seen',
+    requireRole('COLLEGE'),
+    h(async (req, res) => {
+      await prisma.user.update({ where: { id: currentUser(req).id }, data: { noticesSeenAt: now() } });
+      res.json({ ok: true });
+    }),
+  );
+
   // ---------------------------------------------------------------- cycles
   r.get(
     '/cycles',
@@ -259,6 +282,7 @@ export function rulesRouter(): Router {
       const who = await names([v.createdById, v.submittedById, v.approvedById, v.publishedById, ...makerIds, ...history.map((h) => h.actorId)]);
       const check = validatePack(v.content);
       const pinnedOpenCases = await prisma.application.count({ where: { rulePackVersionId: v.id, status: { in: [...OPEN] } } });
+      const cyclePublished = await prisma.rulePackVersion.findFirst({ where: { cycleId: v.cycleId, status: 'PUBLISHED' }, select: { id: true, version: true } });
       res.json({
         id: v.id,
         cycle: { id: v.cycleId, code: v.cycle.code, label: v.cycle.label },
@@ -278,6 +302,7 @@ export function rulesRouter(): Router {
         publishedAt: v.publishedAt?.toISOString() ?? null,
         rejectedRemarks: v.rejectedRemarks,
         pinnedOpenCases,
+        cyclePublished,
         errors: check.ok ? [] : check.errors,
         changedBySection,
         makers: makerIds.map((id) => who.get(id) ?? id),

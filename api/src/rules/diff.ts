@@ -212,7 +212,16 @@ export function checkApplyScope(diff: DiffEntry[], scope: ApplyScope): { path: s
   return errors;
 }
 
-/** Live means the version rebases open cases on publish. */
+/** Any path marked live. */
 export function isLiveAmendment(scope: ApplyScope): boolean {
   return Object.values(scope).includes('LIVE');
+}
+
+/**
+ * A version rebases open cases on publish only when a change to a pinned section is marked live. Operational
+ * sections (schedule, reminders, escalation, assignment, committees, calendar) reach every case anyway.
+ */
+export function rebasesLiveCases(diff: DiffEntry[], scope: ApplyScope): boolean {
+  const live = Object.entries(scope).filter(([, v]) => v === 'LIVE').map(([p]) => p);
+  return diff.some((d) => isPinnedSection(d.section) && live.some((p) => d.path === p || d.path.startsWith(`${p}.`)));
 }

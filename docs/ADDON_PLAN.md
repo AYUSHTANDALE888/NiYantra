@@ -36,3 +36,15 @@ This maps `AICTE_RulePacks_UI_Addon_Prompt.md` onto the repository as it stands 
 - **Steps.** The prompt's commits are A1–A6 then B1–B4, while its sections run A1–A12. The work is grouped into six A commits as listed in the task list (A1 schema and expressions; A2 data model and service; A3 consumers and seed; A4 state machine, diff, rebase and API; A5 impact and screens; A6 tests, demo step 11 and docs) and four B commits.
 - **Python reads.** The Python service also read `shared/rules.json` and `shared/formcheck-rules.json` at runtime; both reads go (rules arrive in the request; a built-in copy is the fallback).
 - **Fresh setup is the supported upgrade path.** `npm run setup` recreates the database; `migrate-from-json.ts` also back-fills an existing database for completeness.
+
+## 4. Status
+
+| Step | Commit | State |
+|---|---|---|
+| A1 schema and expressions | `addon A1` | done |
+| A2 data model, guard, roles, migration, service | `addon A2` | done |
+| A3 consumers, Python rules, apply form filing context | `addon A3` | done |
+| A4 API, diff, apply scope, rebase, import/export, public endpoints | `addon A4` | done |
+| A5 Rules Center, impact, notices | `addon A5` | done |
+| A6 A11 tests, demo step 11, README sections | `addon A6` | done |
+| B1–B4 interface | — | next |

@@ -122,13 +122,18 @@ export interface VerifyResult {
   chainsChecked: number;
   rowsChecked: number;
   firstBroken?: { chainKey: string; id: string };
+  /** Every chain with a mismatch (each chain is checked to its end or its first broken row). */
+  brokenChains: string[];
 }
 
 export async function verifyChains(db: Db = prisma): Promise<VerifyResult> {
   const rows = await db.auditLog.findMany({ orderBy: [{ chainKey: 'asc' }, { id: 'asc' }] });
   const lastHash = new Map<string, string>();
+  const broken = new Map<string, string>();
   let rowsChecked = 0;
+  let firstBroken: VerifyResult['firstBroken'];
   for (const r of rows) {
+    if (broken.has(r.chainKey)) continue;
     const prev = lastHash.get(r.chainKey) ?? GENESIS;
     const expected = computeRowHash(prev, {
       at: r.at,
@@ -144,14 +149,12 @@ export async function verifyChains(db: Db = prisma): Promise<VerifyResult> {
     });
     rowsChecked++;
     if (r.prevHash !== prev || r.rowHash !== expected) {
-      return {
-        ok: false,
-        chainsChecked: lastHash.size + 1,
-        rowsChecked,
-        firstBroken: { chainKey: r.chainKey, id: r.id.toString() },
-      };
+      broken.set(r.chainKey, r.id.toString());
+      firstBroken ??= { chainKey: r.chainKey, id: r.id.toString() };
+      lastHash.set(r.chainKey, r.rowHash);
+      continue;
     }
     lastHash.set(r.chainKey, r.rowHash);
   }
-  return { ok: true, chainsChecked: lastHash.size, rowsChecked };
+  return { ok: broken.size === 0, chainsChecked: lastHash.size, rowsChecked, ...(firstBroken ? { firstBroken } : {}), brokenChains: [...broken.keys()] };
 }

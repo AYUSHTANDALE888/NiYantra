@@ -8,7 +8,7 @@ import { notify } from '../lib/notify.js';
 import { isoDate, toDateOnly } from '../lib/dates.js';
 import { addWorkingDays } from '../lib/workdays.js';
 import { evaluate, truthy, type Expr } from './expr.js';
-import { diffPacks, isLiveAmendment, type ApplyScope, type DiffEntry, type WideningProof } from './diff.js';
+import { diffPacks, isLiveAmendment, rebasesLiveCases, type ApplyScope, type DiffEntry, type WideningProof } from './diff.js';
 import type { PackContent } from './schema.js';
 
 const OPEN_STATUSES = ['IN_STAGE', 'RETURNED'] as const;
@@ -98,6 +98,7 @@ export async function rebaseAfterPublish(actor: { id: string; role: string }, pu
   const amendment = await prisma.amendment.findUnique({ where: { versionId: published.id } });
   if (!amendment || !isLiveAmendment(amendment.applyScope as ApplyScope)) return { rebased: 0, movedItems: 0 };
   const diff = await diffForPublish(prisma, previous, published);
+  if (!rebasesLiveCases(diff, amendment.applyScope as ApplyScope)) return { rebased: 0, movedItems: 0 };
   const changes = diff.map((d) => d.path);
   const apps = await prisma.application.findMany({ where: { rulePackVersionId: previous.id, status: { in: [...OPEN_STATUSES] } }, select: { id: true } });
   let movedItems = 0;
