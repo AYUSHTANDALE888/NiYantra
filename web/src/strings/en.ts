@@ -32,6 +32,8 @@ export const en = {
     workforce: 'Workforce',
     admin: 'Administration',
     styleguide: 'Style guide',
+    rules: 'Rules Center',
+    notices: 'What changed',
   },
   login: {
     title: 'Sign in to AICTE Approvals',

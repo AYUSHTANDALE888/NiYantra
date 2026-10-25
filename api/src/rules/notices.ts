@@ -9,15 +9,17 @@ import { APP_TYPES } from './schema.js';
 /** Application types a change touches, from the diff against the previous version. */
 function affectedTypes(prev: PackContent | null, cur: PackContent): string[] {
   if (!prev) return [...APP_TYPES];
-  const out = new Set<string>();
+  const specific = new Set<string>();
+  let general = false;
   for (const d of diffPacks(prev, cur)) {
-    if (d.section === 'documents') for (const t of ((d.new ?? d.old) as { appliesTo?: string[] } | null)?.appliesTo ?? cur.documents.find((x) => d.path.startsWith(`documents.${x.kind}@`))?.appliesTo ?? []) out.add(t);
-    else if (d.section === 'applicationTypes' || d.section === 'fees') {
-      const key = d.path.split('.')[1]!;
-      for (const t of APP_TYPES) if (key.split('+').includes(t)) out.add(t);
-    } else if (['programmes', 'norms', 'schedule', 'timelines', 'formCheckRules'].includes(d.section)) APP_TYPES.forEach((t) => out.add(t));
+    if (d.section === 'documents' || d.section === 'applicationTypes' || d.section === 'fees') {
+      // Keys name the types: "KIND@TYPE+TYPE" for documents and fees, the type itself for applicationTypes.
+      const key = d.path.split('.')[1] ?? '';
+      for (const t of APP_TYPES) if (key === t || key.split('@').pop()!.split('+').includes(t) || key.split('@')[0]!.split('+').includes(t)) specific.add(t);
+    } else if (['programmes', 'norms', 'schedule', 'timelines', 'formCheckRules', 'letters'].includes(d.section)) general = true;
   }
-  return [...out];
+  // Specific document or type changes name their types; otherwise a general change affects every type.
+  return specific.size ? [...specific] : general ? [...APP_TYPES] : [];
 }
 
 export async function publicNotices() {

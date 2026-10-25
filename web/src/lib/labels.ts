@@ -9,6 +9,7 @@ export const ITEM_LABEL: Record<string, string> = {
 
 export const ACTION_HISTORY_LABEL: Record<string, string> = {
   SUBMIT: 'Submitted',
+  RULES_REBASED: 'Moved to newer rules (live amendment)',
   COMPLETE_STAGE: 'Completed scrutiny',
   RETURN: 'Returned to college',
   REPLY: 'College replied',

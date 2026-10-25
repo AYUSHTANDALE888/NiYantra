@@ -11,7 +11,8 @@ import { badRequest, notFound } from '../lib/errors.js';
 import { currentUser, type AuthUser } from '../auth/middleware.js';
 import { requireRole } from '../policy/roles.js';
 import { filingContext } from '../rules/filing.js';
-import { AMENDMENT_KINDS, APP_TYPES, SECTIONS, validatePack, type PackContent } from '../rules/schema.js';
+import { AMENDMENT_KINDS, APP_TYPES, SECTIONS, exprVars, validatePack, type PackContent } from '../rules/schema.js';
+import { typeLabels } from '../rules/service.js';
 import type { ResolvedRules } from '../rules/resolved.js';
 import { diffPacks, type DiffEntry } from '../rules/diff.js';
 import { diffForPublish } from '../rules/rebase.js';
@@ -141,6 +142,51 @@ export function rulesRouter(): Router {
             route: t.route.map((s) => stepLabel(rules, s.stage, s.when, programme)),
             documents: rules.documents(t.type, ctx).map((d) => ({ kind: d.kind, label: d.label, critical: d.critical, hasExpiry: d.hasExpiry, source: d.source ?? null })),
           })),
+      });
+    }),
+  );
+
+  // Variables an expression may use (shared/expr-vars.json), for the condition builder.
+  r.get(
+    '/vars',
+    requireRole(...STAFF),
+    h(async (_req, res) => {
+      res.json(exprVars());
+    }),
+  );
+
+  // Facts of a few seeded cases, to fill the letter preview. Only what the letter placeholders show.
+  r.get(
+    '/letter-samples',
+    requireRole('RULE_EDITOR', 'RULE_APPROVER', 'ADMIN', 'HOD', 'BUREAU'),
+    h(async (_req, res) => {
+      const apps = await prisma.application.findMany({
+        where: { deficiencies: { some: {} } },
+        take: 8,
+        orderBy: { applicationNo: 'asc' },
+        include: { institution: { select: { name: true, permanentId: true } }, deficiencies: { orderBy: { raisedAt: 'desc' }, take: 1 }, decision: true, undertakings: true },
+      });
+      const labels = await typeLabels(apps);
+      res.json({
+        samples: apps.map((a) => {
+          const d = a.deficiencies[0];
+          const items = ((d?.items as string[] | undefined) ?? []).map((i) => `- ${i}`);
+          return {
+            id: a.id,
+            label: `${a.applicationNo} · ${a.institution.name}`,
+            values: {
+              'application.no': a.applicationNo,
+              'application.type': labels.get(a.id) ?? a.type,
+              'institution.name': a.institution.name,
+              'institution.permanentId': a.institution.permanentId,
+              'deficiency.items': items.join('\n') || '- (no items recorded)',
+              'deficiency.reason': d?.reason ?? '',
+              'decision.outcome': a.decision?.outcome.replace(/_/g, ' ').toLowerCase() ?? 'approved with conditions',
+              'decision.reason': a.decision?.reason ?? 'All norms met on the evidence submitted.',
+              'decision.conditions': a.undertakings.map((u) => `- ${u.condition} (by ${isoDate(u.dueDate)})`).join('\n') || '- None',
+            },
+          };
+        }),
       });
     }),
   );

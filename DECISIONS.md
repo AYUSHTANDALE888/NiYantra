@@ -199,3 +199,13 @@ Choices made where the build spec was silent, plus the design review recorded at
 - Demo "Ignore schedule" is a `SimClock.ignoreSchedule` flag, set by the admin via `POST /api/demo/ignore-schedule` (audited as DEMO_IGNORE_SCHEDULE). It is honoured only when DEMO_MODE=true and applies only when no window is open.
 - Impact preview (`rules/impact.ts`) is read-only and returns sentences plus lists: live moves, route, document and purview changes on the last 50 filings, form check hit counts on the 50 samples and the 60 newest seeded checks, South officer utilisation if every open task were reweighted, filing groups before and after, and refusals. About 100–300 ms on the seed.
 - The demo seed has 191–192 applications: the assignment tie-break among equal-score officers compares random UUIDs, so one balancing filing can change between setups. This predates the add-on.
+
+## Add-on A5: Rules Center, notices, impact screens
+
+- Screens: `/rules` (cycles and versions; draft an amendment, new cycle, import), `/rules/versions/:id` (amendment card with apply scope per changed path, section nav with changed / to-fix / unsaved counts, a table or form per section, "Advanced (JSON)" tab), `/diff`, `/impact`, `/review` (approver only), public `/notices` and `/college/notices`. Editors and approvers work there; ADMIN, HoD and Bureau read it.
+- Saving sends JSON Patch `replace` operations for the changed sections, so RULES_EDITED lists section paths. Invalid drafts save with their errors shown next to the rows; submit refuses them.
+- The condition builder edits All/Any of "field · operator · value" rows. A value starting with `@` is a variable (`@norms.maxStudentsPerFaculty`). Conditions it cannot show as rows open in its JSON editor.
+- Letter previews are filled from a few seeded cases (`GET /api/rules/letter-samples`, letter fields only), with React escaping the output.
+- The college banner counts published amendments newer than the last one the user dismissed. The marker is kept per user in localStorage, so a cleared browser shows the banner again (harmless).
+- The case "Rules" line links to the version for roles that can open the Rules Center; others see text. History shows RULES_REBASED as "Moved to newer rules (live amendment)".
+- "Affects" on a notice lists the types named by changed documents, types or fees; general changes (norms, purview, schedule, timelines) list every type.

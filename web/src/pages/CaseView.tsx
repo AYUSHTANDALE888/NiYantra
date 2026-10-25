@@ -1,8 +1,8 @@
-import { useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useState, type ReactNode } from 'react';
+import { Link, useParams } from 'react-router-dom';
 import { ApiError } from '../api/client';
 import { useCase } from '../api/hooks';
-import { useAuth } from '../auth/AuthContext';
+import { useAuth, useMe } from '../auth/AuthContext';
 import { ActionPanel } from '../components/ActionPanel';
 import { statusKind } from '../components/AppStatus';
 import { DocumentViewer } from '../components/DocumentViewer';
@@ -25,10 +25,13 @@ function flagTone(code: string): Tone {
 function Facts({ d }: { d: CaseDetail }) {
   const f = d.application.formData as Record<string, unknown>;
   const courses = (f.courses as { name: string; intake: number; years: number }[] | undefined) ?? [];
-  const rows: [string, string][] = [
+  const me = useMe();
+  const canOpenRules = ['RULE_EDITOR', 'RULE_APPROVER', 'ADMIN', 'HOD', 'BUREAU'].includes(me.role);
+  const rulesText = d.rules ? `${d.rules.cycle.replace('-', '–')} v${d.rules.version} (effective ${formatDate(d.rules.effectiveFrom)})` : '—';
+  const rows: [string, ReactNode][] = [
     ['Application type', d.application.typeLabel],
     ['Submitted', formatDate(d.application.submittedAt)],
-    ['Rules', d.rules ? `${d.rules.cycle.replace('-', '–')} v${d.rules.version} (effective ${formatDate(d.rules.effectiveFrom)})` : '—'],
+    ['Rules', d.rules && canOpenRules ? <Link className="text-accent underline" to={`/rules/versions/${d.rules.versionId}`}>{rulesText}</Link> : rulesText],
     ['Land area', f.landAreaSqm ? `${formatNumber(Number(f.landAreaSqm))} sq m` : '—'],
     ['Built-up area', f.builtupAreaSqm ? `${formatNumber(Number(f.builtupAreaSqm))} sq m` : '—'],
     ['Faculty', f.facultyCount ? formatNumber(Number(f.facultyCount)) : '—'],
