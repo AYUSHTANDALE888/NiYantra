@@ -1,0 +1,3793 @@
+{
+ "ch0.a": {
+  "duration": 4.575,
+  "text": "Approving a technical institution takes many hands, many documents, and many deadlines.",
+  "heard": "Approving a technical institution takes many hands, many documents, and many deadlines.",
+  "wer": 0.0,
+  "attempts": 1,
+  "words": [
+   {
+    "w": "Approving",
+    "s": 0.0,
+    "e": 0.34
+   },
+   {
+    "w": "a",
+    "s": 0.34,
+    "e": 0.44
+   },
+   {
+    "w": "technical",
+    "s": 0.44,
+    "e": 0.76
+   },
+   {
+    "w": "institution",
+    "s": 0.76,
+    "e": 1.14
+   },
+   {
+    "w": "takes",
+    "s": 1.14,
+    "e": 1.7
+   },
+   {
+    "w": "many",
+    "s": 1.7,
+    "e": 1.94
+   },
+   {
+    "w": "hands,",
+    "s": 1.94,
+    "e": 2.34
+   },
+   {
+    "w": "many",
+    "s": 2.62,
+    "e": 2.7
+   },
+   {
+    "w": "documents,",
+    "s": 2.7,
+    "e": 3.06
+   },
+   {
+    "w": "and",
+    "s": 3.5,
+    "e": 3.56
+   },
+   {
+    "w": "many",
+    "s": 3.56,
+    "e": 3.74
+   },
+   {
+    "w": "deadlines.",
+    "s": 3.74,
+    "e": 4.06
+   }
+  ]
+ },
+ "ch0.d": {
+  "duration": 4.056,
+  "text": "This prototype keeps every one of them visible, from the first form to the final decision.",
+  "heard": "This prototype keeps every one of them visible, from the first form to the final decision.",
+  "wer": 0.0,
+  "attempts": 1,
+  "words": [
+   {
+    "w": "This",
+    "s": 0.0,
+    "e": 0.16
+   },
+   {
+    "w": "prototype",
+    "s": 0.16,
+    "e": 0.46
+   },
+   {
+    "w": "keeps",
+    "s": 0.46,
+    "e": 0.86
+   },
+   {
+    "w": "every",
+    "s": 0.86,
+    "e": 1.12
+   },
+   {
+    "w": "one",
+    "s": 1.12,
+    "e": 1.32
+   },
+   {
+    "w": "of",
+    "s": 1.32,
+    "e": 1.4
+   },
+   {
+    "w": "them",
+    "s": 1.4,
+    "e": 1.52
+   },
+   {
+    "w": "visible,",
+    "s": 1.52,
+    "e": 1.84
+   },
+   {
+    "w": "from",
+    "s": 2.16,
+    "e": 2.24
+   },
+   {
+    "w": "the",
+    "s": 2.24,
+    "e": 2.36
+   },
+   {
+    "w": "first",
+    "s": 2.36,
+    "e": 2.54
+   },
+   {
+    "w": "form",
+    "s": 2.54,
+    "e": 2.84
+   },
+   {
+    "w": "to",
+    "s": 2.84,
+    "e": 3.1
+   },
+   {
+    "w": "the",
+    "s": 3.1,
+    "e": 3.18
+   },
+   {
+    "w": "final",
+    "s": 3.18,
+    "e": 3.36
+   },
+   {
+    "w": "decision.",
+    "s": 3.36,
+    "e": 3.7
+   }
+  ]
+ },
+ "ch1.a": {
+  "duration": 4.968,
+  "text": "Before anyone signs in, the public portal shows this cycle's schedule, and every rule change.",
+  "heard": "Before anyone signs in, the public portal shows this cycle schedule and every rule change.",
+  "wer": 0.067,
+  "attempts": 2,
+  "words": [
+   {
+    "w": "Before",
+    "s": 0.0,
+    "e": 0.2
+   },
+   {
+    "w": "anyone",
+    "s": 0.2,
+    "e": 0.5
+   },
+   {
+    "w": "signs",
+    "s": 0.5,
+    "e": 0.86
+   },
+   {
+    "w": "in,",
+    "s": 0.86,
+    "e": 1.18
+   },
+   {
+    "w": "the",
+    "s": 1.44,
+    "e": 1.5
+   },
+   {
+    "w": "public",
+    "s": 1.5,
+    "e": 1.72
+   },
+   {
+    "w": "portal",
+    "s": 1.72,
+    "e": 1.94
+   },
+   {
+    "w": "shows",
+    "s": 1.94,
+    "e": 2.36
+   },
+   {
+    "w": "this",
+    "s": 2.36,
+    "e": 2.62
+   },
+   {
+    "w": "cycle",
+    "s": 2.62,
+    "e": 2.88
+   },
+   {
+    "w": "schedule",
+    "s": 2.88,
+    "e": 3.36
+   },
+   {
+    "w": "and",
+    "s": 3.36,
+    "e": 3.7
+   },
+   {
+    "w": "every",
+    "s": 3.7,
+    "e": 4.0
+   },
+   {
+    "w": "rule",
+    "s": 4.0,
+    "e": 4.26
+   },
+   {
+    "w": "change.",
+    "s": 4.26,
+    "e": 4.52
+   }
+  ]
+ },
+ "ch1.b1": {
+  "duration": 1.444,
+  "text": "Text can be made larger.",
+  "heard": "Text can be made larger.",
+  "wer": 0.0,
+  "attempts": 1,
+  "words": [
+   {
+    "w": "Text",
+    "s": 0.0,
+    "e": 0.16
+   },
+   {
+    "w": "can",
+    "s": 0.16,
+    "e": 0.48
+   },
+   {
+    "w": "be",
+    "s": 0.48,
+    "e": 0.62
+   },
+   {
+    "w": "made",
+    "s": 0.62,
+    "e": 0.8
+   },
+   {
+    "w": "larger.",
+    "s": 0.8,
+    "e": 1.04
+   }
+  ]
+ },
+ "ch1.b2": {
+  "duration": 1.786,
+  "text": "The whole site switches to Hindi.",
+  "heard": "The whole site switches to Hindi.",
+  "wer": 0.0,
+  "attempts": 1,
+  "words": [
+   {
+    "w": "The",
+    "s": 0.0,
+    "e": 0.14
+   },
+   {
+    "w": "whole",
+    "s": 0.14,
+    "e": 0.28
+   },
+   {
+    "w": "site",
+    "s": 0.28,
+    "e": 0.56
+   },
+   {
+    "w": "switches",
+    "s": 0.56,
+    "e": 0.9
+   },
+   {
+    "w": "to",
+    "s": 0.9,
+    "e": 1.22
+   },
+   {
+    "w": "Hindi.",
+    "s": 1.22,
+    "e": 1.38
+   }
+  ]
+ },
+ "ch1.b3": {
+  "duration": 2.67,
+  "text": "And a high-contrast mode helps anyone with low vision.",
+  "heard": "and a high contrast mode helps anyone with low vision.",
+  "wer": 0.0,
+  "attempts": 1,
+  "words": [
+   {
+    "w": "and",
+    "s": 0.0,
+    "e": 0.12
+   },
+   {
+    "w": "a",
+    "s": 0.12,
+    "e": 0.2
+   },
+   {
+    "w": "high",
+    "s": 0.2,
+    "e": 0.32
+   },
+   {
+    "w": "contrast",
+    "s": 0.32,
+    "e": 0.66
+   },
+   {
+    "w": "mode",
+    "s": 0.66,
+    "e": 1.06
+   },
+   {
+    "w": "helps",
+    "s": 1.06,
+    "e": 1.28
+   },
+   {
+    "w": "anyone",
+    "s": 1.28,
+    "e": 1.72
+   },
+   {
+    "w": "with",
+    "s": 1.72,
+    "e": 1.94
+   },
+   {
+    "w": "low",
+    "s": 1.94,
+    "e": 2.08
+   },
+   {
+    "w": "vision.",
+    "s": 2.08,
+    "e": 2.34
+   }
+  ]
+ },
+ "ch1.d": {
+  "duration": 4.16,
+  "text": "Accessibility is not an extra screen. It is built into every page.",
+  "heard": "Accessibility is not an extra screen. It is built into every page.",
+  "wer": 0.0,
+  "attempts": 1,
+  "words": [
+   {
+    "w": "Accessibility",
+    "s": 0.0,
+    "e": 0.56
+   },
+   {
+    "w": "is",
+    "s": 0.56,
+    "e": 0.84
+   },
+   {
+    "w": "not",
+    "s": 0.84,
+    "e": 1.04
+   },
+   {
+    "w": "an",
+    "s": 1.04,
+    "e": 1.32
+   },
+   {
+    "w": "extra",
+    "s": 1.32,
+    "e": 1.52
+   },
+   {
+    "w": "screen.",
+    "s": 1.52,
+    "e": 1.92
+   },
+   {
+    "w": "It",
+    "s": 2.64,
+    "e": 2.72
+   },
+   {
+    "w": "is",
+    "s": 2.72,
+    "e": 2.82
+   },
+   {
+    "w": "built",
+    "s": 2.82,
+    "e": 3.02
+   },
+   {
+    "w": "into",
+    "s": 3.02,
+    "e": 3.28
+   },
+   {
+    "w": "every",
+    "s": 3.28,
+    "e": 3.6
+   },
+   {
+    "w": "page.",
+    "s": 3.6,
+    "e": 3.86
+   }
+  ]
+ },
+ "ch2.a": {
+  "duration": 4.286,
+  "text": "Applications are long, and a mistake found months later can cost a college the whole cycle.",
+  "heard": "Applications are long and a mistake found months later can cost a college the whole cycle.",
+  "wer": 0.0,
+  "attempts": 1,
+  "words": [
+   {
+    "w": "Applications",
+    "s": 0.0,
+    "e": 0.3
+   },
+   {
+    "w": "are",
+    "s": 0.3,
+    "e": 0.6
+   },
+   {
+    "w": "long",
+    "s": 0.6,
+    "e": 0.78
+   },
+   {
+    "w": "and",
+    "s": 0.78,
+    "e": 1.34
+   },
+   {
+    "w": "a",
+    "s": 1.34,
+    "e": 1.42
+   },
+   {
+    "w": "mistake",
+    "s": 1.42,
+    "e": 1.64
+   },
+   {
+    "w": "found",
+    "s": 1.64,
+    "e": 1.98
+   },
+   {
+    "w": "months",
+    "s": 1.98,
+    "e": 2.14
+   },
+   {
+    "w": "later",
+    "s": 2.14,
+    "e": 2.44
+   },
+   {
+    "w": "can",
+    "s": 2.44,
+    "e": 2.7
+   },
+   {
+    "w": "cost",
+    "s": 2.7,
+    "e": 2.92
+   },
+   {
+    "w": "a",
+    "s": 2.92,
+    "e": 3.08
+   },
+   {
+    "w": "college",
+    "s": 3.08,
+    "e": 3.3
+   },
+   {
+    "w": "the",
+    "s": 3.3,
+    "e": 3.56
+   },
+   {
+    "w": "whole",
+    "s": 3.56,
+    "e": 3.68
+   },
+   {
+    "w": "cycle.",
+    "s": 3.68,
+    "e": 4.06
+   }
+  ]
+ },
+ "ch2.b1": {
+  "duration": 6.489,
+  "text": "ABC Engineering College starts a new application. The header shows the cycle, and the exact rules version it is filing under.",
+  "heard": "ABC Engineering College starts a new application. The header shows the cycle and the exact rules version it is filing under.",
+  "wer": 0.0,
+  "attempts": 1,
+  "words": [
+   {
+    "w": "ABC",
+    "s": 0.0,
+    "e": 0.26
+   },
+   {
+    "w": "Engineering",
+    "s": 0.26,
+    "e": 0.78
+   },
+   {
+    "w": "College",
+    "s": 0.78,
+    "e": 1.24
+   },
+   {
+    "w": "starts",
+    "s": 1.24,
+    "e": 1.58
+   },
+   {
+    "w": "a",
+    "s": 1.58,
+    "e": 1.76
+   },
+   {
+    "w": "new",
+    "s": 1.76,
+    "e": 1.86
+   },
+   {
+    "w": "application.",
+    "s": 1.86,
+    "e": 2.34
+   },
+   {
+    "w": "The",
+    "s": 3.14,
+    "e": 3.22
+   },
+   {
+    "w": "header",
+    "s": 3.22,
+    "e": 3.34
+   },
+   {
+    "w": "shows",
+    "s": 3.34,
+    "e": 3.58
+   },
+   {
+    "w": "the",
+    "s": 3.58,
+    "e": 3.76
+   },
+   {
+    "w": "cycle",
+    "s": 3.76,
+    "e": 4.04
+   },
+   {
+    "w": "and",
+    "s": 4.04,
+    "e": 4.42
+   },
+   {
+    "w": "the",
+    "s": 4.42,
+    "e": 4.52
+   },
+   {
+    "w": "exact",
+    "s": 4.52,
+    "e": 4.68
+   },
+   {
+    "w": "rules",
+    "s": 4.68,
+    "e": 5.02
+   },
+   {
+    "w": "version",
+    "s": 5.02,
+    "e": 5.42
+   },
+   {
+    "w": "it",
+    "s": 5.42,
+    "e": 5.58
+   },
+   {
+    "w": "is",
+    "s": 5.58,
+    "e": 5.66
+   },
+   {
+    "w": "filing",
+    "s": 5.66,
+    "e": 5.86
+   },
+   {
+    "w": "under.",
+    "s": 5.86,
+    "e": 6.26
+   }
+  ]
+ },
+ "ch2.b2": {
+  "duration": 3.29,
+  "text": "Here, the built-up area is entered as larger than the land itself.",
+  "heard": "Here, the built-up area is entered as larger than the land itself.",
+  "wer": 0.0,
+  "attempts": 2,
+  "words": [
+   {
+    "w": "Here,",
+    "s": 0.0,
+    "e": 0.26
+   },
+   {
+    "w": "the",
+    "s": 0.5,
+    "e": 0.54
+   },
+   {
+    "w": "built",
+    "s": 0.54,
+    "e": 0.7
+   },
+   {
+    "w": "-up",
+    "s": 0.7,
+    "e": 0.88
+   },
+   {
+    "w": "area",
+    "s": 0.88,
+    "e": 1.18
+   },
+   {
+    "w": "is",
+    "s": 1.18,
+    "e": 1.46
+   },
+   {
+    "w": "entered",
+    "s": 1.46,
+    "e": 1.7
+   },
+   {
+    "w": "as",
+    "s": 1.7,
+    "e": 1.88
+   },
+   {
+    "w": "larger",
+    "s": 1.88,
+    "e": 2.08
+   },
+   {
+    "w": "than",
+    "s": 2.08,
+    "e": 2.32
+   },
+   {
+    "w": "the",
+    "s": 2.32,
+    "e": 2.4
+   },
+   {
+    "w": "land",
+    "s": 2.4,
+    "e": 2.58
+   },
+   {
+    "w": "itself.",
+    "s": 2.58,
+    "e": 2.84
+   }
+  ]
+ },
+ "ch2.b3": {
+  "duration": 5.572,
+  "text": "Check my entries flags it straight away, as advice, not a block. The college corrects the figure.",
+  "heard": "Check my entries, flags it straight away, as advice, not a block. The college corrects the figure.",
+  "wer": 0.0,
+  "attempts": 1,
+  "words": [
+   {
+    "w": "Check",
+    "s": 0.0,
+    "e": 0.18
+   },
+   {
+    "w": "my",
+    "s": 0.18,
+    "e": 0.3
+   },
+   {
+    "w": "entries,",
+    "s": 0.3,
+    "e": 0.6
+   },
+   {
+    "w": "flags",
+    "s": 0.96,
+    "e": 1.1
+   },
+   {
+    "w": "it",
+    "s": 1.1,
+    "e": 1.3
+   },
+   {
+    "w": "straight",
+    "s": 1.3,
+    "e": 1.48
+   },
+   {
+    "w": "away,",
+    "s": 1.48,
+    "e": 1.76
+   },
+   {
+    "w": "as",
+    "s": 2.1,
+    "e": 2.18
+   },
+   {
+    "w": "advice,",
+    "s": 2.18,
+    "e": 2.52
+   },
+   {
+    "w": "not",
+    "s": 2.94,
+    "e": 3.06
+   },
+   {
+    "w": "a",
+    "s": 3.06,
+    "e": 3.12
+   },
+   {
+    "w": "block.",
+    "s": 3.12,
+    "e": 3.3
+   },
+   {
+    "w": "The",
+    "s": 4.1,
+    "e": 4.18
+   },
+   {
+    "w": "college",
+    "s": 4.18,
+    "e": 4.4
+   },
+   {
+    "w": "corrects",
+    "s": 4.4,
+    "e": 4.98
+   },
+   {
+    "w": "the",
+    "s": 4.98,
+    "e": 5.02
+   },
+   {
+    "w": "figure.",
+    "s": 5.02,
+    "e": 5.24
+   }
+  ]
+ },
+ "ch2.b4": {
+  "duration": 4.89,
+  "text": "But a missing critical document does block submission, and the message names it: the land lease.",
+  "heard": "But a missing critical document does block submission, and the message names it, the land lease.",
+  "wer": 0.0,
+  "attempts": 1,
+  "words": [
+   {
+    "w": "But",
+    "s": 0.0,
+    "e": 0.22
+   },
+   {
+    "w": "a",
+    "s": 0.22,
+    "e": 0.4
+   },
+   {
+    "w": "missing",
+    "s": 0.4,
+    "e": 0.58
+   },
+   {
+    "w": "critical",
+    "s": 0.58,
+    "e": 0.8
+   },
+   {
+    "w": "document",
+    "s": 0.8,
+    "e": 1.38
+   },
+   {
+    "w": "does",
+    "s": 1.38,
+    "e": 1.64
+   },
+   {
+    "w": "block",
+    "s": 1.64,
+    "e": 1.88
+   },
+   {
+    "w": "submission,",
+    "s": 1.88,
+    "e": 2.1
+   },
+   {
+    "w": "and",
+    "s": 2.86,
+    "e": 2.9
+   },
+   {
+    "w": "the",
+    "s": 2.9,
+    "e": 3.0
+   },
+   {
+    "w": "message",
+    "s": 3.0,
+    "e": 3.2
+   },
+   {
+    "w": "names",
+    "s": 3.2,
+    "e": 3.56
+   },
+   {
+    "w": "it,",
+    "s": 3.56,
+    "e": 3.72
+   },
+   {
+    "w": "the",
+    "s": 3.96,
+    "e": 4.08
+   },
+   {
+    "w": "land",
+    "s": 4.08,
+    "e": 4.26
+   },
+   {
+    "w": "lease.",
+    "s": 4.26,
+    "e": 4.52
+   }
+  ]
+ },
+ "ch2.b5": {
+  "duration": 2.418,
+  "text": "With the lease attached, the application goes in.",
+  "heard": "With the lease attached, the application goes in.",
+  "wer": 0.0,
+  "attempts": 1,
+  "words": [
+   {
+    "w": "With",
+    "s": 0.0,
+    "e": 0.16
+   },
+   {
+    "w": "the",
+    "s": 0.16,
+    "e": 0.28
+   },
+   {
+    "w": "lease",
+    "s": 0.28,
+    "e": 0.42
+   },
+   {
+    "w": "attached,",
+    "s": 0.42,
+    "e": 0.84
+   },
+   {
+    "w": "the",
+    "s": 1.22,
+    "e": 1.28
+   },
+   {
+    "w": "application",
+    "s": 1.28,
+    "e": 1.66
+   },
+   {
+    "w": "goes",
+    "s": 1.66,
+    "e": 1.96
+   },
+   {
+    "w": "in.",
+    "s": 1.96,
+    "e": 2.16
+   }
+  ]
+ },
+ "ch2.c": {
+  "duration": 2.307,
+  "text": "Submitted, with its own application number.",
+  "heard": "Submitted with its own application number,",
+  "wer": 0.0,
+  "attempts": 1,
+  "words": [
+   {
+    "w": "Submitted",
+    "s": 0.0,
+    "e": 0.36
+   },
+   {
+    "w": "with",
+    "s": 0.36,
+    "e": 0.9
+   },
+   {
+    "w": "its",
+    "s": 0.9,
+    "e": 1.06
+   },
+   {
+    "w": "own",
+    "s": 1.06,
+    "e": 1.24
+   },
+   {
+    "w": "application",
+    "s": 1.24,
+    "e": 1.56
+   },
+   {
+    "w": "number,",
+    "s": 1.56,
+    "e": 2.06
+   }
+  ]
+ },
+ "ch2.d": {
+  "duration": 2.35,
+  "text": "Problems are caught at the desk, not months later.",
+  "heard": "Problems are caught at the desk, not months later.",
+  "wer": 0.0,
+  "attempts": 2,
+  "words": [
+   {
+    "w": "Problems",
+    "s": 0.0,
+    "e": 0.3
+   },
+   {
+    "w": "are",
+    "s": 0.3,
+    "e": 0.52
+   },
+   {
+    "w": "caught",
+    "s": 0.52,
+    "e": 0.7
+   },
+   {
+    "w": "at",
+    "s": 0.7,
+    "e": 0.84
+   },
+   {
+    "w": "the",
+    "s": 0.84,
+    "e": 0.92
+   },
+   {
+    "w": "desk,",
+    "s": 0.92,
+    "e": 1.22
+   },
+   {
+    "w": "not",
+    "s": 1.44,
+    "e": 1.58
+   },
+   {
+    "w": "months",
+    "s": 1.58,
+    "e": 1.8
+   },
+   {
+    "w": "later.",
+    "s": 1.8,
+    "e": 2.08
+   }
+  ]
+ },
+ "ch3.a": {
+  "duration": 3.337,
+  "text": "In most offices, who handles a case, and why, is invisible.",
+  "heard": "in most offices who handles a case and why is invisible.",
+  "wer": 0.0,
+  "attempts": 1,
+  "words": [
+   {
+    "w": "in",
+    "s": 0.0,
+    "e": 0.12
+   },
+   {
+    "w": "most",
+    "s": 0.12,
+    "e": 0.26
+   },
+   {
+    "w": "offices",
+    "s": 0.26,
+    "e": 0.74
+   },
+   {
+    "w": "who",
+    "s": 0.74,
+    "e": 1.14
+   },
+   {
+    "w": "handles",
+    "s": 1.14,
+    "e": 1.38
+   },
+   {
+    "w": "a",
+    "s": 1.38,
+    "e": 1.56
+   },
+   {
+    "w": "case",
+    "s": 1.56,
+    "e": 1.8
+   },
+   {
+    "w": "and",
+    "s": 1.8,
+    "e": 2.1
+   },
+   {
+    "w": "why",
+    "s": 2.1,
+    "e": 2.34
+   },
+   {
+    "w": "is",
+    "s": 2.34,
+    "e": 2.68
+   },
+   {
+    "w": "invisible.",
+    "s": 2.68,
+    "e": 2.92
+   }
+  ]
+ },
+ "ch3.b": {
+  "duration": 2.537,
+  "text": "The new case is already in Priya's Action Center.",
+  "heard": "The new case is already in Priya's Action Center.",
+  "wer": 0.0,
+  "attempts": 1,
+  "words": [
+   {
+    "w": "The",
+    "s": 0.0,
+    "e": 0.12
+   },
+   {
+    "w": "new",
+    "s": 0.12,
+    "e": 0.24
+   },
+   {
+    "w": "case",
+    "s": 0.24,
+    "e": 0.46
+   },
+   {
+    "w": "is",
+    "s": 0.46,
+    "e": 0.68
+   },
+   {
+    "w": "already",
+    "s": 0.68,
+    "e": 1.0
+   },
+   {
+    "w": "in",
+    "s": 1.0,
+    "e": 1.28
+   },
+   {
+    "w": "Priya's",
+    "s": 1.28,
+    "e": 1.62
+   },
+   {
+    "w": "Action",
+    "s": 1.62,
+    "e": 1.8
+   },
+   {
+    "w": "Center.",
+    "s": 1.8,
+    "e": 2.16
+   }
+  ]
+ },
+ "ch3.c": {
+  "duration": 5.456,
+  "text": "And it says why: she is the portfolio officer for this college, with her workload and the rules version that applies.",
+  "heard": "And it says why she is the portfolio officer for this college with her workload and the rules version that applies.",
+  "wer": 0.0,
+  "attempts": 1,
+  "words": [
+   {
+    "w": "And",
+    "s": 0.0,
+    "e": 0.16
+   },
+   {
+    "w": "it",
+    "s": 0.16,
+    "e": 0.26
+   },
+   {
+    "w": "says",
+    "s": 0.26,
+    "e": 0.38
+   },
+   {
+    "w": "why",
+    "s": 0.38,
+    "e": 0.72
+   },
+   {
+    "w": "she",
+    "s": 0.72,
+    "e": 1.2
+   },
+   {
+    "w": "is",
+    "s": 1.2,
+    "e": 1.34
+   },
+   {
+    "w": "the",
+    "s": 1.34,
+    "e": 1.44
+   },
+   {
+    "w": "portfolio",
+    "s": 1.44,
+    "e": 1.72
+   },
+   {
+    "w": "officer",
+    "s": 1.72,
+    "e": 2.24
+   },
+   {
+    "w": "for",
+    "s": 2.24,
+    "e": 2.56
+   },
+   {
+    "w": "this",
+    "s": 2.56,
+    "e": 2.68
+   },
+   {
+    "w": "college",
+    "s": 2.68,
+    "e": 3.0
+   },
+   {
+    "w": "with",
+    "s": 3.0,
+    "e": 3.48
+   },
+   {
+    "w": "her",
+    "s": 3.48,
+    "e": 3.6
+   },
+   {
+    "w": "workload",
+    "s": 3.6,
+    "e": 3.9
+   },
+   {
+    "w": "and",
+    "s": 3.9,
+    "e": 4.18
+   },
+   {
+    "w": "the",
+    "s": 4.18,
+    "e": 4.26
+   },
+   {
+    "w": "rules",
+    "s": 4.26,
+    "e": 4.4
+   },
+   {
+    "w": "version",
+    "s": 4.4,
+    "e": 4.68
+   },
+   {
+    "w": "that",
+    "s": 4.68,
+    "e": 4.84
+   },
+   {
+    "w": "applies.",
+    "s": 4.84,
+    "e": 5.06
+   }
+  ]
+ },
+ "ch3.d": {
+  "duration": 1.775,
+  "text": "Every assignment explains itself.",
+  "heard": "Every assignment explains itself.",
+  "wer": 0.0,
+  "attempts": 1,
+  "words": [
+   {
+    "w": "Every",
+    "s": 0.0,
+    "e": 0.26
+   },
+   {
+    "w": "assignment",
+    "s": 0.26,
+    "e": 0.58
+   },
+   {
+    "w": "explains",
+    "s": 0.58,
+    "e": 1.08
+   },
+   {
+    "w": "itself.",
+    "s": 1.08,
+    "e": 1.46
+   }
+  ]
+ },
+ "ch4.a": {
+  "duration": 2.067,
+  "text": "Delays are often blamed on the wrong side.",
+  "heard": "Delays are often blamed on the wrong side.",
+  "wer": 0.0,
+  "attempts": 1,
+  "words": [
+   {
+    "w": "Delays",
+    "s": 0.0,
+    "e": 0.3
+   },
+   {
+    "w": "are",
+    "s": 0.3,
+    "e": 0.44
+   },
+   {
+    "w": "often",
+    "s": 0.44,
+    "e": 0.62
+   },
+   {
+    "w": "blamed",
+    "s": 0.62,
+    "e": 0.88
+   },
+   {
+    "w": "on",
+    "s": 0.88,
+    "e": 1.12
+   },
+   {
+    "w": "the",
+    "s": 1.12,
+    "e": 1.2
+   },
+   {
+    "w": "wrong",
+    "s": 1.2,
+    "e": 1.36
+   },
+   {
+    "w": "side.",
+    "s": 1.36,
+    "e": 1.72
+   }
+  ]
+ },
+ "ch4.b1": {
+  "duration": 6.175,
+  "text": "Priya finds the lease covers only two years. She returns the application, naming the document and the reason.",
+  "heard": "Priya finds the lease covers only two years. She returns the application, naming the document and the reason.",
+  "wer": 0.0,
+  "attempts": 1,
+  "words": [
+   {
+    "w": "Priya",
+    "s": 0.0,
+    "e": 0.3
+   },
+   {
+    "w": "finds",
+    "s": 0.3,
+    "e": 0.56
+   },
+   {
+    "w": "the",
+    "s": 0.56,
+    "e": 0.78
+   },
+   {
+    "w": "lease",
+    "s": 0.78,
+    "e": 0.92
+   },
+   {
+    "w": "covers",
+    "s": 0.92,
+    "e": 1.22
+   },
+   {
+    "w": "only",
+    "s": 1.22,
+    "e": 1.62
+   },
+   {
+    "w": "two",
+    "s": 1.62,
+    "e": 1.86
+   },
+   {
+    "w": "years.",
+    "s": 1.86,
+    "e": 2.2
+   },
+   {
+    "w": "She",
+    "s": 3.04,
+    "e": 3.14
+   },
+   {
+    "w": "returns",
+    "s": 3.14,
+    "e": 3.32
+   },
+   {
+    "w": "the",
+    "s": 3.32,
+    "e": 3.6
+   },
+   {
+    "w": "application,",
+    "s": 3.6,
+    "e": 3.96
+   },
+   {
+    "w": "naming",
+    "s": 4.44,
+    "e": 4.56
+   },
+   {
+    "w": "the",
+    "s": 4.56,
+    "e": 4.72
+   },
+   {
+    "w": "document",
+    "s": 4.72,
+    "e": 4.98
+   },
+   {
+    "w": "and",
+    "s": 4.98,
+    "e": 5.48
+   },
+   {
+    "w": "the",
+    "s": 5.48,
+    "e": 5.62
+   },
+   {
+    "w": "reason.",
+    "s": 5.62,
+    "e": 5.84
+   }
+  ]
+ },
+ "ch4.b2": {
+  "duration": 4.348,
+  "text": "The case turns amber. The clock is paused, because the next move is the college's.",
+  "heard": "The case turns amber. The clock is paused because the next move is the colleges.",
+  "wer": 0.067,
+  "attempts": 1,
+  "words": [
+   {
+    "w": "The",
+    "s": 0.0,
+    "e": 0.12
+   },
+   {
+    "w": "case",
+    "s": 0.12,
+    "e": 0.3
+   },
+   {
+    "w": "turns",
+    "s": 0.3,
+    "e": 0.62
+   },
+   {
+    "w": "amber.",
+    "s": 0.62,
+    "e": 0.9
+   },
+   {
+    "w": "The",
+    "s": 1.6,
+    "e": 1.68
+   },
+   {
+    "w": "clock",
+    "s": 1.68,
+    "e": 1.84
+   },
+   {
+    "w": "is",
+    "s": 1.84,
+    "e": 2.0
+   },
+   {
+    "w": "paused",
+    "s": 2.0,
+    "e": 2.3
+   },
+   {
+    "w": "because",
+    "s": 2.3,
+    "e": 2.7
+   },
+   {
+    "w": "the",
+    "s": 2.7,
+    "e": 2.86
+   },
+   {
+    "w": "next",
+    "s": 2.86,
+    "e": 3.0
+   },
+   {
+    "w": "move",
+    "s": 3.0,
+    "e": 3.24
+   },
+   {
+    "w": "is",
+    "s": 3.24,
+    "e": 3.46
+   },
+   {
+    "w": "the",
+    "s": 3.46,
+    "e": 3.58
+   },
+   {
+    "w": "colleges.",
+    "s": 3.58,
+    "e": 3.84
+   }
+  ]
+ },
+ "ch4.b3": {
+  "duration": 1.986,
+  "text": "The college replies with a three-year lease.",
+  "heard": "The college replies with a three-year lease.",
+  "wer": 0.0,
+  "attempts": 1,
+  "words": [
+   {
+    "w": "The",
+    "s": 0.0,
+    "e": 0.12
+   },
+   {
+    "w": "college",
+    "s": 0.12,
+    "e": 0.32
+   },
+   {
+    "w": "replies",
+    "s": 0.32,
+    "e": 0.62
+   },
+   {
+    "w": "with",
+    "s": 0.62,
+    "e": 0.98
+   },
+   {
+    "w": "a",
+    "s": 0.98,
+    "e": 1.02
+   },
+   {
+    "w": "three",
+    "s": 1.02,
+    "e": 1.22
+   },
+   {
+    "w": "-year",
+    "s": 1.22,
+    "e": 1.42
+   },
+   {
+    "w": "lease.",
+    "s": 1.42,
+    "e": 1.64
+   }
+  ]
+ },
+ "ch4.c": {
+  "duration": 3.984,
+  "text": "And the case goes straight back to Priya, with the days that were left, not a fresh deadline.",
+  "heard": "and the case goes straight back to Priya with the days that were left, not a fresh deadline.",
+  "wer": 0.0,
+  "attempts": 1,
+  "words": [
+   {
+    "w": "and",
+    "s": 0.0,
+    "e": 0.12
+   },
+   {
+    "w": "the",
+    "s": 0.12,
+    "e": 0.18
+   },
+   {
+    "w": "case",
+    "s": 0.18,
+    "e": 0.34
+   },
+   {
+    "w": "goes",
+    "s": 0.34,
+    "e": 0.58
+   },
+   {
+    "w": "straight",
+    "s": 0.58,
+    "e": 0.78
+   },
+   {
+    "w": "back",
+    "s": 0.78,
+    "e": 0.98
+   },
+   {
+    "w": "to",
+    "s": 0.98,
+    "e": 1.12
+   },
+   {
+    "w": "Priya",
+    "s": 1.12,
+    "e": 1.44
+   },
+   {
+    "w": "with",
+    "s": 1.44,
+    "e": 1.84
+   },
+   {
+    "w": "the",
+    "s": 1.84,
+    "e": 1.96
+   },
+   {
+    "w": "days",
+    "s": 1.96,
+    "e": 2.12
+   },
+   {
+    "w": "that",
+    "s": 2.12,
+    "e": 2.3
+   },
+   {
+    "w": "were",
+    "s": 2.3,
+    "e": 2.4
+   },
+   {
+    "w": "left,",
+    "s": 2.4,
+    "e": 2.68
+   },
+   {
+    "w": "not",
+    "s": 2.94,
+    "e": 3.06
+   },
+   {
+    "w": "a",
+    "s": 3.06,
+    "e": 3.12
+   },
+   {
+    "w": "fresh",
+    "s": 3.12,
+    "e": 3.3
+   },
+   {
+    "w": "deadline.",
+    "s": 3.3,
+    "e": 3.56
+   }
+  ]
+ },
+ "ch4.d": {
+  "duration": 1.741,
+  "text": "The clock is fair to both sides.",
+  "heard": "The clock is fair to both sides.",
+  "wer": 0.0,
+  "attempts": 2,
+  "words": [
+   {
+    "w": "The",
+    "s": 0.0,
+    "e": 0.1
+   },
+   {
+    "w": "clock",
+    "s": 0.1,
+    "e": 0.26
+   },
+   {
+    "w": "is",
+    "s": 0.26,
+    "e": 0.46
+   },
+   {
+    "w": "fair",
+    "s": 0.46,
+    "e": 0.64
+   },
+   {
+    "w": "to",
+    "s": 0.64,
+    "e": 0.86
+   },
+   {
+    "w": "both",
+    "s": 0.86,
+    "e": 1.0
+   },
+   {
+    "w": "sides.",
+    "s": 1.0,
+    "e": 1.32
+   }
+  ]
+ },
+ "ch5.a": {
+  "duration": 2.371,
+  "text": "Overdue work tends to be forgotten, quietly.",
+  "heard": "Overdue work tends to be forgotten quietly.",
+  "wer": 0.0,
+  "attempts": 1,
+  "words": [
+   {
+    "w": "Overdue",
+    "s": 0.0,
+    "e": 0.42
+   },
+   {
+    "w": "work",
+    "s": 0.42,
+    "e": 0.62
+   },
+   {
+    "w": "tends",
+    "s": 0.62,
+    "e": 0.84
+   },
+   {
+    "w": "to",
+    "s": 0.84,
+    "e": 1.0
+   },
+   {
+    "w": "be",
+    "s": 1.0,
+    "e": 1.06
+   },
+   {
+    "w": "forgotten",
+    "s": 1.06,
+    "e": 1.36
+   },
+   {
+    "w": "quietly.",
+    "s": 1.36,
+    "e": 1.92
+   }
+  ]
+ },
+ "ch5.b": {
+  "duration": 3.653,
+  "text": "For the demo, the administrator moves the simulated date forward by twenty days.",
+  "heard": "For the demo, the administrator moves the simulated date forward by 20 days.",
+  "wer": 0.077,
+  "attempts": 1,
+  "words": [
+   {
+    "w": "For",
+    "s": 0.0,
+    "e": 0.14
+   },
+   {
+    "w": "the",
+    "s": 0.14,
+    "e": 0.22
+   },
+   {
+    "w": "demo,",
+    "s": 0.22,
+    "e": 0.44
+   },
+   {
+    "w": "the",
+    "s": 0.8,
+    "e": 0.88
+   },
+   {
+    "w": "administrator",
+    "s": 0.88,
+    "e": 1.12
+   },
+   {
+    "w": "moves",
+    "s": 1.12,
+    "e": 1.54
+   },
+   {
+    "w": "the",
+    "s": 1.54,
+    "e": 1.7
+   },
+   {
+    "w": "simulated",
+    "s": 1.7,
+    "e": 1.92
+   },
+   {
+    "w": "date",
+    "s": 1.92,
+    "e": 2.28
+   },
+   {
+    "w": "forward",
+    "s": 2.28,
+    "e": 2.54
+   },
+   {
+    "w": "by",
+    "s": 2.54,
+    "e": 2.86
+   },
+   {
+    "w": "20",
+    "s": 2.86,
+    "e": 3.06
+   },
+   {
+    "w": "days.",
+    "s": 3.06,
+    "e": 3.3
+   }
+  ]
+ },
+ "ch5.c": {
+  "duration": 7.529,
+  "text": "The deadline engine has escalated the unscheduled visit to the manager, Kumar. Exactly once. And his dashboard shows why.",
+  "heard": "The deadline engine has escalated the unscheduled visit to the manager, Kumar, exactly once, and his dashboard shows why.",
+  "wer": 0.0,
+  "attempts": 2,
+  "words": [
+   {
+    "w": "The",
+    "s": 0.0,
+    "e": 0.14
+   },
+   {
+    "w": "deadline",
+    "s": 0.14,
+    "e": 0.34
+   },
+   {
+    "w": "engine",
+    "s": 0.34,
+    "e": 0.74
+   },
+   {
+    "w": "has",
+    "s": 0.74,
+    "e": 0.98
+   },
+   {
+    "w": "escalated",
+    "s": 0.98,
+    "e": 1.42
+   },
+   {
+    "w": "the",
+    "s": 1.42,
+    "e": 1.66
+   },
+   {
+    "w": "unscheduled",
+    "s": 1.66,
+    "e": 2.2
+   },
+   {
+    "w": "visit",
+    "s": 2.2,
+    "e": 2.42
+   },
+   {
+    "w": "to",
+    "s": 2.42,
+    "e": 2.68
+   },
+   {
+    "w": "the",
+    "s": 2.68,
+    "e": 2.76
+   },
+   {
+    "w": "manager,",
+    "s": 2.76,
+    "e": 3.1
+   },
+   {
+    "w": "Kumar,",
+    "s": 3.38,
+    "e": 3.5
+   },
+   {
+    "w": "exactly",
+    "s": 4.1,
+    "e": 4.66
+   },
+   {
+    "w": "once,",
+    "s": 4.66,
+    "e": 5.08
+   },
+   {
+    "w": "and",
+    "s": 5.86,
+    "e": 6.12
+   },
+   {
+    "w": "his",
+    "s": 6.12,
+    "e": 6.36
+   },
+   {
+    "w": "dashboard",
+    "s": 6.36,
+    "e": 6.76
+   },
+   {
+    "w": "shows",
+    "s": 6.76,
+    "e": 6.96
+   },
+   {
+    "w": "why.",
+    "s": 6.96,
+    "e": 7.26
+   }
+  ]
+ },
+ "ch5.d": {
+  "duration": 1.525,
+  "text": "Nothing slips through unnoticed.",
+  "heard": "Nothing slips through unnoticed.",
+  "wer": 0.0,
+  "attempts": 1,
+  "words": [
+   {
+    "w": "Nothing",
+    "s": 0.0,
+    "e": 0.32
+   },
+   {
+    "w": "slips",
+    "s": 0.32,
+    "e": 0.54
+   },
+   {
+    "w": "through",
+    "s": 0.54,
+    "e": 0.8
+   },
+   {
+    "w": "unnoticed.",
+    "s": 0.8,
+    "e": 1.14
+   }
+  ]
+ },
+ "ch6.a": {
+  "duration": 2.972,
+  "text": "When an officer is away, their queue usually just stops.",
+  "heard": "When an officer is away, their cue usually just stops.",
+  "wer": 0.1,
+  "attempts": 1,
+  "words": [
+   {
+    "w": "When",
+    "s": 0.0,
+    "e": 0.14
+   },
+   {
+    "w": "an",
+    "s": 0.14,
+    "e": 0.22
+   },
+   {
+    "w": "officer",
+    "s": 0.22,
+    "e": 0.46
+   },
+   {
+    "w": "is",
+    "s": 0.46,
+    "e": 0.76
+   },
+   {
+    "w": "away,",
+    "s": 0.76,
+    "e": 0.98
+   },
+   {
+    "w": "their",
+    "s": 1.3,
+    "e": 1.44
+   },
+   {
+    "w": "cue",
+    "s": 1.44,
+    "e": 1.68
+   },
+   {
+    "w": "usually",
+    "s": 1.68,
+    "e": 2.08
+   },
+   {
+    "w": "just",
+    "s": 2.08,
+    "e": 2.3
+   },
+   {
+    "w": "stops.",
+    "s": 2.3,
+    "e": 2.58
+   }
+  ]
+ },
+ "ch6.b1": {
+  "duration": 6.464,
+  "text": "Kumar records a week of medical leave for Arjun. His open tasks are released, and reassigned, each with a reason.",
+  "heard": "Kumar records a week of medical leave for Arjun. His open tasks are released and reassigned each with a reason.",
+  "wer": 0.0,
+  "attempts": 1,
+  "words": [
+   {
+    "w": "Kumar",
+    "s": 0.0,
+    "e": 0.14
+   },
+   {
+    "w": "records",
+    "s": 0.14,
+    "e": 0.44
+   },
+   {
+    "w": "a",
+    "s": 0.44,
+    "e": 0.7
+   },
+   {
+    "w": "week",
+    "s": 0.7,
+    "e": 0.8
+   },
+   {
+    "w": "of",
+    "s": 0.8,
+    "e": 0.94
+   },
+   {
+    "w": "medical",
+    "s": 0.94,
+    "e": 1.14
+   },
+   {
+    "w": "leave",
+    "s": 1.14,
+    "e": 1.42
+   },
+   {
+    "w": "for",
+    "s": 1.42,
+    "e": 1.6
+   },
+   {
+    "w": "Arjun.",
+    "s": 1.6,
+    "e": 1.92
+   },
+   {
+    "w": "His",
+    "s": 2.66,
+    "e": 2.74
+   },
+   {
+    "w": "open",
+    "s": 2.74,
+    "e": 3.02
+   },
+   {
+    "w": "tasks",
+    "s": 3.02,
+    "e": 3.3
+   },
+   {
+    "w": "are",
+    "s": 3.3,
+    "e": 3.66
+   },
+   {
+    "w": "released",
+    "s": 3.66,
+    "e": 3.96
+   },
+   {
+    "w": "and",
+    "s": 3.96,
+    "e": 4.5
+   },
+   {
+    "w": "reassigned",
+    "s": 4.5,
+    "e": 5.08
+   },
+   {
+    "w": "each",
+    "s": 5.08,
+    "e": 5.46
+   },
+   {
+    "w": "with",
+    "s": 5.46,
+    "e": 5.68
+   },
+   {
+    "w": "a",
+    "s": 5.68,
+    "e": 5.76
+   },
+   {
+    "w": "reason.",
+    "s": 5.76,
+    "e": 6.04
+   }
+  ]
+ },
+ "ch6.b2": {
+  "duration": 6.119,
+  "text": "Kumar can also move work by hand. The system recommends who has capacity, and his choice is recorded.",
+  "heard": "Kumar can also move work by hand. The system recommends who has capacity and his choice is recorded.",
+  "wer": 0.0,
+  "attempts": 1,
+  "words": [
+   {
+    "w": "Kumar",
+    "s": 0.0,
+    "e": 0.2
+   },
+   {
+    "w": "can",
+    "s": 0.2,
+    "e": 0.48
+   },
+   {
+    "w": "also",
+    "s": 0.48,
+    "e": 0.7
+   },
+   {
+    "w": "move",
+    "s": 0.7,
+    "e": 1.04
+   },
+   {
+    "w": "work",
+    "s": 1.04,
+    "e": 1.22
+   },
+   {
+    "w": "by",
+    "s": 1.22,
+    "e": 1.44
+   },
+   {
+    "w": "hand.",
+    "s": 1.44,
+    "e": 1.74
+   },
+   {
+    "w": "The",
+    "s": 2.44,
+    "e": 2.52
+   },
+   {
+    "w": "system",
+    "s": 2.52,
+    "e": 2.76
+   },
+   {
+    "w": "recommends",
+    "s": 2.76,
+    "e": 3.2
+   },
+   {
+    "w": "who",
+    "s": 3.2,
+    "e": 3.5
+   },
+   {
+    "w": "has",
+    "s": 3.5,
+    "e": 3.68
+   },
+   {
+    "w": "capacity",
+    "s": 3.68,
+    "e": 4.2
+   },
+   {
+    "w": "and",
+    "s": 4.2,
+    "e": 4.74
+   },
+   {
+    "w": "his",
+    "s": 4.74,
+    "e": 5.0
+   },
+   {
+    "w": "choice",
+    "s": 5.0,
+    "e": 5.2
+   },
+   {
+    "w": "is",
+    "s": 5.2,
+    "e": 5.42
+   },
+   {
+    "w": "recorded.",
+    "s": 5.42,
+    "e": 5.72
+   }
+  ]
+ },
+ "ch6.d": {
+  "duration": 2.588,
+  "text": "Work follows capacity, not chance.",
+  "heard": "Work follows capacity, not chance.",
+  "wer": 0.0,
+  "attempts": 1,
+  "words": [
+   {
+    "w": "Work",
+    "s": 0.0,
+    "e": 0.28
+   },
+   {
+    "w": "follows",
+    "s": 0.28,
+    "e": 0.66
+   },
+   {
+    "w": "capacity,",
+    "s": 0.66,
+    "e": 1.24
+   },
+   {
+    "w": "not",
+    "s": 1.56,
+    "e": 1.8
+   },
+   {
+    "w": "chance.",
+    "s": 1.8,
+    "e": 2.06
+   }
+  ]
+ },
+ "ch7.a": {
+  "duration": 4.237,
+  "text": "Approval is not the end. The conditions attached to it have to be met.",
+  "heard": "Approval is not the end. The conditions attached to it have to be met.",
+  "wer": 0.0,
+  "attempts": 1,
+  "words": [
+   {
+    "w": "Approval",
+    "s": 0.0,
+    "e": 0.4
+   },
+   {
+    "w": "is",
+    "s": 0.4,
+    "e": 0.64
+   },
+   {
+    "w": "not",
+    "s": 0.64,
+    "e": 0.92
+   },
+   {
+    "w": "the",
+    "s": 0.92,
+    "e": 1.2
+   },
+   {
+    "w": "end.",
+    "s": 1.2,
+    "e": 1.46
+   },
+   {
+    "w": "The",
+    "s": 2.22,
+    "e": 2.3
+   },
+   {
+    "w": "conditions",
+    "s": 2.3,
+    "e": 2.52
+   },
+   {
+    "w": "attached",
+    "s": 2.52,
+    "e": 2.9
+   },
+   {
+    "w": "to",
+    "s": 2.9,
+    "e": 3.24
+   },
+   {
+    "w": "it",
+    "s": 3.24,
+    "e": 3.34
+   },
+   {
+    "w": "have",
+    "s": 3.34,
+    "e": 3.48
+   },
+   {
+    "w": "to",
+    "s": 3.48,
+    "e": 3.64
+   },
+   {
+    "w": "be",
+    "s": 3.64,
+    "e": 3.74
+   },
+   {
+    "w": "met.",
+    "s": 3.74,
+    "e": 3.92
+   }
+  ]
+ },
+ "ch7.b1": {
+  "duration": 3.619,
+  "text": "Ravi schedules the expert visit, with a committee proposed by the system.",
+  "heard": "Ravi schedules the expert visit with a committee proposed by the system.",
+  "wer": 0.0,
+  "attempts": 1,
+  "words": [
+   {
+    "w": "Ravi",
+    "s": 0.0,
+    "e": 0.28
+   },
+   {
+    "w": "schedules",
+    "s": 0.28,
+    "e": 0.6
+   },
+   {
+    "w": "the",
+    "s": 0.6,
+    "e": 0.88
+   },
+   {
+    "w": "expert",
+    "s": 0.88,
+    "e": 1.06
+   },
+   {
+    "w": "visit",
+    "s": 1.06,
+    "e": 1.48
+   },
+   {
+    "w": "with",
+    "s": 1.48,
+    "e": 1.92
+   },
+   {
+    "w": "a",
+    "s": 1.92,
+    "e": 1.98
+   },
+   {
+    "w": "committee",
+    "s": 1.98,
+    "e": 2.26
+   },
+   {
+    "w": "proposed",
+    "s": 2.26,
+    "e": 2.58
+   },
+   {
+    "w": "by",
+    "s": 2.58,
+    "e": 2.88
+   },
+   {
+    "w": "the",
+    "s": 2.88,
+    "e": 3.0
+   },
+   {
+    "w": "system.",
+    "s": 3.0,
+    "e": 3.26
+   }
+  ]
+ },
+ "ch7.b2": {
+  "duration": 1.524,
+  "text": "The committee files its report.",
+  "heard": "The committee files its report.",
+  "wer": 0.0,
+  "attempts": 1,
+  "words": [
+   {
+    "w": "The",
+    "s": 0.0,
+    "e": 0.14
+   },
+   {
+    "w": "committee",
+    "s": 0.14,
+    "e": 0.32
+   },
+   {
+    "w": "files",
+    "s": 0.32,
+    "e": 0.7
+   },
+   {
+    "w": "its",
+    "s": 0.7,
+    "e": 0.92
+   },
+   {
+    "w": "report.",
+    "s": 0.92,
+    "e": 1.18
+   }
+  ]
+ },
+ "ch7.b3": {
+  "duration": 4.913,
+  "text": "And the competent authority approves, with a condition: a fire no-objection certificate within ninety days.",
+  "heard": "and the competent authority approves, with a condition, a fire no objection certificate within 90 days.",
+  "wer": 0.062,
+  "attempts": 1,
+  "words": [
+   {
+    "w": "and",
+    "s": 0.0,
+    "e": 0.12
+   },
+   {
+    "w": "the",
+    "s": 0.12,
+    "e": 0.18
+   },
+   {
+    "w": "competent",
+    "s": 0.18,
+    "e": 0.46
+   },
+   {
+    "w": "authority",
+    "s": 0.46,
+    "e": 0.82
+   },
+   {
+    "w": "approves,",
+    "s": 0.82,
+    "e": 1.26
+   },
+   {
+    "w": "with",
+    "s": 1.58,
+    "e": 1.62
+   },
+   {
+    "w": "a",
+    "s": 1.62,
+    "e": 1.68
+   },
+   {
+    "w": "condition,",
+    "s": 1.68,
+    "e": 2.0
+   },
+   {
+    "w": "a",
+    "s": 2.34,
+    "e": 2.38
+   },
+   {
+    "w": "fire",
+    "s": 2.38,
+    "e": 2.6
+   },
+   {
+    "w": "no",
+    "s": 2.6,
+    "e": 2.82
+   },
+   {
+    "w": "objection",
+    "s": 2.82,
+    "e": 3.08
+   },
+   {
+    "w": "certificate",
+    "s": 3.08,
+    "e": 3.48
+   },
+   {
+    "w": "within",
+    "s": 3.48,
+    "e": 3.88
+   },
+   {
+    "w": "90",
+    "s": 3.88,
+    "e": 4.18
+   },
+   {
+    "w": "days.",
+    "s": 4.18,
+    "e": 4.48
+   }
+  ]
+ },
+ "ch7.b4": {
+  "duration": 6.569,
+  "text": "Eighty-five days later, after reminders at thirty, fifteen and seven days, the college uploads the certificate. Priya verifies it.",
+  "heard": "85 days later, after reminders at 30, 15, and 7 days, the college uploads the certificate. Drea verifies it.",
+  "wer": 0.05,
+  "attempts": 1,
+  "words": [
+   {
+    "w": "85",
+    "s": 0.0,
+    "e": 0.24
+   },
+   {
+    "w": "days",
+    "s": 0.24,
+    "e": 0.62
+   },
+   {
+    "w": "later,",
+    "s": 0.62,
+    "e": 0.9
+   },
+   {
+    "w": "after",
+    "s": 1.26,
+    "e": 1.42
+   },
+   {
+    "w": "reminders",
+    "s": 1.42,
+    "e": 1.7
+   },
+   {
+    "w": "at",
+    "s": 1.7,
+    "e": 1.96
+   },
+   {
+    "w": "30,",
+    "s": 1.96,
+    "e": 2.16
+   },
+   {
+    "w": "15,",
+    "s": 2.2,
+    "e": 2.44
+   },
+   {
+    "w": "and",
+    "s": 2.44,
+    "e": 2.68
+   },
+   {
+    "w": "7",
+    "s": 2.68,
+    "e": 2.92
+   },
+   {
+    "w": "days,",
+    "s": 2.92,
+    "e": 3.24
+   },
+   {
+    "w": "the",
+    "s": 3.5,
+    "e": 3.54
+   },
+   {
+    "w": "college",
+    "s": 3.54,
+    "e": 3.78
+   },
+   {
+    "w": "uploads",
+    "s": 3.78,
+    "e": 4.26
+   },
+   {
+    "w": "the",
+    "s": 4.26,
+    "e": 4.34
+   },
+   {
+    "w": "certificate.",
+    "s": 4.34,
+    "e": 4.6
+   },
+   {
+    "w": "Drea",
+    "s": 5.56,
+    "e": 5.74
+   },
+   {
+    "w": "verifies",
+    "s": 5.74,
+    "e": 6.14
+   },
+   {
+    "w": "it.",
+    "s": 6.14,
+    "e": 6.4
+   }
+  ]
+ },
+ "ch7.c": {
+  "duration": 1.941,
+  "text": "And the case closes, on its own.",
+  "heard": "and the case closes on its own.",
+  "wer": 0.0,
+  "attempts": 1,
+  "words": [
+   {
+    "w": "and",
+    "s": 0.0,
+    "e": 0.24
+   },
+   {
+    "w": "the",
+    "s": 0.24,
+    "e": 0.34
+   },
+   {
+    "w": "case",
+    "s": 0.34,
+    "e": 0.46
+   },
+   {
+    "w": "closes",
+    "s": 0.46,
+    "e": 0.88
+   },
+   {
+    "w": "on",
+    "s": 0.88,
+    "e": 1.34
+   },
+   {
+    "w": "its",
+    "s": 1.34,
+    "e": 1.48
+   },
+   {
+    "w": "own.",
+    "s": 1.48,
+    "e": 1.72
+   }
+  ]
+ },
+ "ch7.d": {
+  "duration": 2.968,
+  "text": "From application to closure, one traceable thread.",
+  "heard": "From application to closure, one traceable thread.",
+  "wer": 0.0,
+  "attempts": 1,
+  "words": [
+   {
+    "w": "From",
+    "s": 0.0,
+    "e": 0.2
+   },
+   {
+    "w": "application",
+    "s": 0.2,
+    "e": 0.62
+   },
+   {
+    "w": "to",
+    "s": 0.62,
+    "e": 1.04
+   },
+   {
+    "w": "closure,",
+    "s": 1.04,
+    "e": 1.34
+   },
+   {
+    "w": "one",
+    "s": 1.74,
+    "e": 1.88
+   },
+   {
+    "w": "traceable",
+    "s": 1.88,
+    "e": 2.36
+   },
+   {
+    "w": "thread.",
+    "s": 2.36,
+    "e": 2.64
+   }
+  ]
+ },
+ "ch8.a": {
+  "duration": 5.231,
+  "text": "Rules change every year. Sudden changes surprise colleges, and break systems.",
+  "heard": "Rules change every year. Sudden changes surprise colleges and break systems.",
+  "wer": 0.0,
+  "attempts": 1,
+  "words": [
+   {
+    "w": "Rules",
+    "s": 0.0,
+    "e": 0.28
+   },
+   {
+    "w": "change",
+    "s": 0.28,
+    "e": 0.62
+   },
+   {
+    "w": "every",
+    "s": 0.62,
+    "e": 1.14
+   },
+   {
+    "w": "year.",
+    "s": 1.14,
+    "e": 1.48
+   },
+   {
+    "w": "Sudden",
+    "s": 2.12,
+    "e": 2.32
+   },
+   {
+    "w": "changes",
+    "s": 2.32,
+    "e": 2.72
+   },
+   {
+    "w": "surprise",
+    "s": 2.72,
+    "e": 3.06
+   },
+   {
+    "w": "colleges",
+    "s": 3.06,
+    "e": 3.62
+   },
+   {
+    "w": "and",
+    "s": 3.62,
+    "e": 4.16
+   },
+   {
+    "w": "break",
+    "s": 4.16,
+    "e": 4.42
+   },
+   {
+    "w": "systems.",
+    "s": 4.42,
+    "e": 4.8
+   }
+  ]
+ },
+ "ch8.b1": {
+  "duration": 4.938,
+  "text": "A rules editor drafts an amendment: a new required document, and a longer application window.",
+  "heard": "A Rules Editor drafts an amendment, a new required document, and a longer application window.",
+  "wer": 0.0,
+  "attempts": 2,
+  "words": [
+   {
+    "w": "A",
+    "s": 0.0,
+    "e": 0.12
+   },
+   {
+    "w": "Rules",
+    "s": 0.12,
+    "e": 0.26
+   },
+   {
+    "w": "Editor",
+    "s": 0.26,
+    "e": 0.6
+   },
+   {
+    "w": "drafts",
+    "s": 0.6,
+    "e": 0.92
+   },
+   {
+    "w": "an",
+    "s": 0.92,
+    "e": 1.18
+   },
+   {
+    "w": "amendment,",
+    "s": 1.18,
+    "e": 1.36
+   },
+   {
+    "w": "a",
+    "s": 1.94,
+    "e": 1.94
+   },
+   {
+    "w": "new",
+    "s": 1.94,
+    "e": 2.06
+   },
+   {
+    "w": "required",
+    "s": 2.06,
+    "e": 2.34
+   },
+   {
+    "w": "document,",
+    "s": 2.34,
+    "e": 2.78
+   },
+   {
+    "w": "and",
+    "s": 3.34,
+    "e": 3.4
+   },
+   {
+    "w": "a",
+    "s": 3.4,
+    "e": 3.5
+   },
+   {
+    "w": "longer",
+    "s": 3.5,
+    "e": 3.72
+   },
+   {
+    "w": "application",
+    "s": 3.72,
+    "e": 4.12
+   },
+   {
+    "w": "window.",
+    "s": 4.12,
+    "e": 4.66
+   }
+  ]
+ },
+ "ch8.b2": {
+  "duration": 6.29,
+  "text": "Applying the new document to cases already filed is refused. A tighter rule can only apply to new applications.",
+  "heard": "Applying the new document to cases already filed is refused. A tighter rule can only apply to new applications.",
+  "wer": 0.0,
+  "attempts": 1,
+  "words": [
+   {
+    "w": "Applying",
+    "s": 0.0,
+    "e": 0.3
+   },
+   {
+    "w": "the",
+    "s": 0.3,
+    "e": 0.46
+   },
+   {
+    "w": "new",
+    "s": 0.46,
+    "e": 0.56
+   },
+   {
+    "w": "document",
+    "s": 0.56,
+    "e": 0.88
+   },
+   {
+    "w": "to",
+    "s": 0.88,
+    "e": 1.1
+   },
+   {
+    "w": "cases",
+    "s": 1.1,
+    "e": 1.28
+   },
+   {
+    "w": "already",
+    "s": 1.28,
+    "e": 1.62
+   },
+   {
+    "w": "filed",
+    "s": 1.62,
+    "e": 1.98
+   },
+   {
+    "w": "is",
+    "s": 1.98,
+    "e": 2.26
+   },
+   {
+    "w": "refused.",
+    "s": 2.26,
+    "e": 2.58
+   },
+   {
+    "w": "A",
+    "s": 3.38,
+    "e": 3.46
+   },
+   {
+    "w": "tighter",
+    "s": 3.46,
+    "e": 3.66
+   },
+   {
+    "w": "rule",
+    "s": 3.66,
+    "e": 3.98
+   },
+   {
+    "w": "can",
+    "s": 3.98,
+    "e": 4.2
+   },
+   {
+    "w": "only",
+    "s": 4.2,
+    "e": 4.42
+   },
+   {
+    "w": "apply",
+    "s": 4.42,
+    "e": 4.8
+   },
+   {
+    "w": "to",
+    "s": 4.8,
+    "e": 5.12
+   },
+   {
+    "w": "new",
+    "s": 5.12,
+    "e": 5.26
+   },
+   {
+    "w": "applications.",
+    "s": 5.26,
+    "e": 5.72
+   }
+  ]
+ },
+ "ch8.b3": {
+  "duration": 4.033,
+  "text": "Before anything is published, the impact preview shows exactly who would be affected.",
+  "heard": "Before anything is published, the impact preview shows exactly who would be affected.",
+  "wer": 0.0,
+  "attempts": 1,
+  "words": [
+   {
+    "w": "Before",
+    "s": 0.0,
+    "e": 0.24
+   },
+   {
+    "w": "anything",
+    "s": 0.24,
+    "e": 0.52
+   },
+   {
+    "w": "is",
+    "s": 0.52,
+    "e": 0.76
+   },
+   {
+    "w": "published,",
+    "s": 0.76,
+    "e": 1.14
+   },
+   {
+    "w": "the",
+    "s": 1.5,
+    "e": 1.54
+   },
+   {
+    "w": "impact",
+    "s": 1.54,
+    "e": 1.78
+   },
+   {
+    "w": "preview",
+    "s": 1.78,
+    "e": 2.08
+   },
+   {
+    "w": "shows",
+    "s": 2.08,
+    "e": 2.44
+   },
+   {
+    "w": "exactly",
+    "s": 2.44,
+    "e": 2.82
+   },
+   {
+    "w": "who",
+    "s": 2.82,
+    "e": 3.14
+   },
+   {
+    "w": "would",
+    "s": 3.14,
+    "e": 3.26
+   },
+   {
+    "w": "be",
+    "s": 3.26,
+    "e": 3.36
+   },
+   {
+    "w": "affected.",
+    "s": 3.36,
+    "e": 3.58
+   }
+  ]
+ },
+ "ch8.b4": {
+  "duration": 6.801,
+  "text": "Then a different person, the rules approver, reviews it and publishes it. Nobody can approve their own change.",
+  "heard": "Then a different person, the rules approver, reviews it and publishes it. Nobody can approve their own change.",
+  "wer": 0.0,
+  "attempts": 1,
+  "words": [
+   {
+    "w": "Then",
+    "s": 0.0,
+    "e": 0.24
+   },
+   {
+    "w": "a",
+    "s": 0.24,
+    "e": 0.44
+   },
+   {
+    "w": "different",
+    "s": 0.44,
+    "e": 0.66
+   },
+   {
+    "w": "person,",
+    "s": 0.66,
+    "e": 1.12
+   },
+   {
+    "w": "the",
+    "s": 1.46,
+    "e": 1.66
+   },
+   {
+    "w": "rules",
+    "s": 1.66,
+    "e": 1.86
+   },
+   {
+    "w": "approver,",
+    "s": 1.86,
+    "e": 2.4
+   },
+   {
+    "w": "reviews",
+    "s": 2.68,
+    "e": 2.98
+   },
+   {
+    "w": "it",
+    "s": 2.98,
+    "e": 3.24
+   },
+   {
+    "w": "and",
+    "s": 3.24,
+    "e": 3.44
+   },
+   {
+    "w": "publishes",
+    "s": 3.44,
+    "e": 3.76
+   },
+   {
+    "w": "it.",
+    "s": 3.76,
+    "e": 4.18
+   },
+   {
+    "w": "Nobody",
+    "s": 4.72,
+    "e": 5.0
+   },
+   {
+    "w": "can",
+    "s": 5.0,
+    "e": 5.36
+   },
+   {
+    "w": "approve",
+    "s": 5.36,
+    "e": 5.58
+   },
+   {
+    "w": "their",
+    "s": 5.58,
+    "e": 5.88
+   },
+   {
+    "w": "own",
+    "s": 5.88,
+    "e": 6.06
+   },
+   {
+    "w": "change.",
+    "s": 6.06,
+    "e": 6.38
+   }
+  ]
+ },
+ "ch8.c": {
+  "duration": 2.651,
+  "text": "And the college sees the change the next time it signs in.",
+  "heard": "and the college sees the change the next time it signs in.",
+  "wer": 0.0,
+  "attempts": 1,
+  "words": [
+   {
+    "w": "and",
+    "s": 0.0,
+    "e": 0.12
+   },
+   {
+    "w": "the",
+    "s": 0.12,
+    "e": 0.2
+   },
+   {
+    "w": "college",
+    "s": 0.2,
+    "e": 0.44
+   },
+   {
+    "w": "sees",
+    "s": 0.44,
+    "e": 0.8
+   },
+   {
+    "w": "the",
+    "s": 0.8,
+    "e": 1.02
+   },
+   {
+    "w": "change",
+    "s": 1.02,
+    "e": 1.22
+   },
+   {
+    "w": "the",
+    "s": 1.22,
+    "e": 1.46
+   },
+   {
+    "w": "next",
+    "s": 1.46,
+    "e": 1.58
+   },
+   {
+    "w": "time",
+    "s": 1.58,
+    "e": 1.8
+   },
+   {
+    "w": "it",
+    "s": 1.8,
+    "e": 1.92
+   },
+   {
+    "w": "signs",
+    "s": 1.92,
+    "e": 2.08
+   },
+   {
+    "w": "in.",
+    "s": 2.08,
+    "e": 2.34
+   }
+  ]
+ },
+ "ch8.d": {
+  "duration": 2.92,
+  "text": "Every change is previewed, approved by two people, and announced.",
+  "heard": "Every change is previewed, approved by two people, and announced.",
+  "wer": 0.0,
+  "attempts": 1,
+  "words": [
+   {
+    "w": "Every",
+    "s": 0.0,
+    "e": 0.22
+   },
+   {
+    "w": "change",
+    "s": 0.22,
+    "e": 0.38
+   },
+   {
+    "w": "is",
+    "s": 0.38,
+    "e": 0.54
+   },
+   {
+    "w": "previewed,",
+    "s": 0.54,
+    "e": 1.02
+   },
+   {
+    "w": "approved",
+    "s": 1.14,
+    "e": 1.28
+   },
+   {
+    "w": "by",
+    "s": 1.28,
+    "e": 1.54
+   },
+   {
+    "w": "two",
+    "s": 1.54,
+    "e": 1.68
+   },
+   {
+    "w": "people,",
+    "s": 1.68,
+    "e": 1.98
+   },
+   {
+    "w": "and",
+    "s": 2.24,
+    "e": 2.34
+   },
+   {
+    "w": "announced.",
+    "s": 2.34,
+    "e": 2.56
+   }
+  ]
+ },
+ "ch9.a": {
+  "duration": 2.323,
+  "text": "An audit log that can be edited proves nothing.",
+  "heard": "An audit log that can be edited proves nothing.",
+  "wer": 0.0,
+  "attempts": 1,
+  "words": [
+   {
+    "w": "An",
+    "s": 0.0,
+    "e": 0.12
+   },
+   {
+    "w": "audit",
+    "s": 0.12,
+    "e": 0.32
+   },
+   {
+    "w": "log",
+    "s": 0.32,
+    "e": 0.6
+   },
+   {
+    "w": "that",
+    "s": 0.6,
+    "e": 0.82
+   },
+   {
+    "w": "can",
+    "s": 0.82,
+    "e": 0.94
+   },
+   {
+    "w": "be",
+    "s": 0.94,
+    "e": 1.04
+   },
+   {
+    "w": "edited",
+    "s": 1.04,
+    "e": 1.3
+   },
+   {
+    "w": "proves",
+    "s": 1.3,
+    "e": 1.62
+   },
+   {
+    "w": "nothing.",
+    "s": 1.62,
+    "e": 2.04
+   }
+  ]
+ },
+ "ch9.b1": {
+  "duration": 4.874,
+  "text": "Every action is chained by hash. Verify integrity, and every row checks out.",
+  "heard": "Every action is chained by hash. Verify integrity, and every row checks out.",
+  "wer": 0.0,
+  "attempts": 1,
+  "words": [
+   {
+    "w": "Every",
+    "s": 0.0,
+    "e": 0.24
+   },
+   {
+    "w": "action",
+    "s": 0.24,
+    "e": 0.52
+   },
+   {
+    "w": "is",
+    "s": 0.52,
+    "e": 0.76
+   },
+   {
+    "w": "chained",
+    "s": 0.76,
+    "e": 0.98
+   },
+   {
+    "w": "by",
+    "s": 0.98,
+    "e": 1.24
+   },
+   {
+    "w": "hash.",
+    "s": 1.24,
+    "e": 1.52
+   },
+   {
+    "w": "Verify",
+    "s": 2.28,
+    "e": 2.44
+   },
+   {
+    "w": "integrity,",
+    "s": 2.44,
+    "e": 3.12
+   },
+   {
+    "w": "and",
+    "s": 3.48,
+    "e": 3.58
+   },
+   {
+    "w": "every",
+    "s": 3.58,
+    "e": 3.82
+   },
+   {
+    "w": "row",
+    "s": 3.82,
+    "e": 4.06
+   },
+   {
+    "w": "checks",
+    "s": 4.06,
+    "e": 4.26
+   },
+   {
+    "w": "out.",
+    "s": 4.26,
+    "e": 4.56
+   }
+  ]
+ },
+ "ch9.b2": {
+  "duration": 3.683,
+  "text": "Now, with a demo tool, one row is changed directly in the database.",
+  "heard": "Now, with a demo tool, one row is changed directly in the database.",
+  "wer": 0.0,
+  "attempts": 1,
+  "words": [
+   {
+    "w": "Now,",
+    "s": 0.0,
+    "e": 0.26
+   },
+   {
+    "w": "with",
+    "s": 0.52,
+    "e": 0.58
+   },
+   {
+    "w": "a",
+    "s": 0.58,
+    "e": 0.68
+   },
+   {
+    "w": "demo",
+    "s": 0.68,
+    "e": 0.88
+   },
+   {
+    "w": "tool,",
+    "s": 0.88,
+    "e": 1.2
+   },
+   {
+    "w": "one",
+    "s": 1.58,
+    "e": 1.66
+   },
+   {
+    "w": "row",
+    "s": 1.66,
+    "e": 1.88
+   },
+   {
+    "w": "is",
+    "s": 1.88,
+    "e": 2.06
+   },
+   {
+    "w": "changed",
+    "s": 2.06,
+    "e": 2.26
+   },
+   {
+    "w": "directly",
+    "s": 2.26,
+    "e": 2.62
+   },
+   {
+    "w": "in",
+    "s": 2.62,
+    "e": 2.94
+   },
+   {
+    "w": "the",
+    "s": 2.94,
+    "e": 3.0
+   },
+   {
+    "w": "database.",
+    "s": 3.0,
+    "e": 3.24
+   }
+  ]
+ },
+ "ch9.c1": {
+  "duration": 2.451,
+  "text": "Verification points to the exact broken row.",
+  "heard": "Verification points to the exact broken row.",
+  "wer": 0.0,
+  "attempts": 1,
+  "words": [
+   {
+    "w": "Verification",
+    "s": 0.0,
+    "e": 0.4
+   },
+   {
+    "w": "points",
+    "s": 0.4,
+    "e": 0.86
+   },
+   {
+    "w": "to",
+    "s": 0.86,
+    "e": 1.14
+   },
+   {
+    "w": "the",
+    "s": 1.14,
+    "e": 1.22
+   },
+   {
+    "w": "exact",
+    "s": 1.22,
+    "e": 1.44
+   },
+   {
+    "w": "broken",
+    "s": 1.44,
+    "e": 1.82
+   },
+   {
+    "w": "row.",
+    "s": 1.82,
+    "e": 2.18
+   }
+  ]
+ },
+ "ch9.c2": {
+  "duration": 4.589,
+  "text": "And when an officer opens a case outside their region, access is refused, and logged.",
+  "heard": "And when an officer opens a case outside their region, access is refused and logged.",
+  "wer": 0.0,
+  "attempts": 1,
+  "words": [
+   {
+    "w": "And",
+    "s": 0.0,
+    "e": 0.12
+   },
+   {
+    "w": "when",
+    "s": 0.12,
+    "e": 0.26
+   },
+   {
+    "w": "an",
+    "s": 0.26,
+    "e": 0.36
+   },
+   {
+    "w": "officer",
+    "s": 0.36,
+    "e": 0.68
+   },
+   {
+    "w": "opens",
+    "s": 0.68,
+    "e": 1.1
+   },
+   {
+    "w": "a",
+    "s": 1.1,
+    "e": 1.24
+   },
+   {
+    "w": "case",
+    "s": 1.24,
+    "e": 1.42
+   },
+   {
+    "w": "outside",
+    "s": 1.42,
+    "e": 1.68
+   },
+   {
+    "w": "their",
+    "s": 1.68,
+    "e": 2.06
+   },
+   {
+    "w": "region,",
+    "s": 2.06,
+    "e": 2.38
+   },
+   {
+    "w": "access",
+    "s": 2.68,
+    "e": 2.9
+   },
+   {
+    "w": "is",
+    "s": 2.9,
+    "e": 3.14
+   },
+   {
+    "w": "refused",
+    "s": 3.14,
+    "e": 3.42
+   },
+   {
+    "w": "and",
+    "s": 3.42,
+    "e": 3.94
+   },
+   {
+    "w": "logged.",
+    "s": 3.94,
+    "e": 4.22
+   }
+  ]
+ },
+ "ch9.d": {
+  "duration": 2.441,
+  "text": "Tamper-evident, and scoped to every role.",
+  "heard": "Tamper evident and scoped to every role.",
+  "wer": 0.0,
+  "attempts": 1,
+  "words": [
+   {
+    "w": "Tamper",
+    "s": 0.0,
+    "e": 0.34
+   },
+   {
+    "w": "evident",
+    "s": 0.34,
+    "e": 0.62
+   },
+   {
+    "w": "and",
+    "s": 0.62,
+    "e": 1.08
+   },
+   {
+    "w": "scoped",
+    "s": 1.08,
+    "e": 1.4
+   },
+   {
+    "w": "to",
+    "s": 1.4,
+    "e": 1.64
+   },
+   {
+    "w": "every",
+    "s": 1.64,
+    "e": 1.88
+   },
+   {
+    "w": "role.",
+    "s": 1.88,
+    "e": 2.14
+   }
+  ]
+ },
+ "ch10.d": {
+  "duration": 8.651,
+  "text": "The AICTE Demo Website. A prototype on synthetic data, for Smart India Hackathon twenty twenty-six. Try it live, at the link on screen.",
+  "heard": "The AICTE demo website. A prototype on synthetic data for Smart India Hackathon 2026. Try it live at the link on screen.",
+  "wer": 0.0,
+  "attempts": 1,
+  "words": [
+   {
+    "w": "The",
+    "s": 0.0,
+    "e": 0.16
+   },
+   {
+    "w": "AICTE",
+    "s": 0.16,
+    "e": 1.0
+   },
+   {
+    "w": "demo",
+    "s": 1.0,
+    "e": 1.34
+   },
+   {
+    "w": "website.",
+    "s": 1.34,
+    "e": 1.86
+   },
+   {
+    "w": "A",
+    "s": 2.54,
+    "e": 2.58
+   },
+   {
+    "w": "prototype",
+    "s": 2.58,
+    "e": 2.88
+   },
+   {
+    "w": "on",
+    "s": 2.88,
+    "e": 3.24
+   },
+   {
+    "w": "synthetic",
+    "s": 3.24,
+    "e": 3.44
+   },
+   {
+    "w": "data",
+    "s": 3.44,
+    "e": 3.88
+   },
+   {
+    "w": "for",
+    "s": 3.88,
+    "e": 4.22
+   },
+   {
+    "w": "Smart",
+    "s": 4.22,
+    "e": 4.38
+   },
+   {
+    "w": "India",
+    "s": 4.38,
+    "e": 4.7
+   },
+   {
+    "w": "Hackathon",
+    "s": 4.7,
+    "e": 5.18
+   },
+   {
+    "w": "2026.",
+    "s": 5.18,
+    "e": 5.98
+   },
+   {
+    "w": "Try",
+    "s": 6.8,
+    "e": 6.94
+   },
+   {
+    "w": "it",
+    "s": 6.94,
+    "e": 7.1
+   },
+   {
+    "w": "live",
+    "s": 7.1,
+    "e": 7.3
+   },
+   {
+    "w": "at",
+    "s": 7.3,
+    "e": 7.72
+   },
+   {
+    "w": "the",
+    "s": 7.72,
+    "e": 7.8
+   },
+   {
+    "w": "link",
+    "s": 7.8,
+    "e": 7.94
+   },
+   {
+    "w": "on",
+    "s": 7.94,
+    "e": 8.1
+   },
+   {
+    "w": "screen.",
+    "s": 8.1,
+    "e": 8.36
+   }
+  ]
+ }
+}

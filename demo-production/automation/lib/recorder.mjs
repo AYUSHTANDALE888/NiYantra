@@ -55,7 +55,8 @@ const ease = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 export class Recorder {
-  constructor(outDir, name) {
+  constructor(outDir, name, timings) {
+    this.timings = timings;
     this.dir = path.join(outDir, name);
     this.name = name;
     fs.rmSync(this.dir, { recursive: true, force: true });
@@ -176,6 +177,25 @@ export class Recorder {
     this.log('mark', { label });
   }
 
+  /** Narration cue. Waits until the previous line has finished, logs the cue (the edit starts that line's audio
+   *  here) and returns while the voice plays, so the actions that follow happen as it is spoken.
+   *  With wait: true it also waits until this line has finished. */
+  async say(id, { wait = false, gap = 0.25 } = {}) {
+    const d = this.timings?.[id]?.duration;
+    if (d == null) throw new Error(`no narration timing for ${id}`);
+    const left = (this.voiceEnd ?? 0) - this.now();
+    if (left > 0) await sleep(left * 1000);
+    this.log('say', { id, duration: d });
+    this.voiceEnd = this.now() + d + gap;
+    if (wait) await sleep((d + gap) * 1000);
+  }
+
+  /** Wait until the current narration line has finished. */
+  async quiet(extra = 0) {
+    const left = (this.voiceEnd ?? 0) - this.now() + extra;
+    if (left > 0) await sleep(left * 1000);
+  }
+
   async hold(ms) {
     await sleep(ms);
   }
@@ -184,7 +204,7 @@ export class Recorder {
 
   /** Write <name>.mp4 (30 fps, constant rate) and <name>.events.json with times relative to the video start. */
   async finish() {
-    await sleep(600);
+    await this.quiet(0.8);
     await this.detach();
     if (!this.frames.length) throw new Error(`${this.name}: no frames captured`);
     const t0 = this.frames[0].t;

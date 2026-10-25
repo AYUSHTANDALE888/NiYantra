@@ -5,3 +5,9 @@ dist
 
 # Ignore the output video from Git but not videos you import into src/.
 out
+
+# Media copied in by render.sh from ../recordings, ../narration, ../audio
+public/recordings
+public/narration
+public/sfx
+public/stills

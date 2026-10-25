@@ -1,0 +1,529 @@
+{
+ "name": "ch6",
+ "duration": 23.765,
+ "scale": 1.2,
+ "viewport": {
+  "width": 1600,
+  "height": 900
+ },
+ "events": [
+  {
+   "t": -0.015,
+   "type": "attach"
+  },
+  {
+   "t": -0.015,
+   "type": "say",
+   "id": "ch6.b1",
+   "duration": 6.464
+  },
+  {
+   "t": 1.06,
+   "type": "hover",
+   "label": "Arjun Rao",
+   "box": {
+    "x": 246,
+    "y": 252.8125,
+    "width": 406.90625,
+    "height": 31.5
+   }
+  },
+  {
+   "t": 1.34,
+   "type": "click",
+   "label": "Arjun Rao",
+   "box": {
+    "x": 246,
+    "y": 252.8125,
+    "width": 406.90625,
+    "height": 31.5
+   },
+   "x": 449.453125,
+   "y": 268.5625
+  },
+  {
+   "t": 1.668,
+   "type": "select",
+   "label": "Arjun Rao",
+   "box": {
+    "x": 246,
+    "y": 252.8125,
+    "width": 406.90625,
+    "height": 31.5
+   }
+  },
+  {
+   "t": 3.104,
+   "type": "hover",
+   "label": "Reason",
+   "box": {
+    "x": 246,
+    "y": 452.3125,
+    "width": 406.90625,
+    "height": 51
+   }
+  },
+  {
+   "t": 3.385,
+   "type": "click",
+   "label": "Reason",
+   "box": {
+    "x": 246,
+    "y": 452.3125,
+    "width": 406.90625,
+    "height": 51
+   },
+   "x": 449.453125,
+   "y": 477.8125
+  },
+  {
+   "t": 3.636,
+   "type": "typeStart",
+   "label": "Reason",
+   "box": {
+    "x": 246,
+    "y": 452.3125,
+    "width": 406.90625,
+    "height": 51
+   },
+   "text": "Medical leave"
+  },
+  {
+   "t": 3.647,
+   "type": "key"
+  },
+  {
+   "t": 3.728,
+   "type": "key"
+  },
+  {
+   "t": 3.816,
+   "type": "key"
+  },
+  {
+   "t": 3.923,
+   "type": "key"
+  },
+  {
+   "t": 4.031,
+   "type": "key"
+  },
+  {
+   "t": 4.125,
+   "type": "key"
+  },
+  {
+   "t": 4.219,
+   "type": "key"
+  },
+  {
+   "t": 4.306,
+   "type": "key"
+  },
+  {
+   "t": 4.39,
+   "type": "key"
+  },
+  {
+   "t": 4.484,
+   "type": "key"
+  },
+  {
+   "t": 4.573,
+   "type": "key"
+  },
+  {
+   "t": 4.65,
+   "type": "key"
+  },
+  {
+   "t": 4.748,
+   "type": "key"
+  },
+  {
+   "t": 4.816,
+   "type": "typeEnd",
+   "label": "Reason",
+   "box": {
+    "x": 246,
+    "y": 452.3125,
+    "width": 406.90625,
+    "height": 51
+   }
+  },
+  {
+   "t": 6.122,
+   "type": "hover",
+   "label": "Leave ends",
+   "box": {
+    "x": 454.703125,
+    "y": 385.8125,
+    "width": 198.203125,
+    "height": 31.5
+   }
+  },
+  {
+   "t": 6.402,
+   "type": "click",
+   "label": "Leave ends",
+   "box": {
+    "x": 454.703125,
+    "y": 385.8125,
+    "width": 198.203125,
+    "height": 31.5
+   },
+   "x": 553.8046875,
+   "y": 401.5625
+  },
+  {
+   "t": 8.035,
+   "type": "hover",
+   "label": "Add period",
+   "box": {
+    "x": 558.296875,
+    "y": 547.0625,
+    "width": 94.609375,
+    "height": 31.5
+   }
+  },
+  {
+   "t": 8.315,
+   "type": "click",
+   "label": "Add period",
+   "box": {
+    "x": 558.296875,
+    "y": 547.0625,
+    "width": 94.609375,
+    "height": 31.5
+   },
+   "x": 605.6015625,
+   "y": 562.8125
+  },
+  {
+   "t": 9.999,
+   "type": "hover",
+   "label": "Add period and reassign",
+   "box": {
+    "x": 815.28125,
+    "y": 166.5,
+    "width": 172.71875,
+    "height": 31.5
+   }
+  },
+  {
+   "t": 10.28,
+   "type": "click",
+   "label": "Add period and reassign",
+   "box": {
+    "x": 815.28125,
+    "y": 166.5,
+    "width": 172.71875,
+    "height": 31.5
+   },
+   "x": 901.640625,
+   "y": 182.25
+  },
+  {
+   "t": 10.961,
+   "type": "result",
+   "label": "Tasks reassigned, each with a reason",
+   "box": {
+    "x": 688.90625,
+    "y": 173.8125,
+    "width": 620.09375,
+    "height": 480.75
+   }
+  },
+  {
+   "t": 11.927,
+   "type": "say",
+   "id": "ch6.b2",
+   "duration": 6.119
+  },
+  {
+   "t": 13.114,
+   "type": "hover",
+   "label": "Meena Pillai",
+   "box": {
+    "x": 232,
+    "y": 252.3125,
+    "width": 1076,
+    "height": 38.5
+   }
+  },
+  {
+   "t": 13.394,
+   "type": "click",
+   "label": "Meena Pillai",
+   "box": {
+    "x": 232,
+    "y": 252.3125,
+    "width": 1076,
+    "height": 38.5
+   },
+   "x": 770,
+   "y": 271.5625
+  },
+  {
+   "t": 14.978,
+   "type": "hover",
+   "label": "Reassign",
+   "box": {
+    "x": 676.515625,
+    "y": 337.9375,
+    "width": 71.484375,
+    "height": 28
+   }
+  },
+  {
+   "t": 15.258,
+   "type": "click",
+   "label": "Reassign",
+   "box": {
+    "x": 676.515625,
+    "y": 337.9375,
+    "width": 71.484375,
+    "height": 28
+   },
+   "x": 712.2578125,
+   "y": 351.9375
+  },
+  {
+   "t": 15.894,
+   "type": "result",
+   "label": "Recommended by system",
+   "box": {
+    "x": 623.5,
+    "y": 163,
+    "width": 353,
+    "height": 17.5
+   }
+  },
+  {
+   "t": 16.918,
+   "type": "hover",
+   "label": "Reassign to",
+   "box": {
+    "x": 612,
+    "y": 277.75,
+    "width": 376,
+    "height": 31.5
+   }
+  },
+  {
+   "t": 17.198,
+   "type": "click",
+   "label": "Reassign to",
+   "box": {
+    "x": 612,
+    "y": 277.75,
+    "width": 376,
+    "height": 31.5
+   },
+   "x": 800,
+   "y": 293.5
+  },
+  {
+   "t": 17.501,
+   "type": "select",
+   "label": "Reassign to",
+   "box": {
+    "x": 612,
+    "y": 277.75,
+    "width": 376,
+    "height": 31.5
+   }
+  },
+  {
+   "t": 19.017,
+   "type": "hover",
+   "label": "Reason",
+   "box": {
+    "x": 612,
+    "y": 344.25,
+    "width": 376,
+    "height": 51
+   }
+  },
+  {
+   "t": 19.298,
+   "type": "click",
+   "label": "Reason",
+   "box": {
+    "x": 612,
+    "y": 344.25,
+    "width": 376,
+    "height": 51
+   },
+   "x": 800,
+   "y": 369.75
+  },
+  {
+   "t": 19.556,
+   "type": "typeStart",
+   "label": "Reason",
+   "box": {
+    "x": 612,
+    "y": 344.25,
+    "width": 376,
+    "height": 51
+   },
+   "text": "Spreading work in the team"
+  },
+  {
+   "t": 19.563,
+   "type": "key"
+  },
+  {
+   "t": 19.607,
+   "type": "key"
+  },
+  {
+   "t": 19.663,
+   "type": "key"
+  },
+  {
+   "t": 19.733,
+   "type": "key"
+  },
+  {
+   "t": 19.82,
+   "type": "key"
+  },
+  {
+   "t": 19.876,
+   "type": "key"
+  },
+  {
+   "t": 19.934,
+   "type": "key"
+  },
+  {
+   "t": 20,
+   "type": "key"
+  },
+  {
+   "t": 20.048,
+   "type": "key"
+  },
+  {
+   "t": 20.094,
+   "type": "key"
+  },
+  {
+   "t": 20.159,
+   "type": "key"
+  },
+  {
+   "t": 20.204,
+   "type": "key"
+  },
+  {
+   "t": 20.266,
+   "type": "key"
+  },
+  {
+   "t": 20.323,
+   "type": "key"
+  },
+  {
+   "t": 20.392,
+   "type": "key"
+  },
+  {
+   "t": 20.46,
+   "type": "key"
+  },
+  {
+   "t": 20.512,
+   "type": "key"
+  },
+  {
+   "t": 20.553,
+   "type": "key"
+  },
+  {
+   "t": 20.625,
+   "type": "key"
+  },
+  {
+   "t": 20.693,
+   "type": "key"
+  },
+  {
+   "t": 20.754,
+   "type": "key"
+  },
+  {
+   "t": 20.813,
+   "type": "key"
+  },
+  {
+   "t": 20.865,
+   "type": "key"
+  },
+  {
+   "t": 20.912,
+   "type": "key"
+  },
+  {
+   "t": 20.978,
+   "type": "key"
+  },
+  {
+   "t": 21.069,
+   "type": "key"
+  },
+  {
+   "t": 21.121,
+   "type": "typeEnd",
+   "label": "Reason",
+   "box": {
+    "x": 612,
+    "y": 344.25,
+    "width": 376,
+    "height": 51
+   }
+  },
+  {
+   "t": 22.482,
+   "type": "hover",
+   "label": "Reassign task",
+   "box": {
+    "x": 878.03125,
+    "y": 441.75,
+    "width": 109.96875,
+    "height": 31.5
+   }
+  },
+  {
+   "t": 22.763,
+   "type": "click",
+   "label": "Reassign task",
+   "box": {
+    "x": 878.03125,
+    "y": 441.75,
+    "width": 109.96875,
+    "height": 31.5
+   },
+   "x": 933.015625,
+   "y": 457.5
+  },
+  {
+   "t": 23.343,
+   "type": "result",
+   "label": "Recorded",
+   "box": {
+    "x": 1326.40625,
+    "y": 845.5,
+    "width": 259.59375,
+    "height": 40.5
+   }
+  },
+  {
+   "t": 23.343,
+   "type": "mark",
+   "label": "end"
+  }
+ ]
+}

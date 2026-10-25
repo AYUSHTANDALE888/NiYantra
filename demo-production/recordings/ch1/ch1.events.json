@@ -1,0 +1,143 @@
+{
+ "name": "ch1",
+ "duration": 11.459,
+ "scale": 1.2,
+ "viewport": {
+  "width": 1600,
+  "height": 900
+ },
+ "events": [
+  {
+   "t": -0.012,
+   "type": "attach"
+  },
+  {
+   "t": 0.889,
+   "type": "say",
+   "id": "ch1.b1",
+   "duration": 1.444
+  },
+  {
+   "t": 1.99,
+   "type": "hover",
+   "label": "Larger text (A+)",
+   "box": {
+    "x": 1099.265625,
+    "y": 3.5,
+    "width": 23.21875,
+    "height": 21
+   }
+  },
+  {
+   "t": 2.27,
+   "type": "click",
+   "label": "Larger text (A+)",
+   "box": {
+    "x": 1099.265625,
+    "y": 3.5,
+    "width": 23.21875,
+    "height": 21
+   },
+   "x": 1110.875,
+   "y": 14
+  },
+  {
+   "t": 2.924,
+   "type": "result",
+   "label": "Text is larger",
+   "box": {
+    "x": 117,
+    "y": 286,
+    "width": 769.75,
+    "height": 40.5
+   }
+  },
+  {
+   "t": 3.726,
+   "type": "say",
+   "id": "ch1.b2",
+   "duration": 1.786
+  },
+  {
+   "t": 4.797,
+   "type": "hover",
+   "label": "हिंदी",
+   "box": {
+    "x": 1467.15625,
+    "y": 4.5,
+    "width": 34.84375,
+    "height": 27
+   }
+  },
+  {
+   "t": 5.078,
+   "type": "click",
+   "label": "हिंदी",
+   "box": {
+    "x": 1467.15625,
+    "y": 4.5,
+    "width": 34.84375,
+    "height": 27
+   },
+   "x": 1484.578125,
+   "y": 18
+  },
+  {
+   "t": 5.732,
+   "type": "result",
+   "label": "Whole site in Hindi",
+   "box": {
+    "x": 0,
+    "y": 0,
+    "width": 1600,
+    "height": 240
+   }
+  },
+  {
+   "t": 6.533,
+   "type": "say",
+   "id": "ch1.b3",
+   "duration": 2.67
+  },
+  {
+   "t": 7.638,
+   "type": "hover",
+   "label": "High contrast",
+   "box": {
+    "x": 1301.328125,
+    "y": 4.5,
+    "width": 70.796875,
+    "height": 27
+   }
+  },
+  {
+   "t": 7.919,
+   "type": "click",
+   "label": "High contrast",
+   "box": {
+    "x": 1301.328125,
+    "y": 4.5,
+    "width": 70.796875,
+    "height": 27
+   },
+   "x": 1336.7265625,
+   "y": 18
+  },
+  {
+   "t": 8.528,
+   "type": "result",
+   "label": "High-contrast mode",
+   "box": {
+    "x": 0,
+    "y": 0,
+    "width": 1600,
+    "height": 1670
+   }
+  },
+  {
+   "t": 10.654,
+   "type": "mark",
+   "label": "end"
+  }
+ ]
+}
