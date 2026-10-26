@@ -7,6 +7,8 @@
 // - JWT_SECRET (unless set), DEMO_MODE, STORAGE_DRIVER=db, DEMO_RESET_MODE=snapshot, a short rules poll.
 // It does nothing when DATABASE_URL is already set (local, compose, tests).
 import crypto from 'node:crypto';
+import fs from 'node:fs';
+import path from 'node:path';
 
 function ownerUrl(): string | null {
   const key = Object.keys(process.env).find((k) => /(^|_)DATABASE_URL_UNPOOLED$/.test(k));
@@ -41,4 +43,7 @@ if (hosted) {
   process.env.DEMO_RESET_MODE ??= 'snapshot';
   process.env.RULES_POLL_MS ??= '5000';
   process.env.HOSTED ??= 'vercel';
+  // shared/ (expression variables, form-check samples, seed inputs) is copied next to the bundled function;
+  // at build time the default ../shared from api/ is used.
+  if (!process.env.SHARED_DIR && fs.existsSync(path.join(process.cwd(), 'shared'))) process.env.SHARED_DIR = path.join(process.cwd(), 'shared');
 }

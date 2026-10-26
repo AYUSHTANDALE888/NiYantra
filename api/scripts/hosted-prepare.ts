@@ -13,6 +13,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import pg from 'pg';
 import { derive, hosted } from '../src/lib/hosted.js';
+import { CYCLE_LOCK_ID } from '../src/engine/cycle.js';
 
 const apiDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const LOCK = 7_310_001;
@@ -39,6 +40,13 @@ async function main() {
   await c.connect();
   try {
     await c.query('SELECT pg_advisory_lock($1)', [LOCK]);
+    // A function instance frozen mid-cycle may still hold the engine lock; end such idle sessions.
+    const stale = await c.query(
+      `SELECT pg_terminate_backend(l.pid) FROM pg_locks l JOIN pg_stat_activity a ON a.pid = l.pid
+       WHERE l.locktype = 'advisory' AND l.objid = $1 AND a.state = 'idle' AND a.state_change < now() - interval '2 minutes'`,
+      [CYCLE_LOCK_ID],
+    );
+    if (stale.rowCount) console.log(`[hosted] released ${stale.rowCount} stale engine lock(s)`);
     const pw = derive(owner, 'app-role');
     const role = await c.query(`SELECT 1 FROM pg_roles WHERE rolname = 'aicte_app'`);
     await c.query(`${role.rowCount ? 'ALTER' : 'CREATE'} ROLE aicte_app LOGIN PASSWORD '${pw}'`);

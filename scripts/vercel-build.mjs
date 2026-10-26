@@ -45,6 +45,8 @@ for (const dir of ['@prisma/client', '.prisma/client']) {
 for (const f of fs.readdirSync(path.join(fn, 'node_modules/.prisma/client'))) {
   if (!process.env.KEEP_ALL_ENGINES && f.includes('query_engine') && !f.includes('rhel-openssl-3.0.x')) fs.rmSync(path.join(fn, 'node_modules/.prisma/client', f));
 }
+// Data files the API reads at runtime (expression variables, form-check samples, seed inputs).
+fs.cpSync(path.join(root, 'shared'), path.join(fn, 'shared'), { recursive: true });
 fs.writeFileSync(path.join(fn, 'package.json'), JSON.stringify({ type: 'module' }));
 fs.writeFileSync(
   path.join(fn, '.vc-config.json'),

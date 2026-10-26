@@ -39,7 +39,9 @@ async function tick(source: string): Promise<void> {
     const data = { isLeader: true, lastRunAt: clock.now(), lastResult: result as unknown as Prisma.InputJsonValue };
     await prisma.schedulerHeartbeat.upsert({ where: { instanceId: INSTANCE }, create: { instanceId: INSTANCE, ...data }, update: data });
   } catch (e) {
-    console.error('[engine] tick skipped:', (e as Error).message);
+    const msg = (e as Error).message;
+    // Another instance holding the lock is the normal case when several requests arrive together.
+    if (!/Another engine cycle is running/.test(msg)) console.error('[engine] tick failed:', msg);
   }
 }
 

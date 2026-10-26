@@ -282,6 +282,10 @@ export async function runEngineCycle(meta: Record<string, string> = {}, opts: { 
 export async function runCycleWithLock(meta: Record<string, string> = {}, waitMs = 10_000): Promise<CycleResult> {
   const client = new pg.Client({ connectionString: process.env.DATABASE_URL });
   await client.connect();
+  // Hosted (serverless): an instance can be frozen mid-cycle with this connection still open, and a session
+  // lock would then be held for ever. An idle session is closed by the server after two minutes, which
+  // releases the lock; a cycle takes seconds, so a live one is never cut off.
+  if (process.env.HOSTED) await client.query(`SET idle_session_timeout = '120s'`);
   try {
     const deadline = performance.now() + waitMs;
     for (;;) {
