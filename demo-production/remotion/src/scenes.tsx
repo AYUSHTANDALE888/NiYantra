@@ -3,14 +3,14 @@ import { AbsoluteFill, Easing, Img, interpolate, Sequence, spring, staticFile, u
 import { Audio, Video } from '@remotion/media';
 import { cameraAt, cameraKeys } from './camera';
 import { CauseArrow, Callout, Chip, ClickPulse, FastBadge, RoleBanner, Spotlight, Subtitle, TerminalCard } from './overlays';
-import { BAR, C, FONT, H, W } from './theme';
+import { C, FONT, H, W } from './theme';
 import type { Box, Chapter, Line, RecEvent, Recording } from './types';
 
 const clamp = { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' } as const;
 const sec = (f: number, fps: number) => f / fps;
 
 // Sound levels (narration peaks at about -1 dBFS; the music bed sits about 26 dB below it).
-export const SFX = { click: 0.85, key: 0.3, pop: 0.45, notice: 0.5, chime: 0.4, whoosh: 0.45, riser: 0.35 };
+export const SFX = { click: 0.6, key: 0.22, pop: 0.35, notice: 0.4, chime: 0.3, whoosh: 0.32, riser: 0.28 };
 
 export const Sfx: React.FC<{ at: number; name: string; volume: number }> = ({ at, name, volume }) => {
   const { fps } = useVideoConfig();
@@ -25,7 +25,7 @@ export const Voice: React.FC<{ at: number; line: Line }> = ({ at, line }) => {
   const { fps } = useVideoConfig();
   return (
     <Sequence from={Math.round(at * fps)} durationInFrames={Math.ceil((line.duration + 0.5) * fps)} layout="none">
-      <Audio src={staticFile(line.src)} volume={1} />
+      <Audio src={staticFile(line.src)} volume={0.82} />
     </Sequence>
   );
 };
@@ -204,7 +204,7 @@ export const CloseScene: React.FC<{ ch: Chapter }> = ({ ch }) => {
   const ideas = ['Mistakes caught while filing', 'Every assignment and deadline explained', 'Yearly rules: previewed, approved by two, announced', 'Tamper-evident audit, scoped access'];
   return (
     <AbsoluteFill style={{ background: `linear-gradient(135deg, ${C.navyDeep}, ${C.navy})`, fontFamily: FONT, color: '#fff' }}>
-      <div style={{ position: 'absolute', left: 150, top: 150 }}>
+      <div style={{ position: 'absolute', left: 150, top: 140 }}>
         <div style={{ fontSize: 80, fontWeight: 700 }}>AICTE Demo Website</div>
         <div style={{ marginTop: 40, display: 'flex', flexDirection: 'column', gap: 20 }}>
           {ideas.map((x, i) => {
@@ -223,7 +223,7 @@ export const CloseScene: React.FC<{ ch: Chapter }> = ({ ch }) => {
           <div style={{ fontSize: 28, color: '#cbd5e1', marginTop: 12 }}>Pick any demo user · password demo1234 · Admin → Reset demo restores the data</div>
         </div>
       </div>
-      <div style={{ position: 'absolute', left: 150, bottom: BAR + 40, fontSize: 24, color: '#93c5fd' }}>Prototype for Smart India Hackathon 2026 · synthetic data · not an official AICTE system</div>
+      <div style={{ position: 'absolute', left: 150, top: 80, fontSize: 24, color: '#93c5fd' }}>Prototype for Smart India Hackathon 2026 · synthetic data · not an official AICTE system</div>
       <Subtitle line={ch.d} t={t - 0.8} />
     </AbsoluteFill>
   );

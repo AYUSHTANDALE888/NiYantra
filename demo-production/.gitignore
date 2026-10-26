@@ -1,1 +1,3 @@
 out/*.raw.mp4
+# Rendered videos are ~40-100 MB; they are shared directly rather than committed.
+out/*.mp4

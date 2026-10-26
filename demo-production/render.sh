@@ -24,7 +24,7 @@ mkdir -p out
 render() { # $1 composition, $2 cut name
   (cd remotion && npx remotion render "$1" "../out/$2.raw.mp4" --browser-executable="$BROWSER" --concurrency=${CONCURRENCY:-4} --codec=h264 --crf=18 --audio-codec=aac --audio-bitrate=192k --log=error)
   # Chapter markers + loudness (-16 LUFS, true peak -1.5 dB) in one pass; video is copied, not re-encoded.
-  ffmpeg -loglevel error -y -i "out/$2.raw.mp4" -i "out/$2.ffmeta" -map 0 -map_metadata 1 -map_chapters 1 -c:v copy -af "loudnorm=I=-16:TP=-1.5:LRA=11" -c:a aac -b:a 192k -movflags +faststart "out/aicte-demo-$2.mp4"
+  ffmpeg -loglevel error -y -i "out/$2.raw.mp4" -i "out/$2.ffmeta" -map 0 -map_metadata 1 -map_chapters 1 -c:v copy -af "loudnorm=I=-16:TP=-1.5:LRA=11,alimiter=limit=0.84:level=false" -ar 48000 -c:a aac -b:a 192k -movflags +faststart "out/aicte-demo-$2.mp4"
   rm -f "out/$2.raw.mp4"
   echo "out/aicte-demo-$2.mp4"
 }

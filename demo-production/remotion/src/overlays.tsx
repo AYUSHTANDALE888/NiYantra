@@ -137,7 +137,8 @@ export const ClickPulse: React.FC<{ x: number; y: number; age: number }> = ({ x,
   return <div style={{ position: 'absolute', left: x - r, top: y - r, width: r * 2, height: r * 2, borderRadius: r, border: `5px solid rgba(245, 158, 11, ${op})`, background: `rgba(245, 158, 11, ${op * 0.18})` }} />;
 };
 
-export const Chip: React.FC<{ x: number; y: number; text: string; icon: string; age: number; hold: number }> = ({ x, y, text, icon, age, hold }) => {
+export const Chip: React.FC<{ x: number; y: number; text: string; icon: string; age: number; hold: number }> = ({ x, y, text, icon, age, hold: h }) => {
+  const hold = Math.max(0.8, h);
   const op = interpolate(age, [0, 0.2, hold - 0.25, hold], [0, 1, 1, 0], clamp);
   return (
     <div style={{ position: 'absolute', left: Math.min(W - 520, Math.max(20, x)), top: Math.max(20, y), opacity: op, display: 'flex', gap: 10, alignItems: 'center', padding: '8px 16px', borderRadius: 999, background: C.navy, color: '#fff', fontFamily: FONT, fontSize: 24, fontWeight: 600, boxShadow: '0 8px 24px rgba(2,8,23,.3)', whiteSpace: 'nowrap' }}>
@@ -160,7 +161,7 @@ export const RoleBanner: React.FC<{ role: string; age: number }> = ({ role, age 
   const inn = spring({ frame: Math.round(age * fps), fps, config: { damping: 16 } });
   const out = interpolate(age, [2.0, 2.4], [1, 0], clamp);
   return (
-    <div style={{ position: 'absolute', left: 0, right: 0, top: 120, display: 'flex', justifyContent: 'center', opacity: out }}>
+    <div style={{ position: 'absolute', left: 0, right: 0, top: 26, display: 'flex', justifyContent: 'center', opacity: out }}>
       <div style={{ translate: `0 ${(1 - inn) * -40}px`, padding: '14px 30px', borderRadius: 16, background: C.navy, color: '#fff', fontFamily: FONT, fontSize: 32, fontWeight: 700, boxShadow: '0 14px 40px rgba(2,8,23,.35)' }}>
         <span style={{ color: '#93c5fd', fontWeight: 600 }}>Now signed in as </span>
         {role}

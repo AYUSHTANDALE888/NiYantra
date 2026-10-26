@@ -4,7 +4,7 @@ A product showcase of the AICTE Demo Website, produced from the real running app
 
 | Output | Length | File |
 |---|---|---|
-| Main cut, 1920×1080, 30 fps, H.264/AAC, −16 LUFS, chapter markers | ≈ 5:50 | `out/aicte-demo-main.mp4` |
+| Main cut, 1920×1080, 30 fps, H.264/AAC, −16 LUFS, chapter markers | ≈ 5:50 | `out/aicte-demo-main.mp4` (not committed: ~95 MB; run `./render.sh`) |
 | Short cut (fair clock, yearly rules, trust) | ≈ 2:30 | `out/aicte-demo-short.mp4` |
 | Subtitles (same text and timing as the burned-in ones) | | `out/main.srt`, `out/short.srt` |
 | Chapter list for YouTube | | `out/main.chapters.txt` |
