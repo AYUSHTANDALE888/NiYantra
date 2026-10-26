@@ -1,11 +1,11 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { AbsoluteFill, Sequence, staticFile, useCurrentFrame, useVideoConfig } from 'remotion';
 import { Audio } from '@remotion/media';
 import data from './data/timeline.json';
 import { useFonts } from './Fonts';
 import { BottomBar } from './overlays';
 import { ChapterCard, CloseScene, OpenScene, RecordingScene, SFX, Sfx, Takeaway, Voice } from './scenes';
-import type { Chapter, Timeline } from './types';
+import type { Chapter, Line, Timeline } from './types';
 
 export type Cut = 'main' | 'short';
 export const timelineFor = (cut: Cut) => (data as unknown as Record<Cut, Timeline>)[cut];
@@ -22,9 +22,51 @@ const montageFor = (chs: Chapter[]) =>
       return { video: c.rec!.video, at: Math.max(0, src - 0.4) };
     });
 
+// Every stretch of narration in absolute seconds, mirroring where <Voice> is placed below; gaps shorter than
+// 1.4 s are bridged so the music does not pump between sentences.
+const voiceSpans = (tl: Timeline): [number, number][] => {
+  const s: [number, number][] = [];
+  for (const c of tl.chapters) {
+    const add = (at: number, l?: Line) => l && s.push([c.start + at, c.start + at + l.duration]);
+    if (c.kind === 'open') {
+      add(0.6, c.a);
+      add(0.6 + c.a!.duration + 0.3, c.d);
+    } else if (c.kind === 'close') add(0.8, c.d);
+    else {
+      add(0.7, c.a);
+      for (const e of c.rec!.events) if (e.type === 'say') add(c.cardDur! + e.t, e);
+      add(c.cardDur! + c.rec!.duration + 0.4, c.d);
+    }
+  }
+  s.sort((a, b) => a[0] - b[0]);
+  const merged: [number, number][] = [];
+  for (const sp of s) {
+    const last = merged[merged.length - 1];
+    if (last && sp[0] - last[1] < 1.4) last[1] = Math.max(last[1], sp[1]);
+    else merged.push([...sp]);
+  }
+  return merged;
+};
+
+// Music level: ducked about 5 dB below its level between sentences, so it sits about 19 dB under the voice (smooth 0.3 s dip, 0.9 s recovery), a little fuller on the
+// opening and closing cards.
+const MUSIC = { underVoice: 0.14, between: 0.24, cards: 0.36 };
+const musicGain = (t: number, spans: [number, number][], tl: Timeline) => {
+  let v = 0;
+  for (const [a, b] of spans) {
+    if (t < a - 0.3 || t > b + 0.9) continue;
+    v = Math.max(v, t < a ? (t - (a - 0.3)) / 0.3 : t <= b ? 1 : 1 - (t - b) / 0.9);
+  }
+  const close = tl.chapters[tl.chapters.length - 1];
+  const free = t < tl.chapters[0].duration || t >= close.start ? MUSIC.cards : MUSIC.between;
+  const smooth = v * v * (3 - 2 * v);
+  return free + (MUSIC.underVoice - free) * smooth;
+};
+
 export const Showcase: React.FC<{ cut: Cut }> = ({ cut }) => {
   useFonts();
   const tl = timelineFor(cut);
+  const spans = useMemo(() => voiceSpans(tl), [tl]);
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const t = frame / fps;
@@ -73,17 +115,8 @@ export const Showcase: React.FC<{ cut: Cut }> = ({ cut }) => {
           )}
         </Sequence>
       ))}
-      {/* Quiet music bed, kept low under the voice; a little fuller on the opening and closing cards. */}
-      <Audio
-        src={staticFile('sfx/music-bed.opus')}
-        loop
-        volume={(f) => {
-          const s = f / fps;
-          const edge = s < 1.2 || s > tl.duration - 4 ? 0.1 : 0.055;
-          const fadeOut = Math.min(1, Math.max(0, (tl.duration - s) / 2.5));
-          return edge * fadeOut;
-        }}
-      />
+      {/* Music composed to this cut's exact length (automation/make_music.py), ducked under the narration. */}
+      <Audio src={staticFile(`sfx/music-${cut}.opus`)} volume={(f) => musicGain(f / fps, spans, tl)} />
       <BottomBar chapters={tl.chapters} current={current} role={role} t={t} total={tl.duration} />
     </AbsoluteFill>
   );

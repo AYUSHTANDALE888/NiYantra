@@ -19,7 +19,9 @@ A product showcase of the AICTE Demo Website, produced from the real running app
 | `narration/script.json` | Narration text per chapter and part (A purpose, B interaction, C result, D takeaway), with an emotion level per line. |
 | `narration/audio/` | One WAV per line + `timings.json` (duration, what speech-to-text heard, word error rate, word timings). |
 | `narration/samples/` | The voice comparison (Kokoro and Chatterbox) used to choose the voice. |
-| `audio/sfx/` | Synthesised, licence-free sounds: click, key taps, whoosh, pop, chime, soft "refused" tone, riser, music bed (`automation/make_sfx.py`). |
+| `audio/sfx/` | Synthesised, licence-free sounds: click, key taps, whoosh, pop, chime, soft "refused" tone, riser (`automation/make_sfx.py`; its old sine-pad bed is no longer used). |
+| `automation/make_music.py` | The music: an original calm arrangement (electric piano, warm pad, bass, soft drums, strings and vibraphone in the lifts) composed in code, played on the MuseScore General soundfont with FluidSynth and mixed with a dip at 2.5 kHz to leave room for the voice. Built to each cut's exact length so the last chord rings out under the closing card. |
+| `automation/master_voice.py` | Narration mastering: 48 kHz, low cut, presence, softer sibilance, gentle compression, every line at −18 LUFS. |
 | `automation/lib/recorder.mjs` | Recorder: Chrome screencast frames → constant-rate MP4, injected cursor with click ripple, and a log of every click, keystroke, upload, result and narration cue. |
 | `automation/record.mjs` | The nine chapter scenarios. Each step asserts the real outcome on screen or through the API; a failed assertion stops the recording. |
 | `automation/narrate.py` | Chatterbox narration with breath pauses between sentences; each line is transcribed with faster-whisper and regenerated if it does not match the script. |
@@ -32,7 +34,8 @@ A product showcase of the AICTE Demo Website, produced from the real running app
 ## Render
 
 ```bash
-# Prerequisites: the local stack running (npm run dev, two schedulers), ffmpeg, Chromium (Playwright's).
+# Prerequisites: the local stack running (npm run dev, two schedulers), ffmpeg, Chromium (Playwright's),
+# fluidsynth + musescore-general-soundfont (apt), Python packages mido pyloudnorm pedalboard scipy soundfile.
 cd demo-production/remotion && npm install && cd ..
 ./render.sh                 # edit and render both cuts from the existing recordings and narration
 ./render.sh --record        # re-record all chapters first (resets the demo database)
@@ -52,6 +55,13 @@ Preview and fine-tune in Remotion Studio: `cd remotion && npx remotion studio`.
 4. **Explain alongside the interface.** Subtitles with word-by-word highlighting, and short callouts placed next to the element, never over the field in use.
 5. **Make interactions readable.** Visible cursor with click ripples (in the footage), an extra click pulse after zooming, a "Typing · field" chip, a "file attached" chip, clear click and key sounds, a speed badge whenever time is compressed.
 6. **Organise into chapters.** Nine chapter cards, chapter markers inside the MP4, and a chapter list for YouTube.
+
+## Sound
+
+- **Voice first.** Narration is mastered to one level; the mix keeps it on top at all times.
+- **Music that gets out of the way.** The bed dips about 5 dB smoothly whenever someone speaks (0.3 s down, 0.9 s back up; gaps under 1.4 s are bridged so it never pumps between sentences) and sits about 19 dB under the voice. It is a little fuller on the opening and closing cards.
+- **Interface sounds you can hear but do not notice.** Clicks, a soft pop for each verified result, a gentle two-note tone for refusals, a whoosh when the signed-in person changes. Typing is thinned to one tap per 75 ms with slight level variation, so fast-forwarded input does not rattle.
+- **Even loudness.** Two passes: measure, then one linear gain to −16 LUFS with a transparent peak limiter at −1.5 dB, so nothing is squashed.
 
 ## Honesty notes
 
