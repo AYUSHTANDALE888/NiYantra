@@ -48,9 +48,9 @@ const voiceSpans = (tl: Timeline): [number, number][] => {
   return merged;
 };
 
-// Music level: ducked about 5 dB below its level between sentences, so it sits about 19 dB under the voice (smooth 0.3 s dip, 0.9 s recovery), a little fuller on the
+// Music level: ducked about 5 dB below its level between sentences, so it sits about 22 dB under the voice (smooth 0.3 s dip, 0.9 s recovery), a little fuller on the
 // opening and closing cards.
-const MUSIC = { underVoice: 0.14, between: 0.24, cards: 0.36 };
+const MUSIC = { underVoice: 0.1, between: 0.17, cards: 0.26 };
 const musicGain = (t: number, spans: [number, number][], tl: Timeline) => {
   let v = 0;
   for (const [a, b] of spans) {

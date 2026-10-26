@@ -20,7 +20,7 @@ A product showcase of the AICTE Demo Website, produced from the real running app
 | `narration/audio/` | One WAV per line + `timings.json` (duration, what speech-to-text heard, word error rate, word timings). |
 | `narration/samples/` | The voice comparison (Kokoro and Chatterbox) used to choose the voice. |
 | `audio/sfx/` | Synthesised, licence-free sounds: click, key taps, whoosh, pop, chime, soft "refused" tone, riser (`automation/make_sfx.py`; its old sine-pad bed is no longer used). |
-| `automation/make_music.py` | The music: an original calm arrangement (electric piano, warm pad, bass, soft drums, strings and vibraphone in the lifts) composed in code, played on the MuseScore General soundfont with FluidSynth and mixed with a dip at 2.5 kHz to leave room for the voice. Built to each cut's exact length so the last chord rings out under the closing card. |
+| `automation/make_music.py` | The music: an original soft, warm arrangement at 70 bpm with no drums (slow electric-piano broken chords, warm pad, gentle acoustic bass, slow strings) composed in code, played on the MuseScore General soundfont with FluidSynth, darkened above 6.5 kHz and dipped at 2.5 kHz to leave room for the voice. Built to each cut's exact length so the last chord rings out under the closing card. |
 | `automation/master_voice.py` | Narration mastering: 48 kHz, low cut, presence, softer sibilance, gentle compression, every line at −18 LUFS. |
 | `automation/lib/recorder.mjs` | Recorder: Chrome screencast frames → constant-rate MP4, injected cursor with click ripple, and a log of every click, keystroke, upload, result and narration cue. |
 | `automation/record.mjs` | The nine chapter scenarios. Each step asserts the real outcome on screen or through the API; a failed assertion stops the recording. |
@@ -59,7 +59,7 @@ Preview and fine-tune in Remotion Studio: `cd remotion && npx remotion studio`.
 ## Sound
 
 - **Voice first.** Narration is mastered to one level; the mix keeps it on top at all times.
-- **Music that gets out of the way.** The bed dips about 5 dB smoothly whenever someone speaks (0.3 s down, 0.9 s back up; gaps under 1.4 s are bridged so it never pumps between sentences) and sits about 19 dB under the voice. It is a little fuller on the opening and closing cards.
+- **Music that gets out of the way.** The bed dips about 5 dB smoothly whenever someone speaks (0.3 s down, 0.9 s back up; gaps under 1.4 s are bridged so it never pumps between sentences) and sits about 22 dB under the voice. It is a little fuller on the opening and closing cards.
 - **Interface sounds you can hear but do not notice.** Clicks, a soft pop for each verified result, a gentle two-note tone for refusals, a whoosh when the signed-in person changes. Typing is thinned to one tap per 75 ms with slight level variation, so fast-forwarded input does not rattle.
 - **Even loudness.** Two passes: measure, then one linear gain to −16 LUFS with a transparent peak limiter at −1.5 dB, so nothing is squashed.
 
