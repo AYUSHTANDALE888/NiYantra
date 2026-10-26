@@ -90,7 +90,9 @@ export const RecordingScene: React.FC<{ rec: Recording }> = ({ rec }) => {
       {activeResult ? <Spotlight box={mapBox(activeResult.box!)} age={t - activeResult.t} hold={RESULT_HOLD} /> : null}
       {activeResult
         ? (() => {
-            const cause = clicks.filter((c) => c.t < activeResult.t && activeResult.t - c.t < 4).pop();
+            // Only a click on the same screen (after the last page switch) is drawn as the cause.
+            const lastAttach = ev.filter((x) => x.type === 'attach' && x.t <= activeResult.t).pop()?.t ?? 0;
+            const cause = clicks.filter((c) => c.t > lastAttach && c.t < activeResult.t && activeResult.t - c.t < 4).pop();
             if (!cause) return null;
             const from = cam.map(cause.box!.x + cause.box!.w / 2, cause.box!.y + cause.box!.h / 2);
             return <CauseArrow from={from} to={mapBox(activeResult.box!)} age={t - activeResult.t} hold={RESULT_HOLD} />;
