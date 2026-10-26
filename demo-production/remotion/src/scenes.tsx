@@ -208,7 +208,7 @@ export const OpenScene: React.FC<{ ch: Chapter; montage: { video: string; at: nu
   );
 };
 
-const TEAM = ['sanjayvasudevan-c', 'Arya-Ananth', 'abilashprabakar27-ctrl', 'A-R-Mohamed-Arshad', 'diya-240108'];
+const TEAM = ['sanjayvasudevan-c', 'Arya-Ananth', 'abilashprabakar27-ctrl', 'A-R-Mohamed-Arshad', 'diya-240108', 'VishalN711'];
 
 export const CloseScene: React.FC<{ ch: Chapter }> = ({ ch }) => {
   const frame = useCurrentFrame();
