@@ -9,8 +9,11 @@ import type { Box, Chapter, Line, RecEvent, Recording } from './types';
 const clamp = { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' } as const;
 const sec = (f: number, fps: number) => f / fps;
 
-// Sound levels (narration peaks at about -1 dBFS; the music bed sits about 26 dB below it).
-export const SFX = { click: 0.6, key: 0.22, pop: 0.35, notice: 0.4, chime: 0.3, whoosh: 0.32, riser: 0.28 };
+// Sound levels. Narration lines are mastered to -18 LUFS (automation/master_voice.py); interface sounds stay
+// clearly audible but well under the voice, and typing is thinned so fast-forwarded input does not rattle.
+// Everything is mixed with headroom (voice at 0.7); render.sh brings the final mix to -16 LUFS.
+export const SFX = { click: 0.32, key: 0.08, pop: 0.21, notice: 0.21, chime: 0.15, whoosh: 0.15, riser: 0.14 };
+const KEY_GAP = 0.075; // seconds between audible key taps
 
 export const Sfx: React.FC<{ at: number; name: string; volume: number }> = ({ at, name, volume }) => {
   const { fps } = useVideoConfig();
@@ -25,7 +28,7 @@ export const Voice: React.FC<{ at: number; line: Line }> = ({ at, line }) => {
   const { fps } = useVideoConfig();
   return (
     <Sequence from={Math.round(at * fps)} durationInFrames={Math.ceil((line.duration + 0.5) * fps)} layout="none">
-      <Audio src={staticFile(line.src)} volume={0.82} />
+      <Audio src={staticFile(line.src)} volume={0.7} />
     </Sequence>
   );
 };
@@ -67,6 +70,7 @@ export const RecordingScene: React.FC<{ rec: Recording }> = ({ rec }) => {
   const keys = useMemo(() => cameraKeys(rec.events, rec.duration), [rec]);
   const cam = cameraAt(keys, t);
   const ev = rec.events;
+  let lastKey = -1;
   const seg = rec.segments.find((s) => t >= s.outStart && t < s.outEnd) ?? rec.segments[rec.segments.length - 1];
   const mapBox = (b: Box): Box => {
     const p = cam.map(b.x, b.y);
@@ -135,7 +139,11 @@ export const RecordingScene: React.FC<{ rec: Recording }> = ({ rec }) => {
       {ev.map((e, i) => {
         if (e.type === 'say') return <Voice key={i} at={e.t} line={e} />;
         if (e.type === 'click') return <Sfx key={i} at={e.t} name="click" volume={SFX.click} />;
-        if (e.type === 'key') return <Sfx key={i} at={e.t} name={`key${(i % 4) + 1}`} volume={SFX.key} />;
+        if (e.type === 'key') {
+          if (e.t - lastKey < KEY_GAP) return null;
+          lastKey = e.t;
+          return <Sfx key={i} at={e.t} name={`key${(i % 4) + 1}`} volume={SFX.key * (0.85 + 0.3 * ((i * 7) % 5) / 4)} />;
+        }
         if (e.type === 'result') return <Sfx key={i} at={e.t} name={/refused|blocked|disabled|tampering/i.test(e.label ?? '') ? 'notice' : 'pop'} volume={SFX.pop} />;
         if (e.type === 'upload') return <Sfx key={i} at={e.t} name="pop" volume={SFX.pop * 0.6} />;
         if (e.type === 'attach' && e.t > 0.5) return <Sfx key={i} at={e.t} name="whoosh" volume={SFX.whoosh} />;
@@ -191,13 +199,16 @@ export const OpenScene: React.FC<{ ch: Chapter; montage: { video: string; at: nu
         <div style={{ display: 'inline-flex', width: 120, height: 120, borderRadius: 16, background: '#fff', color: C.navy, fontSize: 56, fontWeight: 700, alignItems: 'center', justifyContent: 'center' }}>AD</div>
         <div style={{ fontSize: 104, fontWeight: 700, marginTop: 26 }}>AICTE Demo Website</div>
         <div style={{ fontSize: 40, color: '#dbeafe', marginTop: 12 }}>Approval workflow prototype · Smart India Hackathon 2026</div>
-        <div style={{ fontSize: 26, color: '#93c5fd', marginTop: 26 }}>Prototype on synthetic data · not an official AICTE system</div>
+        <div style={{ fontSize: 30, color: '#e2e8f0', marginTop: 18, fontWeight: 600 }}>by Team GeoLogics</div>
+        <div style={{ fontSize: 26, color: '#93c5fd', marginTop: 22 }}>Prototype on synthetic data · not an official AICTE system</div>
       </div>
       <Subtitle line={a} t={t - 0.6} />
       <Subtitle line={ch.d} t={t - titleAt} />
     </AbsoluteFill>
   );
 };
+
+const TEAM = ['sanjayvasudevan-c', 'Arya-Ananth', 'abilashprabakar27-ctrl', 'A-R-Mohamed-Arshad', 'diya-240108', 'VishalN711'];
 
 export const CloseScene: React.FC<{ ch: Chapter }> = ({ ch }) => {
   const frame = useCurrentFrame();
@@ -226,6 +237,27 @@ export const CloseScene: React.FC<{ ch: Chapter }> = ({ ch }) => {
         </div>
       </div>
       <div style={{ position: 'absolute', left: 150, top: 80, fontSize: 24, color: '#93c5fd' }}>Prototype for Smart India Hackathon 2026 · synthetic data · not an official AICTE system</div>
+      <div
+        style={{
+          position: 'absolute', left: 1300, top: 190, width: 500, padding: '30px 30px', borderRadius: 14,
+          background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(147,197,253,0.35)',
+          opacity: interpolate(t, [3.0, 3.6], [0, 1], clamp), translate: `0 ${interpolate(t, [3.0, 3.6], [16, 0], clamp)}px`,
+        }}
+      >
+        <div style={{ fontSize: 26, color: '#93c5fd' }}>Built by</div>
+        <div style={{ fontSize: 44, fontWeight: 700, marginTop: 4 }}>Team GeoLogics</div>
+        <div style={{ fontSize: 22, color: '#cbd5e1', marginTop: 6 }}>SIH 2026 · team ID 197385</div>
+        <div style={{ fontSize: 20, color: '#94a3b8', marginTop: 24 }}>On GitHub</div>
+        <div style={{ marginTop: 8, display: 'flex', flexDirection: 'column', gap: 10 }}>
+          {TEAM.map((u, i) => (
+            <div key={u} style={{ fontSize: 28, whiteSpace: 'nowrap', opacity: interpolate(t, [3.4 + i * 0.15, 3.9 + i * 0.15], [0, 1], clamp) }}>
+              {u}
+            </div>
+          ))}
+        </div>
+        <div style={{ fontSize: 20, color: '#94a3b8', marginTop: 24 }}>Source code</div>
+        <div style={{ fontSize: 16.5, color: '#93c5fd', marginTop: 4, whiteSpace: 'nowrap' }}>github.com/sanjayvasudevan-c/SIH-demo-source-code</div>
+      </div>
       <Subtitle line={ch.d} t={t - 0.8} />
     </AbsoluteFill>
   );
