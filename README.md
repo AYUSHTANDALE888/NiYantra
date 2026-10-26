@@ -96,6 +96,24 @@ Reset before each demo run. After a reset the schedulers reconnect on their own 
 
 Default credentials and secrets in `.env.example` are for the demo only. Change `JWT_SECRET` and the database passwords before putting this anywhere but a laptop.
 
+## Live demo (Vercel + Neon)
+
+**https://aicte-demo-website.vercel.app**: open it, pick a demo user on the sign-in card (password `demo1234`), and every screen works. Admin → Reset demo restores the seeded data in under a second.
+
+How the hosted version differs from the compose stack (all switched on automatically by `api/src/lib/hosted.ts` when the Neon integration's variables are present):
+
+| Concern | Compose stack | Hosted |
+|---|---|---|
+| API | Express process | the same Express app as one Vercel function (`api/src/serverless.ts`) |
+| Deadline engine | two scheduler processes, leader by advisory lock | runs after requests (at most once a minute, same lock) and from a daily Vercel cron; time travel runs it immediately |
+| Database roles | `aicte_migrator`, `aicte_app` with passwords from `.env` | Neon owner for migrations and reset; the app still connects as `aicte_app` (password derived from the owner's, nothing extra stored) |
+| Uploads | files on disk | `StoredBlob` table (`STORAGE_DRIVER=db`) |
+| Demo reset | recreate the database from a template | restore a snapshot of the seeded rows (`DEMO_RESET_MODE=snapshot`) |
+| Form check service | Python container | not deployed; the app shows "Model unavailable: rules only" and uses the Node rules |
+| Tamper demo | `npm run demo:tamper` | not available (it needs direct database access) |
+
+Build: the Vercel project's root directory is `web/`; `web/vercel.json` runs `scripts/vercel-build.mjs`, which migrates, reseeds and snapshots only when the schema or seed changed, then emits `.vercel/output`.
+
 ## Demo users
 
 Password for every user: `demo1234`.

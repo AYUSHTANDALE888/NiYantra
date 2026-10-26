@@ -1,10 +1,9 @@
-import fs from 'node:fs';
 import { Router } from 'express';
 import { z } from 'zod';
 import { prisma } from '../lib/db.js';
 import { h, parse } from '../lib/http.js';
 import { badRequest, forbidden, notFound } from '../lib/errors.js';
-import { saveBuffer, storedPath, upload } from '../lib/storage.js';
+import { readStored, saveBuffer, upload } from '../lib/storage.js';
 import { now } from '../lib/clock.js';
 import { parseDateOnly } from '../lib/dates.js';
 import { currentUser, type AuthUser } from '../auth/middleware.js';
@@ -38,7 +37,7 @@ export function documentsRouter(): Router {
       const app = await prisma.application.findUnique({ where: { id: body.applicationId } });
       if (!app || app.institutionId !== user.institutionId) throw notFound();
       if (!(await rulesForApp(app)).documents(app.type, { formData: app.formData as Record<string, unknown> }).some((d) => d.kind === body.kind)) throw badRequest(`${body.kind} is not a document for this application type.`);
-      const s = saveBuffer(req.file.buffer, req.file.originalname, req.file.mimetype);
+      const s = await saveBuffer(req.file.buffer, req.file.originalname, req.file.mimetype);
       const doc = await prisma.document.create({
         data: {
           applicationId: app.id,
@@ -65,13 +64,13 @@ export function documentsRouter(): Router {
         await logAccessDenied(user, { applicationId: doc.applicationId, path: req.originalUrl, reason: 'Document outside the user’s scope' });
         throw notFound();
       }
-      const p = storedPath(doc.storedName);
-      if (!fs.existsSync(p)) throw notFound('The file is missing from storage.');
+      const bytes = await readStored(doc.storedName);
+      if (!bytes) throw notFound('The file is missing from storage.');
       res.setHeader('Content-Type', doc.mimeType);
       res.setHeader('Content-Disposition', `inline; filename="${doc.fileName.replace(/[^\w.\- ]/g, '_')}"`);
       res.setHeader('Cache-Control', 'private, no-store');
       res.setHeader('X-Content-Type-Options', 'nosniff');
-      fs.createReadStream(p).pipe(res);
+      res.send(bytes);
     }),
   );
 

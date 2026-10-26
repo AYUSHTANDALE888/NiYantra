@@ -1,0 +1,87 @@
+1
+00:00:00,600 --> 00:00:05,375
+Approving a technical institution takes many hands, many documents, and many deadlines.
+
+2
+00:00:05,475 --> 00:00:09,731
+This prototype keeps every one of them visible, from the first form to the final decision.
+
+3
+00:00:11,831 --> 00:00:14,098
+Delays are often blamed on the wrong side.
+
+4
+00:00:05,715 --> 00:00:12,090
+Priya finds the lease covers only two years. She returns the application, naming the document and the reason.
+
+5
+00:00:22,827 --> 00:00:27,375
+The case turns amber. The clock is paused, because the next move is the college's.
+
+6
+00:00:28,570 --> 00:00:30,756
+The college replies with a three-year lease.
+
+7
+00:00:36,538 --> 00:00:40,722
+And the case goes straight back to Priya, with the days that were left, not a fresh deadline.
+
+8
+00:00:42,572 --> 00:00:44,513
+The clock is fair to both sides.
+
+9
+00:00:46,113 --> 00:00:51,544
+Rules change every year. Sudden changes surprise colleges, and break systems.
+
+10
+00:00:25,028 --> 00:00:30,166
+A rules editor drafts an amendment: a new required document, and a longer application window.
+
+11
+00:01:08,363 --> 00:01:14,853
+Applying the new document to cases already filed is refused. A tighter rule can only apply to new applications.
+
+12
+00:01:20,271 --> 00:01:24,504
+Before anything is published, the impact preview shows exactly who would be affected.
+
+13
+00:01:27,954 --> 00:01:34,955
+Then a different person, the rules approver, reviews it and publishes it. Nobody can approve their own change.
+
+14
+00:01:37,878 --> 00:01:40,729
+And the college sees the change the next time it signs in.
+
+15
+00:01:42,582 --> 00:01:45,702
+Every change is previewed, approved by two people, and announced.
+
+16
+00:01:47,302 --> 00:01:49,825
+An audit log that can be edited proves nothing.
+
+17
+00:01:51,714 --> 00:01:56,788
+Every action is chained by hash. Verify integrity, and every row checks out.
+
+18
+00:01:57,039 --> 00:02:00,922
+Now, with a demo tool, one row is changed directly in the database.
+
+19
+00:02:02,247 --> 00:02:04,898
+Verification points to the exact broken row.
+
+20
+00:02:06,182 --> 00:02:10,971
+And when an officer opens a case outside their region, access is refused, and logged.
+
+21
+00:02:12,823 --> 00:02:15,464
+Tamper-evident, and scoped to every role.
+
+22
+00:02:17,164 --> 00:02:26,015
+The AICTE Demo Website. A prototype on synthetic data, for Smart India Hackathon twenty twenty-six. Try it live, at the link on screen.

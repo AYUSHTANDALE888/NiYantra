@@ -1,0 +1,159 @@
+{
+ "name": "ch9",
+ "duration": 24.349,
+ "scale": 1.2,
+ "viewport": {
+  "width": 1600,
+  "height": 900
+ },
+ "events": [
+  {
+   "t": -0.015,
+   "type": "attach"
+  },
+  {
+   "t": 1.023,
+   "type": "hover",
+   "label": "Audit log",
+   "box": {
+    "x": 339.28125,
+    "y": 173.8125,
+    "width": 59.875,
+    "height": 33.5
+   }
+  },
+  {
+   "t": 1.304,
+   "type": "click",
+   "label": "Audit log",
+   "box": {
+    "x": 339.28125,
+    "y": 173.8125,
+    "width": 59.875,
+    "height": 33.5
+   },
+   "x": 369.21875,
+   "y": 190.5625
+  },
+  {
+   "t": 1.855,
+   "type": "say",
+   "id": "ch9.b1",
+   "duration": 4.874
+  },
+  {
+   "t": 3.027,
+   "type": "hover",
+   "label": "Verify integrity",
+   "box": {
+    "x": 246,
+    "y": 279.3125,
+    "width": 116.796875,
+    "height": 31.5
+   }
+  },
+  {
+   "t": 3.307,
+   "type": "click",
+   "label": "Verify integrity",
+   "box": {
+    "x": 246,
+    "y": 279.3125,
+    "width": 116.796875,
+    "height": 31.5
+   },
+   "x": 304.3984375,
+   "y": 295.0625
+  },
+  {
+   "t": 3.925,
+   "type": "result",
+   "label": "Every row matches its hash",
+   "box": {
+    "x": 376.796875,
+    "y": 286.3125,
+    "width": 311.625,
+    "height": 17.5
+   }
+  },
+  {
+   "t": 7.18,
+   "type": "say",
+   "id": "ch9.b2",
+   "duration": 3.683
+  },
+  {
+   "t": 8.111,
+   "type": "terminal",
+   "command": "npm run demo:tamper",
+   "output": "[demo:tamper] changed the reason on audit row 995 (chain c216d6e1-55bc-4dc8-8822-0432c1af2249, action RELEASE)."
+  },
+  {
+   "t": 12.225,
+   "type": "hover",
+   "label": "Verify integrity",
+   "box": {
+    "x": 246,
+    "y": 279.3125,
+    "width": 116.796875,
+    "height": 31.5
+   }
+  },
+  {
+   "t": 12.506,
+   "type": "click",
+   "label": "Verify integrity",
+   "box": {
+    "x": 246,
+    "y": 279.3125,
+    "width": 116.796875,
+    "height": 31.5
+   },
+   "x": 304.3984375,
+   "y": 295.0625
+  },
+  {
+   "t": 13.056,
+   "type": "say",
+   "id": "ch9.c1",
+   "duration": 2.451
+  },
+  {
+   "t": 13.096,
+   "type": "result",
+   "label": "Tampering detected",
+   "box": {
+    "x": 246,
+    "y": 324.8125,
+    "width": 923.1875,
+    "height": 17.5
+   }
+  },
+  {
+   "t": 18.492,
+   "type": "attach"
+  },
+  {
+   "t": 18.503,
+   "type": "say",
+   "id": "ch9.c2",
+   "duration": 4.589
+  },
+  {
+   "t": 18.564,
+   "type": "result",
+   "label": "Refused, and logged",
+   "box": {
+    "x": 231,
+    "y": 86.3125,
+    "width": 419.6875,
+    "height": 24.5
+   }
+  },
+  {
+   "t": 24.344,
+   "type": "mark",
+   "label": "end"
+  }
+ ]
+}

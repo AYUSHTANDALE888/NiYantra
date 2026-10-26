@@ -1,0 +1,1048 @@
+{
+ "name": "ch2",
+ "duration": 69.677,
+ "scale": 1.2,
+ "viewport": {
+  "width": 1600,
+  "height": 900
+ },
+ "events": [
+  {
+   "t": -0.017,
+   "type": "attach"
+  },
+  {
+   "t": 1.685,
+   "type": "hover",
+   "label": "Demo user: ABC Engineering College",
+   "box": {
+    "x": 925.25,
+    "y": 644.25,
+    "width": 157.125,
+    "height": 38.75
+   }
+  },
+  {
+   "t": 1.97,
+   "type": "click",
+   "label": "Demo user: ABC Engineering College",
+   "box": {
+    "x": 925.25,
+    "y": 644.25,
+    "width": 157.125,
+    "height": 38.75
+   },
+   "x": 1003.8125,
+   "y": 663.625
+  },
+  {
+   "t": 3.669,
+   "type": "hover",
+   "label": "Sign in",
+   "box": {
+    "x": 1248.859375,
+    "y": 458.5,
+    "width": 75.140625,
+    "height": 31.5
+   }
+  },
+  {
+   "t": 3.95,
+   "type": "click",
+   "label": "Sign in",
+   "box": {
+    "x": 1248.859375,
+    "y": 458.5,
+    "width": 75.140625,
+    "height": 31.5
+   },
+   "x": 1286.4296875,
+   "y": 474.25
+  },
+  {
+   "t": 5.569,
+   "type": "hover",
+   "label": "New application",
+   "box": {
+    "x": 0,
+    "y": 114.3125,
+    "width": 209,
+    "height": 31.5
+   }
+  },
+  {
+   "t": 5.849,
+   "type": "click",
+   "label": "New application",
+   "box": {
+    "x": 0,
+    "y": 114.3125,
+    "width": 209,
+    "height": 31.5
+   },
+   "x": 104.5,
+   "y": 130.0625
+  },
+  {
+   "t": 6.414,
+   "type": "say",
+   "id": "ch2.b1",
+   "duration": 6.489
+  },
+  {
+   "t": 6.458,
+   "type": "result",
+   "label": "Cycle and rules version",
+   "box": {
+    "x": 246,
+    "y": 187.3125,
+    "width": 1048,
+    "height": 15.75
+   }
+  },
+  {
+   "t": 14.235,
+   "type": "hover",
+   "label": "Continue",
+   "box": {
+    "x": 767.734375,
+    "y": 811.0625,
+    "width": 83.34375,
+    "height": 31.5
+   }
+  },
+  {
+   "t": 14.516,
+   "type": "click",
+   "label": "Continue",
+   "box": {
+    "x": 767.734375,
+    "y": 811.0625,
+    "width": 83.34375,
+    "height": 31.5
+   },
+   "x": 809.40625,
+   "y": 826.8125
+  },
+  {
+   "t": 15.06,
+   "type": "say",
+   "id": "ch2.b2",
+   "duration": 3.29
+  },
+  {
+   "t": 16.119,
+   "type": "hover",
+   "label": "Land area (sq m)",
+   "box": {
+    "x": 246,
+    "y": 433.5625,
+    "width": 560,
+    "height": 31.5
+   }
+  },
+  {
+   "t": 16.4,
+   "type": "click",
+   "label": "Land area (sq m)",
+   "box": {
+    "x": 246,
+    "y": 433.5625,
+    "width": 560,
+    "height": 31.5
+   },
+   "x": 526,
+   "y": 449.3125
+  },
+  {
+   "t": 16.664,
+   "type": "typeStart",
+   "label": "Land area (sq m)",
+   "box": {
+    "x": 246,
+    "y": 433.5625,
+    "width": 560,
+    "height": 31.5
+   },
+   "text": "5000"
+  },
+  {
+   "t": 16.682,
+   "type": "key"
+  },
+  {
+   "t": 16.758,
+   "type": "key"
+  },
+  {
+   "t": 16.855,
+   "type": "key"
+  },
+  {
+   "t": 16.955,
+   "type": "key"
+  },
+  {
+   "t": 17.053,
+   "type": "typeEnd",
+   "label": "Land area (sq m)",
+   "box": {
+    "x": 246,
+    "y": 433.5625,
+    "width": 560,
+    "height": 31.5
+   }
+  },
+  {
+   "t": 18.372,
+   "type": "hover",
+   "label": "Built-up area (sq m)",
+   "box": {
+    "x": 246,
+    "y": 517.5625,
+    "width": 560,
+    "height": 31.5
+   }
+  },
+  {
+   "t": 18.653,
+   "type": "click",
+   "label": "Built-up area (sq m)",
+   "box": {
+    "x": 246,
+    "y": 517.5625,
+    "width": 560,
+    "height": 31.5
+   },
+   "x": 526,
+   "y": 533.3125
+  },
+  {
+   "t": 18.895,
+   "type": "typeStart",
+   "label": "Built-up area (sq m)",
+   "box": {
+    "x": 246,
+    "y": 517.5625,
+    "width": 560,
+    "height": 31.5
+   },
+   "text": "9000"
+  },
+  {
+   "t": 18.906,
+   "type": "key"
+  },
+  {
+   "t": 18.985,
+   "type": "key"
+  },
+  {
+   "t": 19.087,
+   "type": "key"
+  },
+  {
+   "t": 19.171,
+   "type": "key"
+  },
+  {
+   "t": 19.249,
+   "type": "typeEnd",
+   "label": "Built-up area (sq m)",
+   "box": {
+    "x": 246,
+    "y": 517.5625,
+    "width": 560,
+    "height": 31.5
+   }
+  },
+  {
+   "t": 20.548,
+   "type": "hover",
+   "label": "Lease expiry",
+   "box": {
+    "x": 246,
+    "y": 601.5625,
+    "width": 560,
+    "height": 31.5
+   }
+  },
+  {
+   "t": 20.829,
+   "type": "click",
+   "label": "Lease expiry",
+   "box": {
+    "x": 246,
+    "y": 601.5625,
+    "width": 560,
+    "height": 31.5
+   },
+   "x": 526,
+   "y": 617.3125
+  },
+  {
+   "t": 22.526,
+   "type": "hover",
+   "label": "Continue",
+   "box": {
+    "x": 767.734375,
+    "y": 686.5625,
+    "width": 83.34375,
+    "height": 31.5
+   }
+  },
+  {
+   "t": 22.807,
+   "type": "click",
+   "label": "Continue",
+   "box": {
+    "x": 767.734375,
+    "y": 686.5625,
+    "width": 83.34375,
+    "height": 31.5
+   },
+   "x": 809.40625,
+   "y": 702.3125
+  },
+  {
+   "t": 23.357,
+   "type": "say",
+   "id": "ch2.b3",
+   "duration": 5.572
+  },
+  {
+   "t": 23.411,
+   "type": "result",
+   "label": "Advice, not a block",
+   "box": {
+    "x": 898.578125,
+    "y": 466.0625,
+    "width": 383.921875,
+    "height": 35
+   }
+  },
+  {
+   "t": 25.869,
+   "type": "hover",
+   "label": "Back",
+   "box": {
+    "x": 699.34375,
+    "y": 653.3125,
+    "width": 57.890625,
+    "height": 31.5
+   }
+  },
+  {
+   "t": 26.15,
+   "type": "click",
+   "label": "Back",
+   "box": {
+    "x": 699.34375,
+    "y": 653.3125,
+    "width": 57.890625,
+    "height": 31.5
+   },
+   "x": 728.2890625,
+   "y": 669.0625
+  },
+  {
+   "t": 27.65,
+   "type": "hover",
+   "label": "Corrected built-up area",
+   "box": {
+    "x": 246,
+    "y": 517.5625,
+    "width": 560,
+    "height": 31.5
+   }
+  },
+  {
+   "t": 27.931,
+   "type": "click",
+   "label": "Corrected built-up area",
+   "box": {
+    "x": 246,
+    "y": 517.5625,
+    "width": 560,
+    "height": 31.5
+   },
+   "x": 526,
+   "y": 533.3125
+  },
+  {
+   "t": 28.227,
+   "type": "typeStart",
+   "label": "Corrected built-up area",
+   "box": {
+    "x": 246,
+    "y": 517.5625,
+    "width": 560,
+    "height": 31.5
+   },
+   "text": "4000"
+  },
+  {
+   "t": 28.255,
+   "type": "key"
+  },
+  {
+   "t": 28.358,
+   "type": "key"
+  },
+  {
+   "t": 28.446,
+   "type": "key"
+  },
+  {
+   "t": 28.537,
+   "type": "key"
+  },
+  {
+   "t": 28.631,
+   "type": "typeEnd",
+   "label": "Corrected built-up area",
+   "box": {
+    "x": 246,
+    "y": 517.5625,
+    "width": 560,
+    "height": 31.5
+   }
+  },
+  {
+   "t": 30.24,
+   "type": "hover",
+   "label": "Continue",
+   "box": {
+    "x": 767.734375,
+    "y": 686.5625,
+    "width": 83.34375,
+    "height": 31.5
+   }
+  },
+  {
+   "t": 30.521,
+   "type": "click",
+   "label": "Continue",
+   "box": {
+    "x": 767.734375,
+    "y": 686.5625,
+    "width": 83.34375,
+    "height": 31.5
+   },
+   "x": 809.40625,
+   "y": 702.3125
+  },
+  {
+   "t": 32.093,
+   "type": "hover",
+   "label": "Programme",
+   "box": {
+    "x": 246,
+    "y": 388.0625,
+    "width": 378,
+    "height": 31.5
+   }
+  },
+  {
+   "t": 32.374,
+   "type": "click",
+   "label": "Programme",
+   "box": {
+    "x": 246,
+    "y": 388.0625,
+    "width": 378,
+    "height": 31.5
+   },
+   "x": 435,
+   "y": 403.8125
+  },
+  {
+   "t": 32.621,
+   "type": "typeStart",
+   "label": "Programme",
+   "box": {
+    "x": 246,
+    "y": 388.0625,
+    "width": 378,
+    "height": 31.5
+   },
+   "text": "B.Tech Computer Science"
+  },
+  {
+   "t": 32.642,
+   "type": "key"
+  },
+  {
+   "t": 32.691,
+   "type": "key"
+  },
+  {
+   "t": 32.769,
+   "type": "key"
+  },
+  {
+   "t": 32.847,
+   "type": "key"
+  },
+  {
+   "t": 32.897,
+   "type": "key"
+  },
+  {
+   "t": 32.97,
+   "type": "key"
+  },
+  {
+   "t": 33.025,
+   "type": "key"
+  },
+  {
+   "t": 33.083,
+   "type": "key"
+  },
+  {
+   "t": 33.131,
+   "type": "key"
+  },
+  {
+   "t": 33.201,
+   "type": "key"
+  },
+  {
+   "t": 33.259,
+   "type": "key"
+  },
+  {
+   "t": 33.319,
+   "type": "key"
+  },
+  {
+   "t": 33.402,
+   "type": "key"
+  },
+  {
+   "t": 33.467,
+   "type": "key"
+  },
+  {
+   "t": 33.516,
+   "type": "key"
+  },
+  {
+   "t": 33.576,
+   "type": "key"
+  },
+  {
+   "t": 33.648,
+   "type": "key"
+  },
+  {
+   "t": 33.724,
+   "type": "key"
+  },
+  {
+   "t": 33.785,
+   "type": "key"
+  },
+  {
+   "t": 33.854,
+   "type": "key"
+  },
+  {
+   "t": 33.918,
+   "type": "key"
+  },
+  {
+   "t": 33.967,
+   "type": "key"
+  },
+  {
+   "t": 34.026,
+   "type": "key"
+  },
+  {
+   "t": 34.097,
+   "type": "typeEnd",
+   "label": "Programme",
+   "box": {
+    "x": 246,
+    "y": 388.0625,
+    "width": 378,
+    "height": 31.5
+   }
+  },
+  {
+   "t": 35.512,
+   "type": "hover",
+   "label": "Intake",
+   "box": {
+    "x": 631,
+    "y": 388.0625,
+    "width": 84,
+    "height": 31.5
+   }
+  },
+  {
+   "t": 35.792,
+   "type": "click",
+   "label": "Intake",
+   "box": {
+    "x": 631,
+    "y": 388.0625,
+    "width": 84,
+    "height": 31.5
+   },
+   "x": 673,
+   "y": 403.8125
+  },
+  {
+   "t": 36.041,
+   "type": "typeStart",
+   "label": "Intake",
+   "box": {
+    "x": 631,
+    "y": 388.0625,
+    "width": 84,
+    "height": 31.5
+   },
+   "text": "120"
+  },
+  {
+   "t": 36.067,
+   "type": "key"
+  },
+  {
+   "t": 36.166,
+   "type": "key"
+  },
+  {
+   "t": 36.31,
+   "type": "key"
+  },
+  {
+   "t": 36.386,
+   "type": "typeEnd",
+   "label": "Intake",
+   "box": {
+    "x": 631,
+    "y": 388.0625,
+    "width": 84,
+    "height": 31.5
+   }
+  },
+  {
+   "t": 37.768,
+   "type": "hover",
+   "label": "Faculty",
+   "box": {
+    "x": 246,
+    "y": 519.3125,
+    "width": 560,
+    "height": 31.5
+   }
+  },
+  {
+   "t": 38.049,
+   "type": "click",
+   "label": "Faculty",
+   "box": {
+    "x": 246,
+    "y": 519.3125,
+    "width": 560,
+    "height": 31.5
+   },
+   "x": 526,
+   "y": 535.0625
+  },
+  {
+   "t": 38.295,
+   "type": "typeStart",
+   "label": "Faculty",
+   "box": {
+    "x": 246,
+    "y": 519.3125,
+    "width": 560,
+    "height": 31.5
+   },
+   "text": "30"
+  },
+  {
+   "t": 38.304,
+   "type": "key"
+  },
+  {
+   "t": 38.401,
+   "type": "key"
+  },
+  {
+   "t": 38.472,
+   "type": "typeEnd",
+   "label": "Faculty",
+   "box": {
+    "x": 246,
+    "y": 519.3125,
+    "width": 560,
+    "height": 31.5
+   }
+  },
+  {
+   "t": 39.795,
+   "type": "hover",
+   "label": "Laboratories",
+   "box": {
+    "x": 246,
+    "y": 585.8125,
+    "width": 560,
+    "height": 31.5
+   }
+  },
+  {
+   "t": 40.075,
+   "type": "click",
+   "label": "Laboratories",
+   "box": {
+    "x": 246,
+    "y": 585.8125,
+    "width": 560,
+    "height": 31.5
+   },
+   "x": 526,
+   "y": 601.5625
+  },
+  {
+   "t": 40.393,
+   "type": "typeStart",
+   "label": "Laboratories",
+   "box": {
+    "x": 246,
+    "y": 585.8125,
+    "width": 560,
+    "height": 31.5
+   },
+   "text": "8"
+  },
+  {
+   "t": 40.399,
+   "type": "key"
+  },
+  {
+   "t": 40.495,
+   "type": "typeEnd",
+   "label": "Laboratories",
+   "box": {
+    "x": 246,
+    "y": 585.8125,
+    "width": 560,
+    "height": 31.5
+   }
+  },
+  {
+   "t": 41.871,
+   "type": "hover",
+   "label": "Continue",
+   "box": {
+    "x": 767.734375,
+    "y": 653.3125,
+    "width": 83.34375,
+    "height": 31.5
+   }
+  },
+  {
+   "t": 42.152,
+   "type": "click",
+   "label": "Continue",
+   "box": {
+    "x": 767.734375,
+    "y": 653.3125,
+    "width": 83.34375,
+    "height": 31.5
+   },
+   "x": 809.40625,
+   "y": 669.0625
+  },
+  {
+   "t": 43.756,
+   "type": "hover",
+   "label": "Building plan",
+   "box": {
+    "x": 256.5,
+    "y": 544.5625,
+    "width": 1,
+    "height": 1
+   }
+  },
+  {
+   "t": 44.036,
+   "type": "click",
+   "label": "Building plan",
+   "box": {
+    "x": 256.5,
+    "y": 544.5625,
+    "width": 1,
+    "height": 1
+   },
+   "x": 257,
+   "y": 545.0625
+  },
+  {
+   "t": 44.589,
+   "type": "upload",
+   "label": "Building plan",
+   "box": {
+    "x": 256.5,
+    "y": 544.5625,
+    "width": 1,
+    "height": 1
+   },
+   "file": "plan.pdf"
+  },
+  {
+   "t": 46.159,
+   "type": "hover",
+   "label": "Affidavit",
+   "box": {
+    "x": 256.5,
+    "y": 634.0625,
+    "width": 1,
+    "height": 1
+   }
+  },
+  {
+   "t": 46.44,
+   "type": "click",
+   "label": "Affidavit",
+   "box": {
+    "x": 256.5,
+    "y": 634.0625,
+    "width": 1,
+    "height": 1
+   },
+   "x": 257,
+   "y": 634.5625
+  },
+  {
+   "t": 47.01,
+   "type": "upload",
+   "label": "Affidavit",
+   "box": {
+    "x": 256.5,
+    "y": 634.0625,
+    "width": 1,
+    "height": 1
+   },
+   "file": "affidavit.pdf"
+  },
+  {
+   "t": 48.619,
+   "type": "hover",
+   "label": "Continue",
+   "box": {
+    "x": 767.734375,
+    "y": 845.0625,
+    "width": 83.34375,
+    "height": 31.5
+   }
+  },
+  {
+   "t": 48.9,
+   "type": "click",
+   "label": "Continue",
+   "box": {
+    "x": 767.734375,
+    "y": 845.0625,
+    "width": 83.34375,
+    "height": 31.5
+   },
+   "x": 809.40625,
+   "y": 860.8125
+  },
+  {
+   "t": 49.461,
+   "type": "say",
+   "id": "ch2.b4",
+   "duration": 4.89
+  },
+  {
+   "t": 49.502,
+   "type": "result",
+   "label": "Blocked: names the missing document",
+   "box": {
+    "x": 278.5,
+    "y": 506.3125,
+    "width": 516,
+    "height": 17.5
+   }
+  },
+  {
+   "t": 50.543,
+   "type": "hover",
+   "label": "Submit is disabled",
+   "box": {
+    "x": 711.28125,
+    "y": 709.8125,
+    "width": 139.796875,
+    "height": 31.5
+   }
+  },
+  {
+   "t": 56.034,
+   "type": "hover",
+   "label": "Back",
+   "box": {
+    "x": 642.890625,
+    "y": 709.8125,
+    "width": 57.890625,
+    "height": 31.5
+   }
+  },
+  {
+   "t": 56.315,
+   "type": "click",
+   "label": "Back",
+   "box": {
+    "x": 642.890625,
+    "y": 709.8125,
+    "width": 57.890625,
+    "height": 31.5
+   },
+   "x": 671.8359375,
+   "y": 725.5625
+  },
+  {
+   "t": 57.87,
+   "type": "hover",
+   "label": "Land lease",
+   "box": {
+    "x": 256.5,
+    "y": 395.5625,
+    "width": 1,
+    "height": 1
+   }
+  },
+  {
+   "t": 58.151,
+   "type": "click",
+   "label": "Land lease",
+   "box": {
+    "x": 256.5,
+    "y": 395.5625,
+    "width": 1,
+    "height": 1
+   },
+   "x": 257,
+   "y": 396.0625
+  },
+  {
+   "t": 58.719,
+   "type": "upload",
+   "label": "Land lease",
+   "box": {
+    "x": 256.5,
+    "y": 395.5625,
+    "width": 1,
+    "height": 1
+   },
+   "file": "lease2.pdf"
+  },
+  {
+   "t": 60.148,
+   "type": "hover",
+   "label": "Lease expiry",
+   "box": {
+    "x": 257.5,
+    "y": 438.0625,
+    "width": 537,
+    "height": 31.5
+   }
+  },
+  {
+   "t": 60.428,
+   "type": "click",
+   "label": "Lease expiry",
+   "box": {
+    "x": 257.5,
+    "y": 438.0625,
+    "width": 537,
+    "height": 31.5
+   },
+   "x": 526,
+   "y": 453.8125
+  },
+  {
+   "t": 60.975,
+   "type": "say",
+   "id": "ch2.b5",
+   "duration": 2.418
+  },
+  {
+   "t": 62.158,
+   "type": "hover",
+   "label": "Continue",
+   "box": {
+    "x": 767.734375,
+    "y": 845.0625,
+    "width": 83.34375,
+    "height": 31.5
+   }
+  },
+  {
+   "t": 62.438,
+   "type": "click",
+   "label": "Continue",
+   "box": {
+    "x": 767.734375,
+    "y": 845.0625,
+    "width": 83.34375,
+    "height": 31.5
+   },
+   "x": 809.40625,
+   "y": 860.8125
+  },
+  {
+   "t": 65.283,
+   "type": "hover",
+   "label": "Submit application",
+   "box": {
+    "x": 711.28125,
+    "y": 495.8125,
+    "width": 139.796875,
+    "height": 31.5
+   }
+  },
+  {
+   "t": 65.563,
+   "type": "click",
+   "label": "Submit application",
+   "box": {
+    "x": 711.28125,
+    "y": 495.8125,
+    "width": 139.796875,
+    "height": 31.5
+   },
+   "x": 781.1796875,
+   "y": 511.5625
+  },
+  {
+   "t": 66.112,
+   "type": "say",
+   "id": "ch2.c",
+   "duration": 2.307
+  },
+  {
+   "t": 66.151,
+   "type": "result",
+   "label": "Submitted: S-2026-0168",
+   "box": {
+    "x": 231,
+    "y": 109.3125,
+    "width": 428.953125,
+    "height": 24.5
+   }
+  },
+  {
+   "t": 69.672,
+   "type": "mark",
+   "label": "end"
+  }
+ ]
+}

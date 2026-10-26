@@ -1,0 +1,643 @@
+{
+ "name": "ch4",
+ "duration": 37.173,
+ "scale": 1.2,
+ "viewport": {
+  "width": 1600,
+  "height": 900
+ },
+ "events": [
+  {
+   "t": -0.005,
+   "type": "attach"
+  },
+  {
+   "t": -0.005,
+   "type": "say",
+   "id": "ch4.b1",
+   "duration": 6.175
+  },
+  {
+   "t": 1.07,
+   "type": "hover",
+   "label": "Return to college",
+   "box": {
+    "x": 887.078125,
+    "y": 625.3125,
+    "width": 406.921875,
+    "height": 31.5
+   }
+  },
+  {
+   "t": 1.35,
+   "type": "click",
+   "label": "Return to college",
+   "box": {
+    "x": 887.078125,
+    "y": 625.3125,
+    "width": 406.921875,
+    "height": 31.5
+   },
+   "x": 1090.5390625,
+   "y": 641.0625
+  },
+  {
+   "t": 3.035,
+   "type": "hover",
+   "label": "Land lease or title deed",
+   "box": {
+    "x": 612,
+    "y": 174.25,
+    "width": 14,
+    "height": 14
+   }
+  },
+  {
+   "t": 3.316,
+   "type": "click",
+   "label": "Land lease or title deed",
+   "box": {
+    "x": 612,
+    "y": 174.25,
+    "width": 14,
+    "height": 14
+   },
+   "x": 619,
+   "y": 181.25
+  },
+  {
+   "t": 5.469,
+   "type": "hover",
+   "label": "Reason",
+   "box": {
+    "x": 612,
+    "y": 428.5,
+    "width": 376,
+    "height": 68.5
+   }
+  },
+  {
+   "t": 5.749,
+   "type": "click",
+   "label": "Reason",
+   "box": {
+    "x": 612,
+    "y": 428.5,
+    "width": 376,
+    "height": 68.5
+   },
+   "x": 800,
+   "y": 462.75
+  },
+  {
+   "t": 6.003,
+   "type": "typeStart",
+   "label": "Reason",
+   "box": {
+    "x": 612,
+    "y": 428.5,
+    "width": 376,
+    "height": 68.5
+   },
+   "text": "Lease covers 2 years, 3 required"
+  },
+  {
+   "t": 6.015,
+   "type": "key"
+  },
+  {
+   "t": 6.085,
+   "type": "key"
+  },
+  {
+   "t": 6.15,
+   "type": "key"
+  },
+  {
+   "t": 6.197,
+   "type": "key"
+  },
+  {
+   "t": 6.263,
+   "type": "key"
+  },
+  {
+   "t": 6.321,
+   "type": "key"
+  },
+  {
+   "t": 6.37,
+   "type": "key"
+  },
+  {
+   "t": 6.416,
+   "type": "key"
+  },
+  {
+   "t": 6.473,
+   "type": "key"
+  },
+  {
+   "t": 6.544,
+   "type": "key"
+  },
+  {
+   "t": 6.605,
+   "type": "key"
+  },
+  {
+   "t": 6.652,
+   "type": "key"
+  },
+  {
+   "t": 6.708,
+   "type": "key"
+  },
+  {
+   "t": 6.782,
+   "type": "key"
+  },
+  {
+   "t": 6.835,
+   "type": "key"
+  },
+  {
+   "t": 6.91,
+   "type": "key"
+  },
+  {
+   "t": 6.964,
+   "type": "key"
+  },
+  {
+   "t": 7.039,
+   "type": "key"
+  },
+  {
+   "t": 7.107,
+   "type": "key"
+  },
+  {
+   "t": 7.16,
+   "type": "key"
+  },
+  {
+   "t": 7.213,
+   "type": "key"
+  },
+  {
+   "t": 7.279,
+   "type": "key"
+  },
+  {
+   "t": 7.358,
+   "type": "key"
+  },
+  {
+   "t": 7.44,
+   "type": "key"
+  },
+  {
+   "t": 7.495,
+   "type": "key"
+  },
+  {
+   "t": 7.552,
+   "type": "key"
+  },
+  {
+   "t": 7.606,
+   "type": "key"
+  },
+  {
+   "t": 7.682,
+   "type": "key"
+  },
+  {
+   "t": 7.742,
+   "type": "key"
+  },
+  {
+   "t": 7.802,
+   "type": "key"
+  },
+  {
+   "t": 7.855,
+   "type": "key"
+  },
+  {
+   "t": 7.912,
+   "type": "key"
+  },
+  {
+   "t": 7.977,
+   "type": "typeEnd",
+   "label": "Reason",
+   "box": {
+    "x": 612,
+    "y": 428.5,
+    "width": 376,
+    "height": 68.5
+   }
+  },
+  {
+   "t": 9.536,
+   "type": "hover",
+   "label": "Return to college",
+   "box": {
+    "x": 857.671875,
+    "y": 543.5,
+    "width": 130.328125,
+    "height": 31.5
+   }
+  },
+  {
+   "t": 9.816,
+   "type": "click",
+   "label": "Return to college",
+   "box": {
+    "x": 857.671875,
+    "y": 543.5,
+    "width": 130.328125,
+    "height": 31.5
+   },
+   "x": 922.8359375,
+   "y": 559.25
+  },
+  {
+   "t": 10.373,
+   "type": "say",
+   "id": "ch4.b2",
+   "duration": 4.348
+  },
+  {
+   "t": 10.417,
+   "type": "result",
+   "label": "Clock paused: waiting on college",
+   "box": {
+    "x": 562.40625,
+    "y": 137.4375,
+    "width": 123.984375,
+    "height": 17.5
+   }
+  },
+  {
+   "t": 17.778,
+   "type": "attach"
+  },
+  {
+   "t": 17.789,
+   "type": "say",
+   "id": "ch4.b3",
+   "duration": 1.986
+  },
+  {
+   "t": 19.048,
+   "type": "hover",
+   "label": "Renewed lease (3 years)",
+   "box": {
+    "x": 245,
+    "y": 528.8125,
+    "width": 1,
+    "height": 1
+   }
+  },
+  {
+   "t": 19.328,
+   "type": "click",
+   "label": "Renewed lease (3 years)",
+   "box": {
+    "x": 245,
+    "y": 528.8125,
+    "width": 1,
+    "height": 1
+   },
+   "x": 245.5,
+   "y": 529.3125
+  },
+  {
+   "t": 19.892,
+   "type": "upload",
+   "label": "Renewed lease (3 years)",
+   "box": {
+    "x": 245,
+    "y": 528.8125,
+    "width": 1,
+    "height": 1
+   },
+   "file": "lease3.pdf"
+  },
+  {
+   "t": 21.435,
+   "type": "hover",
+   "label": "Expiry date",
+   "box": {
+    "x": 246,
+    "y": 571.3125,
+    "width": 560,
+    "height": 31.5
+   }
+  },
+  {
+   "t": 21.716,
+   "type": "click",
+   "label": "Expiry date",
+   "box": {
+    "x": 246,
+    "y": 571.3125,
+    "width": 560,
+    "height": 31.5
+   },
+   "x": 526,
+   "y": 587.0625
+  },
+  {
+   "t": 23.317,
+   "type": "hover",
+   "label": "Reply note",
+   "box": {
+    "x": 246,
+    "y": 637.8125,
+    "width": 560,
+    "height": 68.5
+   }
+  },
+  {
+   "t": 23.597,
+   "type": "click",
+   "label": "Reply note",
+   "box": {
+    "x": 246,
+    "y": 637.8125,
+    "width": 560,
+    "height": 68.5
+   },
+   "x": 526,
+   "y": 672.0625
+  },
+  {
+   "t": 23.84,
+   "type": "typeStart",
+   "label": "Reply note",
+   "box": {
+    "x": 246,
+    "y": 637.8125,
+    "width": 560,
+    "height": 68.5
+   },
+   "text": "Attached the renewed lease valid for 3 years."
+  },
+  {
+   "t": 23.855,
+   "type": "key"
+  },
+  {
+   "t": 23.906,
+   "type": "key"
+  },
+  {
+   "t": 23.959,
+   "type": "key"
+  },
+  {
+   "t": 24.015,
+   "type": "key"
+  },
+  {
+   "t": 24.063,
+   "type": "key"
+  },
+  {
+   "t": 24.116,
+   "type": "key"
+  },
+  {
+   "t": 24.172,
+   "type": "key"
+  },
+  {
+   "t": 24.242,
+   "type": "key"
+  },
+  {
+   "t": 24.284,
+   "type": "key"
+  },
+  {
+   "t": 24.326,
+   "type": "key"
+  },
+  {
+   "t": 24.378,
+   "type": "key"
+  },
+  {
+   "t": 24.44,
+   "type": "key"
+  },
+  {
+   "t": 24.513,
+   "type": "key"
+  },
+  {
+   "t": 24.559,
+   "type": "key"
+  },
+  {
+   "t": 24.61,
+   "type": "key"
+  },
+  {
+   "t": 24.663,
+   "type": "key"
+  },
+  {
+   "t": 24.723,
+   "type": "key"
+  },
+  {
+   "t": 24.76,
+   "type": "key"
+  },
+  {
+   "t": 24.804,
+   "type": "key"
+  },
+  {
+   "t": 24.868,
+   "type": "key"
+  },
+  {
+   "t": 24.917,
+   "type": "key"
+  },
+  {
+   "t": 24.972,
+   "type": "key"
+  },
+  {
+   "t": 25.026,
+   "type": "key"
+  },
+  {
+   "t": 25.082,
+   "type": "key"
+  },
+  {
+   "t": 25.149,
+   "type": "key"
+  },
+  {
+   "t": 25.221,
+   "type": "key"
+  },
+  {
+   "t": 25.269,
+   "type": "key"
+  },
+  {
+   "t": 25.327,
+   "type": "key"
+  },
+  {
+   "t": 25.394,
+   "type": "key"
+  },
+  {
+   "t": 25.438,
+   "type": "key"
+  },
+  {
+   "t": 25.484,
+   "type": "key"
+  },
+  {
+   "t": 25.525,
+   "type": "key"
+  },
+  {
+   "t": 25.567,
+   "type": "key"
+  },
+  {
+   "t": 25.629,
+   "type": "key"
+  },
+  {
+   "t": 25.697,
+   "type": "key"
+  },
+  {
+   "t": 25.747,
+   "type": "key"
+  },
+  {
+   "t": 25.8,
+   "type": "key"
+  },
+  {
+   "t": 25.839,
+   "type": "key"
+  },
+  {
+   "t": 25.888,
+   "type": "key"
+  },
+  {
+   "t": 25.957,
+   "type": "key"
+  },
+  {
+   "t": 26,
+   "type": "key"
+  },
+  {
+   "t": 26.073,
+   "type": "key"
+  },
+  {
+   "t": 26.138,
+   "type": "key"
+  },
+  {
+   "t": 26.179,
+   "type": "key"
+  },
+  {
+   "t": 26.216,
+   "type": "key"
+  },
+  {
+   "t": 26.279,
+   "type": "typeEnd",
+   "label": "Reply note",
+   "box": {
+    "x": 246,
+    "y": 637.8125,
+    "width": 560,
+    "height": 68.5
+   }
+  },
+  {
+   "t": 27.716,
+   "type": "hover",
+   "label": "Send reply",
+   "box": {
+    "x": 714.421875,
+    "y": 737.8125,
+    "width": 91.578125,
+    "height": 31.5
+   }
+  },
+  {
+   "t": 27.996,
+   "type": "click",
+   "label": "Send reply",
+   "box": {
+    "x": 714.421875,
+    "y": 737.8125,
+    "width": 91.578125,
+    "height": 31.5
+   },
+   "x": 760.2109375,
+   "y": 753.5625
+  },
+  {
+   "t": 28.599,
+   "type": "result",
+   "label": "Reply sent",
+   "box": {
+    "x": 1379.84375,
+    "y": 845.5,
+    "width": 206.15625,
+    "height": 40.5
+   }
+  },
+  {
+   "t": 30.811,
+   "type": "attach"
+  },
+  {
+   "t": 30.818,
+   "type": "say",
+   "id": "ch4.c",
+   "duration": 3.984
+  },
+  {
+   "t": 30.866,
+   "type": "result",
+   "label": "Back with Priya, remaining days",
+   "box": {
+    "x": 246,
+    "y": 267.3125,
+    "width": 1048,
+    "height": 17.5
+   }
+  },
+  {
+   "t": 36.052,
+   "type": "mark",
+   "label": "end"
+  }
+ ]
+}

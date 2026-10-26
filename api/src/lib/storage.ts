@@ -1,9 +1,14 @@
 // Uploads: PDF, PNG and JPEG only (MIME and extension), 10 MB, random UUID names, never served statically.
+// STORAGE_DRIVER=db keeps the bytes in the StoredBlob table instead of on disk (hosted demo: no writable disk, and
+// the demo reset then restores files together with the rows that point at them).
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import multer from 'multer';
 import { badRequest } from './errors.js';
+import { prisma } from './db.js';
+
+const inDb = () => process.env.STORAGE_DRIVER === 'db';
 
 export const MAX_UPLOAD_BYTES = 10 * 1024 * 1024;
 const ALLOWED: Record<string, string[]> = {
@@ -36,20 +41,37 @@ export interface StoredFile {
   size: number;
 }
 
-export function saveBuffer(buf: Buffer, originalName: string, mimeType: string): StoredFile {
+export async function saveBuffer(buf: Buffer, originalName: string, mimeType: string): Promise<StoredFile> {
   const ext = path.extname(originalName).toLowerCase();
   const storedName = `${crypto.randomUUID()}${ext}`;
-  fs.writeFileSync(path.join(storageDir(), storedName), buf);
+  if (inDb()) await prisma.storedBlob.create({ data: { name: storedName, data: buf } });
+  else fs.writeFileSync(path.join(storageDir(), storedName), buf);
   return { storedName, fileName: path.basename(originalName).slice(0, 200), mimeType, size: buf.length };
 }
 
-export function removeStored(names: string[]): void {
-  for (const n of names) fs.rmSync(path.join(storageDir(), n), { force: true });
+export async function removeStored(names: string[]): Promise<void> {
+  if (inDb()) await prisma.storedBlob.deleteMany({ where: { name: { in: names } } }).catch(() => undefined);
+  else for (const n of names) fs.rmSync(path.join(storageDir(), n), { force: true });
+}
+
+function checkName(storedName: string): void {
+  if (!/^[0-9a-f-]{36}\.(pdf|png|jpe?g)$/.test(storedName)) throw badRequest('Invalid file reference.');
 }
 
 export function storedPath(storedName: string): string {
-  if (!/^[0-9a-f-]{36}\.(pdf|png|jpe?g)$/.test(storedName)) throw badRequest('Invalid file reference.');
+  checkName(storedName);
   return path.join(storageDir(), storedName);
+}
+
+/** The stored bytes, or null when the file is missing. */
+export async function readStored(storedName: string): Promise<Buffer | null> {
+  checkName(storedName);
+  if (inDb()) {
+    const row = await prisma.storedBlob.findUnique({ where: { name: storedName } });
+    return row ? Buffer.from(row.data) : null;
+  }
+  const p = storedPath(storedName);
+  return fs.existsSync(p) ? fs.readFileSync(p) : null;
 }
 
 /** Minimal valid one-page PDF with a few lines of text (seed placeholders). */

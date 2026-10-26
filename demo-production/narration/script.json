@@ -1,0 +1,377 @@
+{
+  "voice": "Chatterbox (ResembleAI, default voice), CPU, offline",
+  "defaults": {
+    "exaggeration": 0.45,
+    "cfg_weight": 0.5,
+    "sentenceGap": 0.42,
+    "ellipsisGap": 0.5
+  },
+  "chapters": [
+    {
+      "id": "ch0",
+      "title": "AICTE Demo Website",
+      "purpose": "Approval workflow prototype",
+      "lines": [
+        {
+          "id": "ch0.a",
+          "part": "A",
+          "text": "Approving a technical institution takes many hands, many documents, and many deadlines.",
+          "exaggeration": 0.5
+        },
+        {
+          "id": "ch0.d",
+          "part": "D",
+          "text": "This prototype keeps every one of them visible, from the first form to the final decision."
+        }
+      ]
+    },
+    {
+      "id": "ch1",
+      "title": "The public portal",
+      "purpose": "Schedules and rule changes, open to everyone",
+      "short": true,
+      "lines": [
+        {
+          "id": "ch1.a",
+          "part": "A",
+          "text": "Before anyone signs in, the public portal shows this cycle's schedule, and every rule change."
+        },
+        {
+          "id": "ch1.b1",
+          "part": "B",
+          "text": "Text can be made larger."
+        },
+        {
+          "id": "ch1.b2",
+          "part": "B",
+          "text": "The whole site switches to Hindi."
+        },
+        {
+          "id": "ch1.b3",
+          "part": "B",
+          "text": "And a high-contrast mode helps anyone with low vision."
+        },
+        {
+          "id": "ch1.d",
+          "part": "D",
+          "text": "Accessibility is not an extra screen. It is built into every page.",
+          "exaggeration": 0.55
+        }
+      ]
+    },
+    {
+      "id": "ch2",
+      "title": "A college files",
+      "purpose": "Catch mistakes while the form is being filled",
+      "short": true,
+      "lines": [
+        {
+          "id": "ch2.a",
+          "part": "A",
+          "text": "Applications are long, and a mistake found months later can cost a college the whole cycle.",
+          "exaggeration": 0.5
+        },
+        {
+          "id": "ch2.b1",
+          "part": "B",
+          "text": "ABC Engineering College starts a new application. The header shows the cycle, and the exact rules version it is filing under."
+        },
+        {
+          "id": "ch2.b2",
+          "part": "B",
+          "text": "Here, the built-up area is entered as larger than the land itself."
+        },
+        {
+          "id": "ch2.b3",
+          "part": "B",
+          "text": "Check my entries flags it straight away, as advice, not a block. The college corrects the figure."
+        },
+        {
+          "id": "ch2.b4",
+          "part": "B",
+          "text": "But a missing critical document does block submission, and the message names it: the land lease."
+        },
+        {
+          "id": "ch2.b5",
+          "part": "B",
+          "text": "With the lease attached, the application goes in."
+        },
+        {
+          "id": "ch2.c",
+          "part": "C",
+          "text": "Submitted, with its own application number.",
+          "exaggeration": 0.55
+        },
+        {
+          "id": "ch2.d",
+          "part": "D",
+          "text": "Problems are caught at the desk, not months later."
+        }
+      ]
+    },
+    {
+      "id": "ch3",
+      "title": "Assigned, with reasons",
+      "purpose": "Who handles a case, and why",
+      "lines": [
+        {
+          "id": "ch3.a",
+          "part": "A",
+          "text": "In most offices, who handles a case, and why, is invisible."
+        },
+        {
+          "id": "ch3.b",
+          "part": "B",
+          "text": "The new case is already in Priya's Action Center."
+        },
+        {
+          "id": "ch3.c",
+          "part": "C",
+          "text": "And it says why: she is the portfolio officer for this college, with her workload and the rules version that applies."
+        },
+        {
+          "id": "ch3.d",
+          "part": "D",
+          "text": "Every assignment explains itself."
+        }
+      ]
+    },
+    {
+      "id": "ch4",
+      "title": "Return and reply",
+      "purpose": "A clock that is fair to both sides",
+      "short": true,
+      "lines": [
+        {
+          "id": "ch4.a",
+          "part": "A",
+          "text": "Delays are often blamed on the wrong side.",
+          "exaggeration": 0.5
+        },
+        {
+          "id": "ch4.b1",
+          "part": "B",
+          "text": "Priya finds the lease covers only two years. She returns the application, naming the document and the reason."
+        },
+        {
+          "id": "ch4.b2",
+          "part": "B",
+          "text": "The case turns amber. The clock is paused, because the next move is the college's."
+        },
+        {
+          "id": "ch4.b3",
+          "part": "B",
+          "text": "The college replies with a three-year lease."
+        },
+        {
+          "id": "ch4.c",
+          "part": "C",
+          "text": "And the case goes straight back to Priya, with the days that were left, not a fresh deadline.",
+          "exaggeration": 0.6
+        },
+        {
+          "id": "ch4.d",
+          "part": "D",
+          "text": "The clock is fair to both sides."
+        }
+      ]
+    },
+    {
+      "id": "ch5",
+      "title": "Deadlines that escalate",
+      "purpose": "Overdue work never goes quiet",
+      "short": true,
+      "lines": [
+        {
+          "id": "ch5.a",
+          "part": "A",
+          "text": "Overdue work tends to be forgotten, quietly.",
+          "exaggeration": 0.5
+        },
+        {
+          "id": "ch5.b",
+          "part": "B",
+          "text": "For the demo, the administrator moves the simulated date forward by twenty days."
+        },
+        {
+          "id": "ch5.c",
+          "part": "C",
+          "text": "The deadline engine has escalated the unscheduled visit to the manager, Kumar. Exactly once. And his dashboard shows why."
+        },
+        {
+          "id": "ch5.d",
+          "part": "D",
+          "text": "Nothing slips through unnoticed.",
+          "exaggeration": 0.55
+        }
+      ]
+    },
+    {
+      "id": "ch6",
+      "title": "Leave and workload",
+      "purpose": "Work follows capacity",
+      "lines": [
+        {
+          "id": "ch6.a",
+          "part": "A",
+          "text": "When an officer is away, their queue usually just stops."
+        },
+        {
+          "id": "ch6.b1",
+          "part": "B",
+          "text": "Kumar records a week of medical leave for Arjun. His open tasks are released, and reassigned, each with a reason."
+        },
+        {
+          "id": "ch6.b2",
+          "part": "B",
+          "text": "Kumar can also move work by hand. The system recommends who has capacity, and his choice is recorded."
+        },
+        {
+          "id": "ch6.d",
+          "part": "D",
+          "text": "Work follows capacity, not chance."
+        }
+      ]
+    },
+    {
+      "id": "ch7",
+      "title": "Visit, decision, compliance",
+      "purpose": "Approval is not the end",
+      "lines": [
+        {
+          "id": "ch7.a",
+          "part": "A",
+          "text": "Approval is not the end. The conditions attached to it have to be met."
+        },
+        {
+          "id": "ch7.b1",
+          "part": "B",
+          "text": "Ravi schedules the expert visit, with a committee proposed by the system."
+        },
+        {
+          "id": "ch7.b2",
+          "part": "B",
+          "text": "The committee files its report."
+        },
+        {
+          "id": "ch7.b3",
+          "part": "B",
+          "text": "And the competent authority approves, with a condition: a fire no-objection certificate within ninety days."
+        },
+        {
+          "id": "ch7.b4",
+          "part": "B",
+          "text": "Eighty-five days later, after reminders at thirty, fifteen and seven days, the college uploads the certificate. Priya verifies it."
+        },
+        {
+          "id": "ch7.c",
+          "part": "C",
+          "text": "And the case closes, on its own.",
+          "exaggeration": 0.6
+        },
+        {
+          "id": "ch7.d",
+          "part": "D",
+          "text": "From application to closure, one traceable thread."
+        }
+      ]
+    },
+    {
+      "id": "ch8",
+      "title": "Rules change every year",
+      "purpose": "Change that is previewed, approved and announced",
+      "short": true,
+      "lines": [
+        {
+          "id": "ch8.a",
+          "part": "A",
+          "text": "Rules change every year. Sudden changes surprise colleges, and break systems.",
+          "exaggeration": 0.5
+        },
+        {
+          "id": "ch8.b1",
+          "part": "B",
+          "text": "A rules editor drafts an amendment: a new required document, and a longer application window."
+        },
+        {
+          "id": "ch8.b2",
+          "part": "B",
+          "text": "Applying the new document to cases already filed is refused. A tighter rule can only apply to new applications."
+        },
+        {
+          "id": "ch8.b3",
+          "part": "B",
+          "text": "Before anything is published, the impact preview shows exactly who would be affected."
+        },
+        {
+          "id": "ch8.b4",
+          "part": "B",
+          "text": "Then a different person, the rules approver, reviews it and publishes it. Nobody can approve their own change."
+        },
+        {
+          "id": "ch8.c",
+          "part": "C",
+          "text": "And the college sees the change the next time it signs in."
+        },
+        {
+          "id": "ch8.d",
+          "part": "D",
+          "text": "Every change is previewed, approved by two people, and announced.",
+          "exaggeration": 0.6
+        }
+      ]
+    },
+    {
+      "id": "ch9",
+      "title": "Trust",
+      "purpose": "A record that cannot be quietly changed",
+      "short": true,
+      "lines": [
+        {
+          "id": "ch9.a",
+          "part": "A",
+          "text": "An audit log that can be edited proves nothing."
+        },
+        {
+          "id": "ch9.b1",
+          "part": "B",
+          "text": "Every action is chained by hash. Verify integrity, and every row checks out."
+        },
+        {
+          "id": "ch9.b2",
+          "part": "B",
+          "text": "Now, with a demo tool, one row is changed directly in the database."
+        },
+        {
+          "id": "ch9.c1",
+          "part": "C",
+          "text": "Verification points to the exact broken row.",
+          "exaggeration": 0.55
+        },
+        {
+          "id": "ch9.c2",
+          "part": "C",
+          "text": "And when an officer opens a case outside their region, access is refused, and logged."
+        },
+        {
+          "id": "ch9.d",
+          "part": "D",
+          "text": "Tamper-evident, and scoped to every role."
+        }
+      ]
+    },
+    {
+      "id": "ch10",
+      "title": "Try it",
+      "purpose": "aicte-demo-website.vercel.app",
+      "lines": [
+        {
+          "id": "ch10.d",
+          "part": "D",
+          "text": "The AICTE Demo Website. A prototype on synthetic data, for Smart India Hackathon twenty twenty-six. Try it live, at the link on screen.",
+          "exaggeration": 0.55
+        }
+      ]
+    }
+  ]
+}

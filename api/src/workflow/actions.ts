@@ -116,8 +116,8 @@ async function releaseOpen(tx: Tx, applicationId: string, taskTypes: TaskType[],
   return open;
 }
 
-function storeUploads(files: UploadInput[]): StoredFile[] {
-  return files.map((f) => saveBuffer(f.buffer, f.originalname, f.mimetype));
+function storeUploads(files: UploadInput[]): Promise<StoredFile[]> {
+  return Promise.all(files.map((f) => saveBuffer(f.buffer, f.originalname, f.mimetype)));
 }
 
 // ---------------------------------------------------------------- SUBMIT
@@ -202,7 +202,7 @@ export async function submitApplication(user: AuthUser, input: z.infer<typeof su
     throw badRequest('Explain the warnings from "Check my entries" before you submit.', { justificationRequired: true, formCheckId: check.id });
   }
 
-  const stored = storeUploads(files);
+  const stored = await storeUploads(files);
   try {
     return await prisma.$transaction(async (tx) => {
       const route = r.route(type, { ...ctx, formData: values as Record<string, unknown> }) as Stage[];
@@ -279,7 +279,7 @@ export async function submitApplication(user: AuthUser, input: z.infer<typeof su
       return app.id;
     }, TX_OPTIONS);
   } catch (e) {
-    removeStored(stored.map((s) => s.storedName));
+    await removeStored(stored.map((s) => s.storedName));
     throw e;
   }
 }
@@ -342,7 +342,7 @@ export async function performAction(user: AuthUser, applicationId: string, actio
     await logAccessDenied(user, { applicationId, action, reason: decision.reason });
     throw new HttpError(decision.status, decision.status === 404 ? "You don't have access to this page." : decision.reason);
   }
-  const stored = action === 'REPLY' ? storeUploads(files) : [];
+  const stored = action === 'REPLY' ? await storeUploads(files) : [];
   try {
     await prisma.$transaction(async (tx) => {
       // Lock the row, re-read and re-check the state (another action may have moved the case).
@@ -365,7 +365,7 @@ export async function performAction(user: AuthUser, applicationId: string, actio
       for (const n of result.notifications ?? []) await notify(tx, n.userIds, { applicationId, kind: action, message: n.message });
     }, TX_OPTIONS);
   } catch (e) {
-    removeStored(stored.map((s) => s.storedName));
+    await removeStored(stored.map((s) => s.storedName));
     throw e;
   }
 }
@@ -601,7 +601,7 @@ export async function uploadEvidence(user: AuthUser, undertakingId: string, file
   if (user.role !== 'COLLEGE' || user.institutionId !== app.institutionId) return denied(user, app.id, 'UPLOAD_EVIDENCE', 'Only the institution can upload evidence.', 404);
   if (u.status !== 'OPEN') throw conflict(u.status === 'SUBMITTED' ? 'Evidence is already waiting for verification.' : 'This undertaking is already verified.');
   const f = single(file);
-  const s = saveBuffer(f.buffer, f.originalname, f.mimetype);
+  const s = await saveBuffer(f.buffer, f.originalname, f.mimetype);
   try {
     await prisma.$transaction(async (tx) => {
       const doc = await tx.document.create({
@@ -615,7 +615,7 @@ export async function uploadEvidence(user: AuthUser, undertakingId: string, file
       await appendAudit(tx, { actorId: user.id, actorRole: user.role, action: 'UPLOAD_EVIDENCE', applicationId: app.id, reason: note ?? null, meta: { undertakingId: u.id, condition: u.condition, documentId: doc.id } });
     }, TX_OPTIONS);
   } catch (e) {
-    removeStored([s.storedName]);
+    await removeStored([s.storedName]);
     throw e;
   }
 }
@@ -683,7 +683,7 @@ export async function uploadRenewal(user: AuthUser, documentId: string, file: Up
   const expiry = parseDateOnly(parse(z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Use the format YYYY-MM-DD'), expiryDate));
   if (expiry <= today()) throw badRequest('The new expiry date must be in the future.');
   const f = single(file);
-  const s = saveBuffer(f.buffer, f.originalname, f.mimetype);
+  const s = await saveBuffer(f.buffer, f.originalname, f.mimetype);
   try {
     await prisma.$transaction(async (tx) => {
       const doc = await tx.document.create({
@@ -696,7 +696,7 @@ export async function uploadRenewal(user: AuthUser, documentId: string, file: Up
       await appendAudit(tx, { actorId: user.id, actorRole: user.role, action: 'UPLOAD_RENEWAL', applicationId: app.id, meta: { documentId: doc.id, supersedesId: old.id, kind: old.kind, expiryDate } });
     }, TX_OPTIONS);
   } catch (e) {
-    removeStored([s.storedName]);
+    await removeStored([s.storedName]);
     throw e;
   }
 }

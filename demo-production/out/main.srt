@@ -1,0 +1,215 @@
+1
+00:00:00,600 --> 00:00:05,375
+Approving a technical institution takes many hands, many documents, and many deadlines.
+
+2
+00:00:05,475 --> 00:00:09,731
+This prototype keeps every one of them visible, from the first form to the final decision.
+
+3
+00:00:11,831 --> 00:00:16,999
+Before anyone signs in, the public portal shows this cycle's schedule, and every rule change.
+
+4
+00:00:18,488 --> 00:00:20,132
+Text can be made larger.
+
+5
+00:00:21,325 --> 00:00:23,311
+The whole site switches to Hindi.
+
+6
+00:00:24,132 --> 00:00:27,002
+And a high-contrast mode helps anyone with low vision.
+
+7
+00:00:29,053 --> 00:00:33,413
+Accessibility is not an extra screen. It is built into every page.
+
+8
+00:00:35,013 --> 00:00:39,499
+Applications are long, and a mistake found months later can cost a college the whole cycle.
+
+9
+00:00:43,267 --> 00:00:49,956
+ABC Engineering College starts a new application. The header shows the cycle, and the exact rules version it is filing under.
+
+10
+00:00:50,801 --> 00:00:54,291
+Here, the built-up area is entered as larger than the land itself.
+
+11
+00:00:56,353 --> 00:01:02,125
+Check my entries flags it straight away, as advice, not a block. The college corrects the figure.
+
+12
+00:01:10,166 --> 00:01:15,256
+But a missing critical document does block submission, and the message names it: the land lease.
+
+13
+00:01:17,819 --> 00:01:20,437
+With the lease attached, the application goes in.
+
+14
+00:01:21,628 --> 00:01:24,135
+Submitted, with its own application number.
+
+15
+00:01:25,988 --> 00:01:28,538
+Problems are caught at the desk, not months later.
+
+16
+00:01:30,138 --> 00:01:33,675
+In most offices, who handles a case, and why, is invisible.
+
+17
+00:01:33,708 --> 00:01:36,445
+The new case is already in Priya's Action Center.
+
+18
+00:01:37,699 --> 00:01:43,355
+And it says why: she is the portfolio officer for this college, with her workload and the rules version that applies.
+
+19
+00:01:45,211 --> 00:01:47,186
+Every assignment explains itself.
+
+20
+00:01:48,786 --> 00:01:51,053
+Delays are often blamed on the wrong side.
+
+21
+00:01:42,670 --> 00:01:49,045
+Priya finds the lease covers only two years. She returns the application, naming the document and the reason.
+
+22
+00:01:59,782 --> 00:02:04,330
+The case turns amber. The clock is paused, because the next move is the college's.
+
+23
+00:02:05,525 --> 00:02:07,711
+The college replies with a three-year lease.
+
+24
+00:02:13,493 --> 00:02:17,677
+And the case goes straight back to Priya, with the days that were left, not a fresh deadline.
+
+25
+00:02:19,527 --> 00:02:21,468
+The clock is fair to both sides.
+
+26
+00:02:23,068 --> 00:02:25,639
+Overdue work tends to be forgotten, quietly.
+
+27
+00:02:23,422 --> 00:02:27,275
+For the demo, the administrator moves the simulated date forward by twenty days.
+
+28
+00:02:35,137 --> 00:02:42,866
+The deadline engine has escalated the unscheduled visit to the manager, Kumar. Exactly once. And his dashboard shows why.
+
+29
+00:02:44,718 --> 00:02:46,443
+Nothing slips through unnoticed.
+
+30
+00:02:48,043 --> 00:02:51,215
+When an officer is away, their queue usually just stops.
+
+31
+00:02:46,625 --> 00:02:53,289
+Kumar records a week of medical leave for Arjun. His open tasks are released, and reassigned, each with a reason.
+
+32
+00:03:01,335 --> 00:03:07,654
+Kumar can also move work by hand. The system recommends who has capacity, and his choice is recorded.
+
+33
+00:03:10,783 --> 00:03:13,571
+Work follows capacity, not chance.
+
+34
+00:03:15,171 --> 00:03:19,608
+Approval is not the end. The conditions attached to it have to be met.
+
+35
+00:02:56,296 --> 00:03:00,115
+Ravi schedules the expert visit, with a committee proposed by the system.
+
+36
+00:03:28,171 --> 00:03:29,895
+The committee files its report.
+
+37
+00:03:36,756 --> 00:03:41,869
+And the competent authority approves, with a condition: a fire no-objection certificate within ninety days.
+
+38
+00:03:50,228 --> 00:03:56,997
+Eighty-five days later, after reminders at thirty, fifteen and seven days, the college uploads the certificate. Priya verifies it.
+
+39
+00:04:00,926 --> 00:04:03,067
+And the case closes, on its own.
+
+40
+00:04:04,918 --> 00:04:08,086
+From application to closure, one traceable thread.
+
+41
+00:04:09,686 --> 00:04:15,117
+Rules change every year. Sudden changes surprise colleges, and break systems.
+
+42
+00:03:48,601 --> 00:03:53,739
+A rules editor drafts an amendment: a new required document, and a longer application window.
+
+43
+00:04:31,936 --> 00:04:38,426
+Applying the new document to cases already filed is refused. A tighter rule can only apply to new applications.
+
+44
+00:04:43,844 --> 00:04:48,077
+Before anything is published, the impact preview shows exactly who would be affected.
+
+45
+00:04:51,527 --> 00:04:58,528
+Then a different person, the rules approver, reviews it and publishes it. Nobody can approve their own change.
+
+46
+00:05:01,451 --> 00:05:04,302
+And the college sees the change the next time it signs in.
+
+47
+00:05:06,155 --> 00:05:09,275
+Every change is previewed, approved by two people, and announced.
+
+48
+00:05:10,875 --> 00:05:13,398
+An audit log that can be edited proves nothing.
+
+49
+00:05:15,287 --> 00:05:20,361
+Every action is chained by hash. Verify integrity, and every row checks out.
+
+50
+00:05:20,612 --> 00:05:24,495
+Now, with a demo tool, one row is changed directly in the database.
+
+51
+00:05:25,820 --> 00:05:28,471
+Verification points to the exact broken row.
+
+52
+00:05:29,755 --> 00:05:34,544
+And when an officer opens a case outside their region, access is refused, and logged.
+
+53
+00:05:36,396 --> 00:05:39,037
+Tamper-evident, and scoped to every role.
+
+54
+00:05:40,737 --> 00:05:49,588
+The AICTE Demo Website. A prototype on synthetic data, for Smart India Hackathon twenty twenty-six. Try it live, at the link on screen.

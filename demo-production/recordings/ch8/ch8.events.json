@@ -1,0 +1,1225 @@
+{
+ "name": "ch8",
+ "duration": 76.732,
+ "scale": 1.2,
+ "viewport": {
+  "width": 1600,
+  "height": 900
+ },
+ "events": [
+  {
+   "t": -0.028,
+   "type": "attach"
+  },
+  {
+   "t": -0.027,
+   "type": "say",
+   "id": "ch8.b1",
+   "duration": 4.938
+  },
+  {
+   "t": 1.335,
+   "type": "hover",
+   "label": "Draft an amendment",
+   "box": {
+    "x": 231,
+    "y": 145.8125,
+    "width": 177.953125,
+    "height": 31.5
+   }
+  },
+  {
+   "t": 1.615,
+   "type": "click",
+   "label": "Draft an amendment",
+   "box": {
+    "x": 231,
+    "y": 145.8125,
+    "width": 177.953125,
+    "height": 31.5
+   },
+   "x": 319.9765625,
+   "y": 161.5625
+  },
+  {
+   "t": 3.409,
+   "type": "hover",
+   "label": "Source: corrigendum",
+   "box": {
+    "x": 612,
+    "y": 274,
+    "width": 376,
+    "height": 31.5
+   }
+  },
+  {
+   "t": 3.689,
+   "type": "click",
+   "label": "Source: corrigendum",
+   "box": {
+    "x": 612,
+    "y": 274,
+    "width": 376,
+    "height": 31.5
+   },
+   "x": 800,
+   "y": 289.75
+  },
+  {
+   "t": 3.999,
+   "type": "select",
+   "label": "Source: corrigendum",
+   "box": {
+    "x": 612,
+    "y": 274,
+    "width": 376,
+    "height": 31.5
+   }
+  },
+  {
+   "t": 5.701,
+   "type": "hover",
+   "label": "Reference",
+   "box": {
+    "x": 612,
+    "y": 340.5,
+    "width": 376,
+    "height": 31.5
+   }
+  },
+  {
+   "t": 5.982,
+   "type": "click",
+   "label": "Reference",
+   "box": {
+    "x": 612,
+    "y": 340.5,
+    "width": 376,
+    "height": 31.5
+   },
+   "x": 800,
+   "y": 356.25
+  },
+  {
+   "t": 6.245,
+   "type": "typeStart",
+   "label": "Reference",
+   "box": {
+    "x": 612,
+    "y": 340.5,
+    "width": 376,
+    "height": 31.5
+   },
+   "text": "PROTOTYPE/CORR/2027-28/1"
+  },
+  {
+   "t": 6.274,
+   "type": "key"
+  },
+  {
+   "t": 6.316,
+   "type": "key"
+  },
+  {
+   "t": 6.393,
+   "type": "key"
+  },
+  {
+   "t": 6.469,
+   "type": "key"
+  },
+  {
+   "t": 6.511,
+   "type": "key"
+  },
+  {
+   "t": 6.575,
+   "type": "key"
+  },
+  {
+   "t": 6.613,
+   "type": "key"
+  },
+  {
+   "t": 6.665,
+   "type": "key"
+  },
+  {
+   "t": 6.733,
+   "type": "key"
+  },
+  {
+   "t": 6.808,
+   "type": "key"
+  },
+  {
+   "t": 6.875,
+   "type": "key"
+  },
+  {
+   "t": 6.913,
+   "type": "key"
+  },
+  {
+   "t": 6.974,
+   "type": "key"
+  },
+  {
+   "t": 7.04,
+   "type": "key"
+  },
+  {
+   "t": 7.109,
+   "type": "key"
+  },
+  {
+   "t": 7.181,
+   "type": "key"
+  },
+  {
+   "t": 7.239,
+   "type": "key"
+  },
+  {
+   "t": 7.294,
+   "type": "key"
+  },
+  {
+   "t": 7.343,
+   "type": "key"
+  },
+  {
+   "t": 7.397,
+   "type": "key"
+  },
+  {
+   "t": 7.439,
+   "type": "key"
+  },
+  {
+   "t": 7.509,
+   "type": "key"
+  },
+  {
+   "t": 7.574,
+   "type": "key"
+  },
+  {
+   "t": 7.62,
+   "type": "key"
+  },
+  {
+   "t": 7.66,
+   "type": "typeEnd",
+   "label": "Reference",
+   "box": {
+    "x": 612,
+    "y": 340.5,
+    "width": 376,
+    "height": 31.5
+   }
+  },
+  {
+   "t": 9.193,
+   "type": "hover",
+   "label": "Title",
+   "box": {
+    "x": 612,
+    "y": 491,
+    "width": 376,
+    "height": 31.5
+   }
+  },
+  {
+   "t": 9.474,
+   "type": "click",
+   "label": "Title",
+   "box": {
+    "x": 612,
+    "y": 491,
+    "width": 376,
+    "height": 31.5
+   },
+   "x": 800,
+   "y": 506.75
+  },
+  {
+   "t": 9.711,
+   "type": "typeStart",
+   "label": "Title",
+   "box": {
+    "x": 612,
+    "y": 491,
+    "width": 376,
+    "height": 31.5
+   },
+   "text": "Corrigendum (prototype)"
+  },
+  {
+   "t": 9.717,
+   "type": "key"
+  },
+  {
+   "t": 9.77,
+   "type": "key"
+  },
+  {
+   "t": 9.829,
+   "type": "key"
+  },
+  {
+   "t": 9.904,
+   "type": "key"
+  },
+  {
+   "t": 9.989,
+   "type": "key"
+  },
+  {
+   "t": 10.05,
+   "type": "key"
+  },
+  {
+   "t": 10.107,
+   "type": "key"
+  },
+  {
+   "t": 10.177,
+   "type": "key"
+  },
+  {
+   "t": 10.244,
+   "type": "key"
+  },
+  {
+   "t": 10.286,
+   "type": "key"
+  },
+  {
+   "t": 10.335,
+   "type": "key"
+  },
+  {
+   "t": 10.372,
+   "type": "key"
+  },
+  {
+   "t": 10.412,
+   "type": "key"
+  },
+  {
+   "t": 10.453,
+   "type": "key"
+  },
+  {
+   "t": 10.518,
+   "type": "key"
+  },
+  {
+   "t": 10.561,
+   "type": "key"
+  },
+  {
+   "t": 10.62,
+   "type": "key"
+  },
+  {
+   "t": 10.679,
+   "type": "key"
+  },
+  {
+   "t": 10.745,
+   "type": "key"
+  },
+  {
+   "t": 10.807,
+   "type": "key"
+  },
+  {
+   "t": 10.878,
+   "type": "key"
+  },
+  {
+   "t": 10.922,
+   "type": "key"
+  },
+  {
+   "t": 10.963,
+   "type": "key"
+  },
+  {
+   "t": 11.025,
+   "type": "typeEnd",
+   "label": "Title",
+   "box": {
+    "x": 612,
+    "y": 491,
+    "width": 376,
+    "height": 31.5
+   }
+  },
+  {
+   "t": 12.574,
+   "type": "hover",
+   "label": "Summary for colleges",
+   "box": {
+    "x": 612,
+    "y": 557.5,
+    "width": 376,
+    "height": 68.5
+   }
+  },
+  {
+   "t": 13.806,
+   "type": "hover",
+   "label": "Create draft",
+   "box": {
+    "x": 887.71875,
+    "y": 672.5,
+    "width": 100.28125,
+    "height": 31.5
+   }
+  },
+  {
+   "t": 14.089,
+   "type": "click",
+   "label": "Create draft",
+   "box": {
+    "x": 887.71875,
+    "y": 672.5,
+    "width": 100.28125,
+    "height": 31.5
+   },
+   "x": 937.859375,
+   "y": 688.25
+  },
+  {
+   "t": 15.78,
+   "type": "hover",
+   "label": "Documents",
+   "box": {
+    "x": 231,
+    "y": 621.3125,
+    "width": 253.75,
+    "height": 31.5
+   }
+  },
+  {
+   "t": 16.06,
+   "type": "click",
+   "label": "Documents",
+   "box": {
+    "x": 231,
+    "y": 621.3125,
+    "width": 253.75,
+    "height": 31.5
+   },
+   "x": 357.875,
+   "y": 637.0625
+  },
+  {
+   "t": 17.89,
+   "type": "hover",
+   "label": "Add a document",
+   "box": {
+    "x": 505.75,
+    "y": 666.0625,
+    "width": 135.375,
+    "height": 28
+   }
+  },
+  {
+   "t": 18.171,
+   "type": "click",
+   "label": "Add a document",
+   "box": {
+    "x": 505.75,
+    "y": 666.0625,
+    "width": 135.375,
+    "height": 28
+   },
+   "x": 573.4375,
+   "y": 680.0625
+  },
+  {
+   "t": 19.844,
+   "type": "hover",
+   "label": "Kind",
+   "box": {
+    "x": 513.75,
+    "y": 664.3125,
+    "width": 35.4375,
+    "height": 28
+   }
+  },
+  {
+   "t": 20.125,
+   "type": "click",
+   "label": "Kind",
+   "box": {
+    "x": 513.75,
+    "y": 664.3125,
+    "width": 35.4375,
+    "height": 28
+   },
+   "x": 531.46875,
+   "y": 678.3125
+  },
+  {
+   "t": 20.435,
+   "type": "typeStart",
+   "label": "Kind",
+   "box": {
+    "x": 513.75,
+    "y": 664.3125,
+    "width": 35.4375,
+    "height": 28
+   },
+   "text": "FIRE_SAFETY_AUDIT"
+  },
+  {
+   "t": 20.457,
+   "type": "key"
+  },
+  {
+   "t": 20.516,
+   "type": "key"
+  },
+  {
+   "t": 20.589,
+   "type": "key"
+  },
+  {
+   "t": 20.667,
+   "type": "key"
+  },
+  {
+   "t": 20.726,
+   "type": "key"
+  },
+  {
+   "t": 20.813,
+   "type": "key"
+  },
+  {
+   "t": 20.891,
+   "type": "key"
+  },
+  {
+   "t": 20.951,
+   "type": "key"
+  },
+  {
+   "t": 21.019,
+   "type": "key"
+  },
+  {
+   "t": 21.082,
+   "type": "key"
+  },
+  {
+   "t": 21.15,
+   "type": "key"
+  },
+  {
+   "t": 21.202,
+   "type": "key"
+  },
+  {
+   "t": 21.259,
+   "type": "key"
+  },
+  {
+   "t": 21.321,
+   "type": "key"
+  },
+  {
+   "t": 21.391,
+   "type": "key"
+  },
+  {
+   "t": 21.448,
+   "type": "key"
+  },
+  {
+   "t": 21.524,
+   "type": "key"
+  },
+  {
+   "t": 21.572,
+   "type": "typeEnd",
+   "label": "Kind",
+   "box": {
+    "x": 513.75,
+    "y": 664.3125,
+    "width": 35.4375,
+    "height": 28
+   }
+  },
+  {
+   "t": 22.976,
+   "type": "hover",
+   "label": "Label",
+   "box": {
+    "x": 563.1875,
+    "y": 664.3125,
+    "width": 38.5,
+    "height": 28
+   }
+  },
+  {
+   "t": 23.256,
+   "type": "click",
+   "label": "Label",
+   "box": {
+    "x": 563.1875,
+    "y": 664.3125,
+    "width": 38.5,
+    "height": 28
+   },
+   "x": 582.4375,
+   "y": 678.3125
+  },
+  {
+   "t": 23.557,
+   "type": "typeStart",
+   "label": "Label",
+   "box": {
+    "x": 563.1875,
+    "y": 664.3125,
+    "width": 38.5,
+    "height": 28
+   },
+   "text": "Fire safety audit report"
+  },
+  {
+   "t": 23.577,
+   "type": "key"
+  },
+  {
+   "t": 23.686,
+   "type": "key"
+  },
+  {
+   "t": 23.76,
+   "type": "key"
+  },
+  {
+   "t": 23.831,
+   "type": "key"
+  },
+  {
+   "t": 23.907,
+   "type": "key"
+  },
+  {
+   "t": 23.969,
+   "type": "key"
+  },
+  {
+   "t": 24.029,
+   "type": "key"
+  },
+  {
+   "t": 24.092,
+   "type": "key"
+  },
+  {
+   "t": 24.167,
+   "type": "key"
+  },
+  {
+   "t": 24.221,
+   "type": "key"
+  },
+  {
+   "t": 24.299,
+   "type": "key"
+  },
+  {
+   "t": 24.35,
+   "type": "key"
+  },
+  {
+   "t": 24.423,
+   "type": "key"
+  },
+  {
+   "t": 24.497,
+   "type": "key"
+  },
+  {
+   "t": 24.575,
+   "type": "key"
+  },
+  {
+   "t": 24.654,
+   "type": "key"
+  },
+  {
+   "t": 24.711,
+   "type": "key"
+  },
+  {
+   "t": 24.764,
+   "type": "key"
+  },
+  {
+   "t": 24.844,
+   "type": "key"
+  },
+  {
+   "t": 24.914,
+   "type": "key"
+  },
+  {
+   "t": 24.974,
+   "type": "key"
+  },
+  {
+   "t": 25.05,
+   "type": "key"
+  },
+  {
+   "t": 25.121,
+   "type": "key"
+  },
+  {
+   "t": 25.205,
+   "type": "key"
+  },
+  {
+   "t": 25.246,
+   "type": "typeEnd",
+   "label": "Label",
+   "box": {
+    "x": 563.1875,
+    "y": 664.3125,
+    "width": 38.5,
+    "height": 28
+   }
+  },
+  {
+   "t": 26.761,
+   "type": "hover",
+   "label": "Critical",
+   "box": {
+    "x": 743.953125,
+    "y": 664.3125,
+    "width": 14,
+    "height": 14
+   }
+  },
+  {
+   "t": 27.042,
+   "type": "click",
+   "label": "Critical",
+   "box": {
+    "x": 743.953125,
+    "y": 664.3125,
+    "width": 14,
+    "height": 14
+   },
+   "x": 750.953125,
+   "y": 671.3125
+  },
+  {
+   "t": 28.859,
+   "type": "hover",
+   "label": "Schedule",
+   "box": {
+    "x": 231,
+    "y": 434.3125,
+    "width": 253.75,
+    "height": 31.5
+   }
+  },
+  {
+   "t": 29.14,
+   "type": "click",
+   "label": "Schedule",
+   "box": {
+    "x": 231,
+    "y": 434.3125,
+    "width": 253.75,
+    "height": 31.5
+   },
+   "x": 357.875,
+   "y": 450.0625
+  },
+  {
+   "t": 30.832,
+   "type": "hover",
+   "label": "Window closes",
+   "box": {
+    "x": 889,
+    "y": 404.8125,
+    "width": 128.375,
+    "height": 28
+   }
+  },
+  {
+   "t": 31.112,
+   "type": "click",
+   "label": "Window closes",
+   "box": {
+    "x": 889,
+    "y": 404.8125,
+    "width": 128.375,
+    "height": 28
+   },
+   "x": 953.1875,
+   "y": 418.8125
+  },
+  {
+   "t": 32.902,
+   "type": "hover",
+   "label": "Save draft",
+   "box": {
+    "x": 505.75,
+    "y": 624.8125,
+    "width": 89.03125,
+    "height": 31.5
+   }
+  },
+  {
+   "t": 33.183,
+   "type": "click",
+   "label": "Save draft",
+   "box": {
+    "x": 505.75,
+    "y": 624.8125,
+    "width": 89.03125,
+    "height": 31.5
+   },
+   "x": 550.265625,
+   "y": 640.5625
+  },
+  {
+   "t": 33.753,
+   "type": "say",
+   "id": "ch8.b2",
+   "duration": 6.29
+  },
+  {
+   "t": 34.863,
+   "type": "hover",
+   "label": "Apply to: live cases",
+   "box": {
+    "x": 960.328125,
+    "y": 176.8125,
+    "width": 325.671875,
+    "height": 28
+   }
+  },
+  {
+   "t": 35.143,
+   "type": "click",
+   "label": "Apply to: live cases",
+   "box": {
+    "x": 960.328125,
+    "y": 176.8125,
+    "width": 325.671875,
+    "height": 28
+   },
+   "x": 1123.1640625,
+   "y": 190.8125
+  },
+  {
+   "t": 35.471,
+   "type": "select",
+   "label": "Apply to: live cases",
+   "box": {
+    "x": 960.328125,
+    "y": 176.8125,
+    "width": 325.671875,
+    "height": 28
+   }
+  },
+  {
+   "t": 37.198,
+   "type": "hover",
+   "label": "Save amendment",
+   "box": {
+    "x": 777,
+    "y": 223.3125,
+    "width": 132.34375,
+    "height": 31.5
+   }
+  },
+  {
+   "t": 37.478,
+   "type": "click",
+   "label": "Save amendment",
+   "box": {
+    "x": 777,
+    "y": 223.3125,
+    "width": 132.34375,
+    "height": 31.5
+   },
+   "x": 843.171875,
+   "y": 239.0625
+  },
+  {
+   "t": 39.328,
+   "type": "hover",
+   "label": "Submit for review",
+   "box": {
+    "x": 1075.375,
+    "y": 109.3125,
+    "width": 133.1875,
+    "height": 31.5
+   }
+  },
+  {
+   "t": 39.609,
+   "type": "click",
+   "label": "Submit for review",
+   "box": {
+    "x": 1075.375,
+    "y": 109.3125,
+    "width": 133.1875,
+    "height": 31.5
+   },
+   "x": 1141.96875,
+   "y": 125.0625
+  },
+  {
+   "t": 41.448,
+   "type": "hover",
+   "label": "Submit for review",
+   "box": {
+    "x": 854.8125,
+    "y": 166.5,
+    "width": 133.1875,
+    "height": 31.5
+   }
+  },
+  {
+   "t": 41.729,
+   "type": "click",
+   "label": "Submit for review",
+   "box": {
+    "x": 854.8125,
+    "y": 166.5,
+    "width": 133.1875,
+    "height": 31.5
+   },
+   "x": 921.40625,
+   "y": 182.25
+  },
+  {
+   "t": 42.415,
+   "type": "result",
+   "label": "Refused: only for new cases",
+   "box": {
+    "x": 612,
+    "y": 148,
+    "width": 376,
+    "height": 31.5
+   }
+  },
+  {
+   "t": 43.645,
+   "type": "hover",
+   "label": "Cancel",
+   "box": {
+    "x": 775.484375,
+    "y": 208.5,
+    "width": 68.828125,
+    "height": 31.5
+   }
+  },
+  {
+   "t": 43.926,
+   "type": "click",
+   "label": "Cancel",
+   "box": {
+    "x": 775.484375,
+    "y": 208.5,
+    "width": 68.828125,
+    "height": 31.5
+   },
+   "x": 809.8984375,
+   "y": 224.25
+  },
+  {
+   "t": 45.761,
+   "type": "hover",
+   "label": "Apply to: new cases",
+   "box": {
+    "x": 960.328125,
+    "y": 407.8125,
+    "width": 325.671875,
+    "height": 28
+   }
+  },
+  {
+   "t": 46.042,
+   "type": "click",
+   "label": "Apply to: new cases",
+   "box": {
+    "x": 960.328125,
+    "y": 407.8125,
+    "width": 325.671875,
+    "height": 28
+   },
+   "x": 1123.1640625,
+   "y": 421.8125
+  },
+  {
+   "t": 46.414,
+   "type": "select",
+   "label": "Apply to: new cases",
+   "box": {
+    "x": 960.328125,
+    "y": 407.8125,
+    "width": 325.671875,
+    "height": 28
+   }
+  },
+  {
+   "t": 48.066,
+   "type": "hover",
+   "label": "Save amendment",
+   "box": {
+    "x": 777,
+    "y": 454.3125,
+    "width": 132.34375,
+    "height": 31.5
+   }
+  },
+  {
+   "t": 48.347,
+   "type": "click",
+   "label": "Save amendment",
+   "box": {
+    "x": 777,
+    "y": 454.3125,
+    "width": 132.34375,
+    "height": 31.5
+   },
+   "x": 843.171875,
+   "y": 470.0625
+  },
+  {
+   "t": 49.649,
+   "type": "say",
+   "id": "ch8.b3",
+   "duration": 4.033
+  },
+  {
+   "t": 49.725,
+   "type": "result",
+   "label": "Impact preview: a dry run",
+   "box": {
+    "x": 246,
+    "y": 299.8125,
+    "width": 1048,
+    "height": 140
+   }
+  },
+  {
+   "t": 57.015,
+   "type": "hover",
+   "label": "Submit for review",
+   "box": {
+    "x": 1075.375,
+    "y": 109.3125,
+    "width": 133.1875,
+    "height": 31.5
+   }
+  },
+  {
+   "t": 57.296,
+   "type": "click",
+   "label": "Submit for review",
+   "box": {
+    "x": 1075.375,
+    "y": 109.3125,
+    "width": 133.1875,
+    "height": 31.5
+   },
+   "x": 1141.96875,
+   "y": 125.0625
+  },
+  {
+   "t": 59.116,
+   "type": "hover",
+   "label": "Submit for review",
+   "box": {
+    "x": 854.8125,
+    "y": 166.5,
+    "width": 133.1875,
+    "height": 31.5
+   }
+  },
+  {
+   "t": 59.396,
+   "type": "click",
+   "label": "Submit for review",
+   "box": {
+    "x": 854.8125,
+    "y": 166.5,
+    "width": 133.1875,
+    "height": 31.5
+   },
+   "x": 921.40625,
+   "y": 182.25
+  },
+  {
+   "t": 62.301,
+   "type": "attach"
+  },
+  {
+   "t": 62.316,
+   "type": "say",
+   "id": "ch8.b4",
+   "duration": 6.801
+  },
+  {
+   "t": 62.381,
+   "type": "result",
+   "label": "Reviewed by a second person",
+   "box": {
+    "x": 246,
+    "y": 253.3125,
+    "width": 157.15625,
+    "height": 21
+   }
+  },
+  {
+   "t": 63.539,
+   "type": "hover",
+   "label": "Approve",
+   "box": {
+    "x": 231,
+    "y": 811.0625,
+    "width": 78.890625,
+    "height": 31.5
+   }
+  },
+  {
+   "t": 63.82,
+   "type": "click",
+   "label": "Approve",
+   "box": {
+    "x": 231,
+    "y": 811.0625,
+    "width": 78.890625,
+    "height": 31.5
+   },
+   "x": 270.4453125,
+   "y": 826.8125
+  },
+  {
+   "t": 65.63,
+   "type": "hover",
+   "label": "Approve",
+   "box": {
+    "x": 909.109375,
+    "y": 266.5,
+    "width": 78.890625,
+    "height": 31.5
+   }
+  },
+  {
+   "t": 65.91,
+   "type": "click",
+   "label": "Approve",
+   "box": {
+    "x": 909.109375,
+    "y": 266.5,
+    "width": 78.890625,
+    "height": 31.5
+   },
+   "x": 948.5546875,
+   "y": 282.25
+  },
+  {
+   "t": 67.713,
+   "type": "hover",
+   "label": "Publish",
+   "box": {
+    "x": 1135.5625,
+    "y": 109.3125,
+    "width": 73,
+    "height": 31.5
+   }
+  },
+  {
+   "t": 67.993,
+   "type": "click",
+   "label": "Publish",
+   "box": {
+    "x": 1135.5625,
+    "y": 109.3125,
+    "width": 73,
+    "height": 31.5
+   },
+   "x": 1172.0625,
+   "y": 125.0625
+  },
+  {
+   "t": 69.783,
+   "type": "hover",
+   "label": "Publish",
+   "box": {
+    "x": 915,
+    "y": 184,
+    "width": 73,
+    "height": 31.5
+   }
+  },
+  {
+   "t": 70.064,
+   "type": "click",
+   "label": "Publish",
+   "box": {
+    "x": 915,
+    "y": 184,
+    "width": 73,
+    "height": 31.5
+   },
+   "x": 951.5,
+   "y": 199.75
+  },
+  {
+   "t": 70.663,
+   "type": "result",
+   "label": "Published",
+   "box": {
+    "x": 401.765625,
+    "y": 112.8125,
+    "width": 73.90625,
+    "height": 17.5
+   }
+  },
+  {
+   "t": 72.812,
+   "type": "attach"
+  },
+  {
+   "t": 72.823,
+   "type": "say",
+   "id": "ch8.c",
+   "duration": 2.651
+  },
+  {
+   "t": 72.88,
+   "type": "result",
+   "label": "Colleges see the change",
+   "box": {
+    "x": 246,
+    "y": 99.5625,
+    "width": 321.484375,
+    "height": 17.5
+   }
+  },
+  {
+   "t": 76.727,
+   "type": "mark",
+   "label": "end"
+  }
+ ]
+}
