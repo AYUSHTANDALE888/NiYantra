@@ -6,7 +6,26 @@ The system routes, assigns, reminds, explains and records. It never decides: the
 
 > **What is placeholder.** All timelines, routes, application types, document lists, assignment weights, capacities and thresholds are pending verification against the APH and with AICTE officers. Holidays are placeholder dates. Form check results (including `formcheck/EVALUATION.md`) are measured on synthetic data. All people and institutions are fictional.
 
-> **Placeholders.** All timelines, routes, application types, document lists, weights and thresholds are placeholders pending verification against the AICTE Approval Process Handbook (APH) and with AICTE officers. Form check results are measured on synthetic data.
+## Team GeoLogics
+
+Built by **Team GeoLogics** for Smart India Hackathon 2026 (problem statement SIH26262, team ID 197385). Everyone below worked on this project; see [CONTRIBUTORS.md](CONTRIBUTORS.md).
+
+<table>
+  <tr>
+    <td align="center"><a href="https://github.com/sanjayvasudevan-c"><img src="https://github.com/sanjayvasudevan-c.png?size=120" width="88" alt="sanjayvasudevan-c"/><br/><sub><b>sanjayvasudevan-c</b></sub></a></td>
+    <td align="center"><a href="https://github.com/Arya-Ananth"><img src="https://github.com/Arya-Ananth.png?size=120" width="88" alt="Arya-Ananth"/><br/><sub><b>Arya-Ananth</b></sub></a></td>
+    <td align="center"><a href="https://github.com/abilashprabakar27-ctrl"><img src="https://github.com/abilashprabakar27-ctrl.png?size=120" width="88" alt="abilashprabakar27-ctrl"/><br/><sub><b>abilashprabakar27-ctrl</b></sub></a></td>
+    <td align="center"><a href="https://github.com/A-R-Mohamed-Arshad"><img src="https://github.com/A-R-Mohamed-Arshad.png?size=120" width="88" alt="A-R-Mohamed-Arshad"/><br/><sub><b>A-R-Mohamed-Arshad</b></sub></a></td>
+    <td align="center"><a href="https://github.com/diya-240108"><img src="https://github.com/diya-240108.png?size=120" width="88" alt="diya-240108"/><br/><sub><b>diya-240108</b></sub></a></td>
+    <td align="center"><a href="https://github.com/VishalN711"><img src="https://github.com/VishalN711.png?size=120" width="88" alt="VishalN711"/><br/><sub><b>VishalN711</b></sub></a></td>
+  </tr>
+</table>
+
+## Presentation and demo
+
+- Slides (SIH 2026 idea presentation): [docs/presentation/GeoLogics_SIH2026_Presentation.pptx](docs/presentation/GeoLogics_SIH2026_Presentation.pptx)
+- Demo video: [Google Drive](https://drive.google.com/file/d/1MtdBjbsbe71ODzVC4wfgrNmJwZF5oWQB/view?usp=sharing)
+- Live prototype: [aicte-demo-website.vercel.app](https://aicte-demo-website.vercel.app)
 
 ## Quick start (about 10 minutes, most of it the first image build)
 
@@ -113,6 +132,10 @@ How the hosted version differs from the compose stack (all switched on automatic
 | Tamper demo | `npm run demo:tamper` | not available (it needs direct database access) |
 
 Build: the Vercel project's root directory is `web/`; `web/vercel.json` runs `scripts/vercel-build.mjs`, which migrates, reseeds and snapshots only when the schema or seed changed, then emits `.vercel/output`.
+
+## Load test
+
+The demo was load-tested at the deck's assumed scale of 15,000 applications in a cycle: no errors, and a second deadline-engine cycle added no duplicate alerts. Method and full results: [docs/LOAD_TEST.md](docs/LOAD_TEST.md). Run it yourself with `npm --workspace api run load:test`.
 
 ## Demo users
 

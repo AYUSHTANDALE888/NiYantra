@@ -37,5 +37,5 @@ render() { # $1 composition, $2 cut name
   rm -f "out/$2.raw.mp4"
   echo "out/aicte-demo-$2.mp4"
 }
-[ $CUTS = main ] || [ $CUTS = all ] && render Main main
-[ $CUTS = short ] || [ $CUTS = all ] && render Short short
+if [ $CUTS = main ] || [ $CUTS = all ]; then render Main main; fi
+if [ $CUTS = short ] || [ $CUTS = all ]; then render Short short; fi
