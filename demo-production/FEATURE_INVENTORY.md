@@ -1,6 +1,6 @@
 # Feature inventory (Phase 1 audit)
 
-Audit of the repository on branch `claude/new-session-35imia` at commit `d0f97d9`. A feature is marked **Verified** only when an automated check exercises it end to end: the API test suite (182 Vitest tests), the form check suite (99 pytest tests), or the Playwright demo script (steps 1–11, run twice in a row after a reset). Anything else is marked as partial, mocked or planned.
+Audit of the repository on branch `claude/new-session-35imia` at commit `d0f97d9`. A feature is marked **Verified** only when an automated check exercises it end to end: the API test suite (183 Vitest tests), the form check suite (99 pytest tests), or the Playwright demo script (steps 1–11, run twice in a row after a reset). Anything else is marked as partial, mocked or planned.
 
 ## Architecture
 
@@ -25,7 +25,7 @@ COLLEGE (`college.abc@demo.in`), OFFICER (`priya@`, `arjun@`, `meena@`, `ravi@` 
 | 1 | Public home: cycle schedule, recent changes, quick links, sign in | `/` | anyone | API up | Open `/`; sign in as any demo user | Schedule table and 3 notices visible; redirect to the role home | Verified (demo, axe) |
 | 2 | Accessibility controls: A-/A/A+/A++, high contrast, English/हिंदी, skip link | every page | anyone | none | Press each control; reload | Root size changes; light high-contrast theme; Hindi labels; choice survives reload | Verified (axe on 13 public pages × 4 modes × 2 widths) |
 | 3 | What changed this cycle (public notices + schedule) | `/notices`, `/college/notices` | anyone | rule packs seeded | Open page | Amendment cards (kind, ref, dates, summary, affected types) and schedule | Verified (API test, demo 11.4) |
-| 4 | Track an application | `/track` | anyone | application no + permanent ID | Enter both, Find | Stage, status, route, rules version; wrong pair → "No application matches" | Verified manually (API); no automated test yet |
+| 4 | Track an application | `/track` | anyone | application no + permanent ID | Enter both, Find | Stage, status, route, rules version; wrong pair → "No application matches" | Verified (API test `public-track.test.ts`) |
 | 5 | Approval process, help, contact, policies, sitemap | `/process`, `/help`, … | anyone | none | Open pages | Content from current rules; "Prototype text" badge | Verified (axe pages load) |
 | 6 | New application with filing context | `/college/apply` | COLLEGE | open application window | Fill the 5 steps | Header "Filing under approval cycle 2027–28 · rules v1"; checklist from the pinned rules | Verified (demo 1) |
 | 7 | "Check my entries" form check | `/college/apply` | COLLEGE | — | Built-up > land | R1 HIGH warning; justification required; never blocks | Verified (demo 1, tests) |
@@ -76,4 +76,4 @@ COLLEGE (`college.abc@demo.in`), OFFICER (`priya@`, `arjun@`, `meena@`, `ravi@` 
 ## Known issues found during the audit
 
 - The demo seed's application count varies between 191 and 192 between setups: the assignment tie-break compares random UUIDs. It is harmless and predates the add-on.
-- "Track application" has no automated test yet (to be added in Phase 3 of the video work).
+- "Track application" had no automated test; `api/test/public-track.test.ts` now covers it (both numbers required, same message for either wrong value).
