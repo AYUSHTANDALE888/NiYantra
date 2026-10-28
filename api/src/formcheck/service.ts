@@ -37,6 +37,17 @@ export async function scoreForm(rules: ResolvedRules, type: AppType, values: For
   const todayIso = isoDate(today());
   const requiredDocs = rules.criticalKinds(type, ctx);
   const norms = rules.norms(rules.programme(values.programme));
+  if (process.env.HOSTED === 'vercel' || process.env.FORMCHECK_URL === 'none') {
+    const warnings = evaluateRules(computeFeatures(values, todayIso, requiredDocs), rules.formCheckRules, norms);
+    return {
+      modelVersion: `rules-${rules.label}`,
+      modelAvailable: false,
+      severity: (warnings.length ? 'HIGH' : 'NONE') as Severity,
+      score: null,
+      threshold: null,
+      warnings,
+    };
+  }
   try {
     const r = await postJson<ScoreResponse>('/score', { type, values, today: todayIso, requiredDocs, rules: rules.formCheckRules, norms });
     return { ...r, modelAvailable: true };
