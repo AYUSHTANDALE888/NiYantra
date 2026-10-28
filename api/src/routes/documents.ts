@@ -10,6 +10,7 @@ import { currentUser, type AuthUser } from '../auth/middleware.js';
 import { inScope } from '../policy/scope.js';
 import { logAccessDenied } from '../policy/roles.js';
 import { rulesForApp } from '../rules/service.js';
+import { appendAudit } from '../lib/audit.js';
 
 /** A document is readable when its application is in scope, or (institution documents) by the college itself. */
 export async function canReadDocument(user: AuthUser, doc: { applicationId: string | null; institutionId: string }): Promise<boolean> {
@@ -66,6 +67,16 @@ export function documentsRouter(): Router {
       }
       const bytes = await readStored(doc.storedName);
       if (!bytes) throw notFound('The file is missing from storage.');
+      await prisma.$transaction(async (tx) => {
+        await appendAudit(tx, {
+          actorId: user.id,
+          actorRole: user.role,
+          action: 'DOCUMENT_DOWNLOADED',
+          applicationId: doc.applicationId,
+          reason: `Downloaded ${doc.fileName}`,
+          meta: { documentId: doc.id, fileName: doc.fileName },
+        });
+      });
       res.setHeader('Content-Type', doc.mimeType);
       res.setHeader('Content-Disposition', `inline; filename="${doc.fileName.replace(/[^\w.\- ]/g, '_')}"`);
       res.setHeader('Cache-Control', 'private, no-store');

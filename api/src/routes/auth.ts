@@ -4,11 +4,12 @@ import bcrypt from 'bcryptjs';
 import { z } from 'zod';
 import { prisma } from '../lib/db.js';
 import { h, parse } from '../lib/http.js';
-import { unauthorized, notFound } from '../lib/errors.js';
+import { unauthorized, notFound, forbidden } from '../lib/errors.js';
 import { appendAuditStandalone } from '../lib/audit.js';
-import { signToken, TOKEN_TTL_SECONDS } from '../auth/token.js';
+import { signToken, TOKEN_TTL_SECONDS, MAX_SESSION_SECONDS } from '../auth/token.js';
 import { currentUser, requireAuth } from '../auth/middleware.js';
 import { NAMED_DEMO_EMAILS, demoMode } from '../auth/demoUsers.js';
+import { now } from '../lib/clock.js';
 
 const loginBody = z.object({ email: z.string().email().max(200), password: z.string().min(1).max(200) });
 
@@ -42,7 +43,28 @@ export function authRouter(): Router {
         throw unauthorized('The email or password is not correct.');
       }
       await appendAuditStandalone({ actorId: user.id, actorRole: user.role, action: 'LOGIN', meta: { ip: req.ip ?? null } });
-      const token = signToken({ sub: user.id, role: user.role });
+      const nowSec = Math.floor(now().getTime() / 1000);
+      const token = signToken({ sub: user.id, role: user.role, authTime: nowSec });
+      res.json({ token, expiresIn: TOKEN_TTL_SECONDS, user: await publicUser(user.id) });
+    }),
+  );
+
+  r.post(
+    '/quick-login',
+    h(async (req, res) => {
+      if (!demoMode()) {
+        throw forbidden('Quick login is only available in demo mode.');
+      }
+      const body = parse(z.object({ email: z.string().email() }), req.body);
+      const email = body.email.toLowerCase();
+      if (!(NAMED_DEMO_EMAILS as readonly string[]).includes(email)) {
+        throw unauthorized('Not an authorized demo user.');
+      }
+      const user = await prisma.user.findUnique({ where: { email } });
+      if (!user || !user.active) throw notFound();
+      await appendAuditStandalone({ actorId: user.id, actorRole: user.role, action: 'DEMO_LOGIN', meta: { ip: req.ip ?? null } });
+      const nowSec = Math.floor(now().getTime() / 1000);
+      const token = signToken({ sub: user.id, role: user.role, authTime: nowSec });
       res.json({ token, expiresIn: TOKEN_TTL_SECONDS, user: await publicUser(user.id) });
     }),
   );
@@ -55,13 +77,18 @@ export function authRouter(): Router {
     }),
   );
 
-  // "Stay signed in": exchange a still-valid token for a fresh 8-hour one.
+  // "Stay signed in": exchange a still-valid token for a fresh 8-hour one up to 24h ceiling.
   r.post(
     '/refresh',
     requireAuth,
     h(async (req, res) => {
       const u = currentUser(req);
-      res.json({ token: signToken({ sub: u.id, role: u.role }), expiresIn: TOKEN_TTL_SECONDS });
+      const nowSec = Math.floor(now().getTime() / 1000);
+      const authTime = req.claims?.authTime ?? nowSec;
+      if (nowSec - authTime > MAX_SESSION_SECONDS) {
+        throw unauthorized('Session maximum lifetime exceeded (24 hours). Please log in again.');
+      }
+      res.json({ token: signToken({ sub: u.id, role: u.role, authTime }), expiresIn: TOKEN_TTL_SECONDS });
     }),
   );
 

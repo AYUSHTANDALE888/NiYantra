@@ -24,15 +24,16 @@ function usePublicClock() {
 
 const cycleText = (c: string) => c.replace('-', '–');
 
-/** Our own monogram: the letters "AD" (AICTE Demo) in a 2px-stroke square. */
-export function Monogram({ size = 40 }: { size?: number }) {
+/** Official AICTE emblem gear */
+export function Monogram({ size = 48, className }: { size?: number; className?: string }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 40 40" aria-hidden className="shrink-0 text-gov-mark">
-      <rect x="1" y="1" width="38" height="38" fill="none" stroke="currentColor" strokeWidth="2" />
-      <text x="20" y="26" textAnchor="middle" fontSize="16" fontWeight="700" fill="currentColor" fontFamily="'Noto Sans', sans-serif">
-        AD
-      </text>
-    </svg>
+    <img
+      src="/aicte-logo.png"
+      alt="All India Council for Technical Education Emblem"
+      width={size}
+      height={size}
+      className={cx('shrink-0 object-contain drop-shadow-sm', className)}
+    />
   );
 }
 
@@ -40,18 +41,25 @@ export function NameBlock({ compact }: { compact?: boolean }) {
   const t = useT();
   if (compact) {
     return (
-      <span className="truncate text-lg font-semibold text-primary">
-        {t.gov.name} <span className="font-normal text-muted">|</span> <span lang="hi">{t.gov.nameHi}</span>
+      <span className="flex flex-col">
+        <span className="text-sm font-bold text-[#0d2b6b] leading-tight">
+          AICTE <span className="font-normal text-muted">|</span> <span lang="hi">{t.gov.nameHi}</span>
+        </span>
+        <span className="text-xs text-secondary truncate">Technical Education Approval Portal</span>
       </span>
     );
   }
   return (
     <span className="flex min-w-0 flex-col">
-      <span lang="hi" className="text-lg font-semibold leading-tight text-primary">
-        {t.gov.nameHi}
+      <span lang="hi" className="text-sm md:text-base font-bold leading-tight text-gray-900">
+        अखिल भारतीय तकनीकी शिक्षा परिषद
       </span>
-      <span className="text-xl font-bold leading-tight text-primary">{t.gov.name}</span>
-      <span className="truncate text-sm text-secondary">{t.gov.subtitle}</span>
+      <span className="text-base md:text-xl font-extrabold leading-tight tracking-tight text-[#0d2b6b]">
+        All India Council for Technical Education
+      </span>
+      <span className="truncate text-xs font-medium text-secondary">
+        (A Statutory Body Under Ministry of Education, Govt. of India)
+      </span>
     </span>
   );
 }
@@ -72,9 +80,15 @@ export function UtilityBar({ publicPage }: { publicPage?: boolean }) {
   const sep = <span aria-hidden className="h-3 w-px bg-gov-ink-muted opacity-60" />;
   const btn = 'hit inline-flex min-h-target items-center rounded px-1.5 text-gov-on-dark hover:underline focus-visible:ring-gov-saffron';
   return (
-    <div className="bg-gov-ink text-xs text-gov-ink-muted">
-      <div className={cx('flex flex-wrap items-center justify-between gap-x-4 gap-y-1 px-4 py-1', width)}>
-        <p>{t.gov.prototype}</p>
+    <div className="bg-[#111827] text-xs text-gray-300 border-b border-gray-800">
+      <div className={cx('flex flex-wrap items-center justify-between gap-x-4 gap-y-1 px-4 py-1.5', width)}>
+        <div className="flex items-center gap-3">
+          <span className="font-mono text-gray-400">
+            {new Date().toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })}
+          </span>
+          <span className="hidden sm:inline text-gray-600">|</span>
+          <p className="hidden md:inline text-gray-400 font-medium">{t.gov.prototype}</p>
+        </div>
         <ul aria-label={t.gov.utility} className="flex flex-wrap items-center gap-2">
           <li>
             <a href="#main" className={btn}>
@@ -90,8 +104,9 @@ export function UtilityBar({ publicPage }: { publicPage?: boolean }) {
           <li>{sep}</li>
           <li>
             <div className="flex items-center gap-0.5" role="group" aria-label={t.gov.textSize}>
+              <span className="mr-1 text-gray-400 hidden sm:inline">Text Size:</span>
               {sizes.map((s) => (
-                <button key={s.id} type="button" className={cx(btn, textSize === s.id && 'font-semibold underline')} aria-pressed={textSize === s.id} title={t.gov[s.key]} onClick={() => setTextSize(s.id)}>
+                <button key={s.id} type="button" className={cx(btn, textSize === s.id && 'font-semibold underline text-amber-400')} aria-pressed={textSize === s.id} title={t.gov[s.key]} onClick={() => setTextSize(s.id)}>
                   {s.label}
                   <span className="sr-only"> ({t.gov[s.key]})</span>
                 </button>
@@ -107,14 +122,23 @@ export function UtilityBar({ publicPage }: { publicPage?: boolean }) {
           <li>{sep}</li>
           <li>
             <div className="flex items-center gap-1" role="group" aria-label={t.gov.language}>
-            <button type="button" lang="en" className={cx(btn, lang === 'en' && 'font-semibold underline')} aria-pressed={lang === 'en'} onClick={() => setLang('en')}>
-              English
-            </button>
-            <span aria-hidden>|</span>
-            <button type="button" lang="hi" className={cx(btn, lang === 'hi' && 'font-semibold underline')} aria-pressed={lang === 'hi'} onClick={() => setLang('hi')}>
-              हिंदी
-            </button>
+              <button type="button" lang="en" className={cx(btn, lang === 'en' && 'font-semibold text-amber-400 underline')} aria-pressed={lang === 'en'} onClick={() => setLang('en')}>
+                English
+              </button>
+              <span aria-hidden className="text-gray-600">|</span>
+              <button type="button" lang="hi" className={cx(btn, lang === 'hi' && 'font-semibold text-amber-400 underline')} aria-pressed={lang === 'hi'} onClick={() => setLang('hi')}>
+                हिंदी
+              </button>
             </div>
+          </li>
+          <li>{sep}</li>
+          <li>
+            <Link
+              to="/#sign-in"
+              className="hit inline-flex items-center rounded-full bg-gradient-to-r from-amber-500 to-amber-600 px-3 py-0.5 text-xs font-semibold text-white shadow-sm hover:from-amber-600 hover:to-amber-700"
+            >
+              Web Portal Login
+            </Link>
           </li>
         </ul>
       </div>
@@ -185,19 +209,27 @@ function PublicHeader() {
   const t = useT();
   const { user } = useAuth();
   return (
-    <div className="border-b border-t-4 border-t-gov-saffron bg-surface">
+    <div className="border-b bg-surface">
       <div className="mx-auto flex min-h-[5.5rem] max-w-content items-center justify-between gap-4 px-4 py-2">
-        <Link to="/" className="flex min-w-0 items-center gap-3 no-underline">
-          <Monogram size={48} />
+        <Link to="/" className="flex min-w-0 items-center gap-3.5 no-underline">
+          <Monogram size={56} />
           <NameBlock />
         </Link>
-        <div className="flex items-center gap-3">
-          <CycleChip />
+        <div className="flex items-center gap-2.5 sm:gap-3">
+          <span className="hidden sm:inline-flex items-center rounded-full bg-emerald-50 px-2.5 py-0.5 text-xs font-semibold text-emerald-800 border border-emerald-200">
+            Cycle 2027–28 Active
+          </span>
+          <span className="hidden lg:inline-flex items-center rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-700 border border-slate-200">
+            National Portal
+          </span>
           <SimulatedDate />
           {user ? (
             <UserMenu />
           ) : (
-            <Link to="/#sign-in" className="hit inline-flex h-control shrink-0 items-center whitespace-nowrap rounded border border-accent bg-accent px-4 text-base font-medium text-on-solid hover:bg-accent-hover">
+            <Link
+              to="/#sign-in"
+              className="hit inline-flex h-control shrink-0 items-center whitespace-nowrap rounded-full bg-gradient-to-r from-amber-500 to-amber-600 px-5 text-sm font-semibold text-white shadow-sm hover:from-amber-600 hover:to-amber-700"
+            >
               {t.gov.signIn}
             </Link>
           )}
@@ -214,34 +246,39 @@ function PublicNav() {
   useEffect(() => setOpen(false), [loc.pathname]);
   const items = [
     { to: '/', label: t.publicNav.home, end: true },
-    { to: '/process', label: t.publicNav.process },
-    { to: '/notices', label: t.publicNav.changed },
-    { to: '/track', label: t.publicNav.track },
-    { to: '/help', label: t.publicNav.help },
+    { to: '/process', label: 'Approval Process' },
+    { to: '/notices', label: 'Rules & Handbook' },
+    { to: '/track', label: 'Track Application' },
+    { to: '/help', label: 'Help & Contact' },
   ];
   const link = (it: (typeof items)[number]) => (
     <NavLink
       to={it.to}
       end={it.end}
-      className={({ isActive }) => cx('hit flex h-12 items-center border-b-[3px] px-3 text-base font-medium text-gov-on-dark hover:underline focus-visible:ring-gov-saffron', isActive ? 'border-gov-saffron' : 'border-transparent')}
+      className={({ isActive }) =>
+        cx(
+          'hit flex h-12 items-center border-b-[3px] px-4 text-sm font-semibold text-white transition-colors hover:text-amber-300 focus-visible:ring-amber-400',
+          isActive ? 'border-amber-400 text-amber-300' : 'border-transparent text-white/90',
+        )
+      }
     >
       {it.label}
     </NavLink>
   );
   return (
-    <nav aria-label={t.gov.mainNav} className="bg-gov-nav">
+    <nav aria-label={t.gov.mainNav} className="bg-[#0d2b6b] shadow-sm">
       <div className="mx-auto max-w-content px-4">
-        <ul className="hidden md:flex">
+        <ul className="hidden md:flex items-center gap-1">
           {items.map((it) => (
             <li key={it.to}>{link(it)}</li>
           ))}
         </ul>
         <div className="md:hidden">
-          <button type="button" aria-expanded={open} onClick={() => setOpen((o) => !o)} className="hit flex h-12 items-center gap-2 text-base font-medium text-gov-on-dark">
+          <button type="button" aria-expanded={open} onClick={() => setOpen((o) => !o)} className="hit flex h-12 items-center gap-2 text-base font-medium text-white">
             {open ? <X size={20} aria-hidden /> : <MenuIcon size={20} aria-hidden />} {t.gov.menu}
           </button>
           {open ? (
-            <ul className="pb-2">
+            <ul className="pb-2 divide-y divide-white/10">
               {items.map((it) => (
                 <li key={it.to}>{link(it)}</li>
               ))}
@@ -259,19 +296,20 @@ interface Notice {
   issuedOn: string;
 }
 
-/** "What's new": the latest three published notices as links. Static (no scrolling). */
+/** "What's new": the latest three published notices as links. */
 function NoticeStrip() {
-  const t = useT();
   const q = useQuery({ queryKey: ['public', 'notices'], queryFn: () => api.get<{ notices: Notice[] }>('/rules/public/notices') });
   const latest = (q.data?.notices ?? []).slice(0, 3);
   return (
-    <div className="border-b bg-surface">
+    <div className="border-b bg-amber-50/50">
       <div className="mx-auto flex min-h-[2.5rem] max-w-content items-stretch gap-3 px-4">
-        <span className="flex items-center bg-gov-saffron px-3 text-sm font-semibold text-gov-ink">{t.gov.whatsNew}</span>
-        <ul className="flex min-w-0 flex-1 flex-wrap items-center gap-x-6 gap-y-1 py-2 text-sm">
+        <span className="flex items-center bg-amber-400 px-3 text-xs font-extrabold uppercase tracking-wider text-gray-950">
+          LATEST NOTICES
+        </span>
+        <ul className="flex min-w-0 flex-1 flex-wrap items-center gap-x-6 gap-y-1 py-1.5 text-xs font-medium">
           {latest.map((n) => (
             <li key={n.versionId} className="min-w-0">
-              <Link to="/notices" className="text-accent underline">
+              <Link to="/notices" className="text-[#0d2b6b] hover:underline">
                 {n.title}
               </Link>{' '}
               <span className="text-muted">({formatDate(n.issuedOn)})</span>

@@ -292,12 +292,77 @@ function Scheduler() {
   );
 }
 
+function ReportsExport() {
+  const [downloading, setDownloading] = useState<string | null>(null);
+  const toast = useToast();
+
+  const reports = [
+    { id: 'pendency', title: 'Pendency & Ageing Report', file: 'pendency.csv', desc: 'Active cases across scrutiny, EVC, SAC/SHC and decision stages with assigned officers and stage ageing.' },
+    { id: 'evc', title: 'Expert Visit Committee (EVC) Report', file: 'evc.csv', desc: 'Complete log of scheduled and conducted expert visits, panel composition and inspection recommendations.' },
+    { id: 'compliance', title: 'Compliance & Undertakings Report', file: 'compliance.csv', desc: 'Post-approval undertakings, evidence submission rounds, verification verdicts and closing status.' },
+    { id: 'validity', title: 'Approval Validity & Document Expiry', file: 'validity.csv', desc: 'Approved institutions, statutory validity dates and critical document expiration schedules.' },
+    { id: 'overdue', title: 'Overdue & Escalations Report', file: 'overdue.csv', desc: 'Overdue stages, delayed tasks, and hierarchical escalation levels across the reportsTo chain.' },
+    { id: 'processing-time', title: 'Processing Duration & SLA Metrics', file: 'processing-time.csv', desc: 'End-to-end processing times, calendar days vs working days breakdown from submission to decision.' },
+  ];
+
+  async function downloadReport(file: string, title: string) {
+    try {
+      setDownloading(file);
+      const token = localStorage.getItem('token');
+      const res = await fetch(`/api/reports/${file}`, {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      });
+      if (!res.ok) throw new Error(`Export failed: ${res.statusText}`);
+      const blob = await res.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = file;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+      toast(`Exported ${title}`);
+    } catch (e) {
+      toast((e as Error).message);
+    } finally {
+      setDownloading(null);
+    }
+  }
+
+  return (
+    <div className="flex flex-col gap-4">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+        {reports.map((rep) => (
+          <Card key={rep.id} className="flex flex-col justify-between p-4">
+            <div>
+              <h3 className="text-base font-semibold text-primary">{rep.title}</h3>
+              <p className="mt-1 text-xs text-secondary">{rep.desc}</p>
+            </div>
+            <div className="mt-4 flex items-center justify-between border-t pt-3">
+              <span className="font-mono text-xs text-muted">{rep.file}</span>
+              <Button
+                size="sm"
+                variant="outline"
+                disabled={downloading === rep.file}
+                onClick={() => downloadReport(rep.file, rep.title)}
+              >
+                {downloading === rep.file ? 'Exporting...' : 'Export CSV'}
+              </Button>
+            </div>
+          </Card>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export function AdminPage() {
   useTitle('Administration');
-  const [tab, setTab] = useState<'demo' | 'audit' | 'directory' | 'scheduler'>('demo');
+  const [tab, setTab] = useState<'demo' | 'audit' | 'directory' | 'scheduler' | 'reports'>('demo');
   return (
     <div className="flex flex-col gap-6">
-      <PageHeader title="Administration" description="Demo controls, the audit log and its integrity check, the directory and the scheduler. Administrators take no case actions." />
+      <PageHeader title="Administration" description="Demo controls, the audit log and its integrity check, the directory, scheduler and official reports. Administrators take no case actions." />
       <Tabs
         label="Administration sections"
         value={tab}
@@ -307,9 +372,10 @@ export function AdminPage() {
           { id: 'audit', label: 'Audit log' },
           { id: 'directory', label: 'Directory' },
           { id: 'scheduler', label: 'Scheduler' },
+          { id: 'reports', label: 'Official reports' },
         ]}
       >
-        {tab === 'demo' ? <DemoControls /> : tab === 'audit' ? <AuditLog /> : tab === 'directory' ? <Directory /> : <Scheduler />}
+        {tab === 'demo' ? <DemoControls /> : tab === 'audit' ? <AuditLog /> : tab === 'directory' ? <Directory /> : tab === 'scheduler' ? <Scheduler /> : <ReportsExport />}
       </Tabs>
     </div>
   );

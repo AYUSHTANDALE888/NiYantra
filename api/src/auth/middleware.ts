@@ -2,7 +2,7 @@ import type { NextFunction, Request, Response } from 'express';
 import type { Role } from '@prisma/client';
 import { prisma } from '../lib/db.js';
 import { unauthorized } from '../lib/errors.js';
-import { verifyToken } from './token.js';
+import { verifyToken, type TokenClaims } from './token.js';
 
 export interface AuthUser {
   id: string;
@@ -20,6 +20,7 @@ declare global {
   namespace Express {
     interface Request {
       user?: AuthUser;
+      claims?: TokenClaims & { exp: number };
     }
   }
 }
@@ -52,6 +53,7 @@ export async function requireAuth(req: Request, _res: Response, next: NextFuncti
     if (!user || !user.active) throw unauthorized();
     const { active: _active, ...rest } = user;
     req.user = rest;
+    req.claims = claims;
     next();
   } catch (e) {
     next(e);

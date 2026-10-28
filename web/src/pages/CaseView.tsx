@@ -67,7 +67,7 @@ function Facts({ d }: { d: CaseDetail }) {
 }
 
 function Rounds({ d }: { d: CaseDetail }) {
-  if (!d.deficiencies.length && !d.evcVisit && !d.decision && !d.recommendations.length) return null;
+  if (!d.deficiencies.length && !d.evcVisit && !d.decision && !d.recommendations.length && !d.appeals?.length) return null;
   return (
     <Card title="Rounds and outcomes">
       <ol className="flex flex-col gap-3">
@@ -103,6 +103,56 @@ function Rounds({ d }: { d: CaseDetail }) {
             ) : null}
           </li>
         ) : null}
+        {d.evcEvents && d.evcEvents.length > 0 ? (
+          <li className="rounded-lg border bg-surface p-3">
+            <p className="text-sm font-semibold">EVC Visit History & Audit Timeline</p>
+            <ol className="relative mt-2 border-l border-border pl-4 space-y-2 text-sm">
+              {d.evcEvents.map((ev) => (
+                <li key={ev.id} className="relative">
+                  <div className="absolute -left-[21px] top-1.5 h-2.5 w-2.5 rounded-full bg-accent" />
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <span className="font-medium text-primary">
+                      {ev.action === 'SCHEDULED' ? 'Visit Scheduled' : ev.action === 'REPORT_SUBMITTED' ? 'Report Submitted' : ev.action === 'REVERTED' ? 'Reverted to Scrutiny' : ev.action}
+                    </span>
+                    <span className="text-xs text-secondary">{formatDate(ev.at)} · {ev.actor}</span>
+                  </div>
+                  {ev.visitDate ? (
+                    <p className="text-xs text-secondary mt-0.5">Date: {formatDate(ev.visitDate)} ({ev.mode?.toLowerCase()}) · Members: {ev.members.map((m) => m.name).join(', ')}</p>
+                  ) : null}
+                  {ev.reason ? (
+                    <p className="text-xs text-secondary mt-0.5">Note: {ev.reason}</p>
+                  ) : null}
+                </li>
+              ))}
+            </ol>
+          </li>
+        ) : null}
+        {d.committee && d.committee.members.length > 0 ? (
+          <li className="rounded-lg border bg-subtle p-3">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <p className="text-sm font-semibold">
+                Hearing Committee Panel · Quorum: {d.committee.recommendationsCount} of {d.committee.quorum} recommendations recorded
+              </p>
+              <Badge tone={d.committee.quorumReached ? 'success' : 'warning'}>
+                {d.committee.quorumReached ? 'Quorum reached' : `Quorum pending (${d.committee.recommendationsCount}/${d.committee.quorum})`}
+              </Badge>
+            </div>
+            <ul className="mt-2 flex flex-col gap-1.5 text-sm">
+              {d.committee.members.map((m) => (
+                <li key={m.id} className="flex items-center justify-between border-b pb-1 text-secondary last:border-b-0">
+                  <span className="font-medium text-primary">{m.name}</span>
+                  {m.recused ? (
+                    <Badge tone="danger">Recused: {m.recusedReason || 'Conflict of interest'}</Badge>
+                  ) : m.hasRecommended ? (
+                    <Badge tone="success">Recommended</Badge>
+                  ) : (
+                    <Badge tone="neutral">Pending recommendation</Badge>
+                  )}
+                </li>
+              ))}
+            </ul>
+          </li>
+        ) : null}
         {d.recommendations.map((r) => (
           <li key={r.id} className="rounded-lg border p-3">
             <p className="text-sm font-semibold">SAC/SHC recommendation · {formatDate(r.at)} · {r.by}</p>
@@ -118,16 +168,61 @@ function Rounds({ d }: { d: CaseDetail }) {
               {d.decision.outcome === 'APPROVED' ? 'Approved' : d.decision.outcome === 'REJECTED' ? 'Rejected' : 'Approved with conditions'}: {d.decision.reason}
             </p>
             {d.undertakings.length ? (
-              <ul className="mt-1 text-sm text-secondary">
+              <div className="mt-2 space-y-2">
+                <p className="text-xs font-semibold uppercase tracking-wider text-secondary">Compliance Undertakings & Evidence Rounds</p>
                 {d.undertakings.map((u) => (
-                  <li key={u.id} className="tnum">
-                    {u.condition} — due {formatDate(u.dueDate)} · {u.status.toLowerCase()}
-                  </li>
+                  <div key={u.id} className="rounded border bg-surface p-2 text-sm">
+                    <div className="flex flex-wrap items-center justify-between gap-1">
+                      <span className="font-medium">{u.condition}</span>
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-xs text-secondary tnum">Due {formatDate(u.dueDate)}</span>
+                        <Badge tone={u.status === 'VERIFIED' ? 'success' : u.status === 'SUBMITTED' ? 'warning' : 'neutral'}>
+                          {u.status}
+                        </Badge>
+                      </div>
+                    </div>
+                    {u.remarks ? <p className="mt-1 text-xs text-secondary">Latest remarks: {u.remarks}</p> : null}
+                    {u.rounds && u.rounds.length > 0 ? (
+                      <div className="mt-2 border-t pt-1.5 text-xs">
+                        <p className="font-medium text-secondary">Evidence Submission Rounds ({u.rounds.length}):</p>
+                        <div className="mt-1 space-y-1">
+                          {u.rounds.map((rnd) => (
+                            <div key={rnd.id} className="flex flex-wrap items-center justify-between rounded bg-subtle px-2 py-1">
+                              <span>Round {rnd.roundNumber}: Uploaded {formatDate(rnd.uploadedAt)}</span>
+                              <div className="flex items-center gap-1.5">
+                                <Badge tone={rnd.verdict === 'ACCEPTED' ? 'success' : rnd.verdict === 'REJECTED' ? 'danger' : 'warning'}>
+                                  {rnd.verdict ?? 'PENDING'}
+                                </Badge>
+                                {rnd.remarks ? <span className="text-secondary italic">"{rnd.remarks}"</span> : null}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    ) : null}
+                  </div>
                 ))}
-              </ul>
+              </div>
             ) : null}
           </li>
         ) : null}
+        {d.appeals && d.appeals.map((a) => (
+          <li key={a.id} className="rounded-lg border border-accent/40 bg-surface p-3">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <p className="text-sm font-semibold">
+                Statutory Appeal to Standing Appellate Committee (SAC) · filed {formatDate(a.filedAt)}
+              </p>
+              <Badge tone={a.status === 'ACCEPTED' ? 'success' : a.status === 'REJECTED' ? 'danger' : 'warning'}>
+                {a.status === 'ACCEPTED' ? 'Appeal Allowed' : a.status === 'REJECTED' ? 'Appeal Dismissed' : 'Appeal Under Review'}
+              </Badge>
+            </div>
+            <p className="mt-1 text-base">{a.reason}</p>
+            <p className="mt-1 text-xs text-secondary">
+              7-day statutory deadline: {formatDate(a.deadline)}
+              {a.decidedAt ? ` · Decided ${formatDate(a.decidedAt)} by ${a.decidedBy ?? 'SAC Committee'}: ${a.decisionReason}` : null}
+            </p>
+          </li>
+        ))}
       </ol>
     </Card>
   );

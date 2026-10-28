@@ -310,7 +310,7 @@ const schemas = {
       reportText: z.string().trim().min(1, 'Enter the report').max(8000),
     }),
   }),
-  FORWARD_SAC_SHC: z.object({ payload: z.object({ note: z.string().trim().min(1, 'Enter a note').max(4000) }) }),
+  FORWARD_SAC_SHC: z.object({ payload: z.object({ note: z.string().trim().min(1, 'Enter a note').max(4000), memberIds: z.array(z.string().uuid()).optional() }) }),
   SUBMIT_RECOMMENDATION: z.object({ payload: z.object({ text: z.string().trim().min(1, 'Enter the recommendation').max(8000) }) }),
   REVERT: z.object({ reason: z.string().trim().min(1, 'Enter a reason').max(2000) }),
   DECIDE: z
@@ -474,6 +474,18 @@ const handlers: Record<CaseAction, Handler> = {
       where: { applicationId: app.id },
       data: { proposedMemberIds: proposal.map((p) => p.userId), memberIds, visitDate, mode: input.payload.mode, status: 'SCHEDULED', appointedUnder },
     });
+    await tx.evcVisitEvent.create({
+      data: {
+        applicationId: app.id,
+        action: 'SCHEDULED',
+        visitDate,
+        mode: input.payload.mode,
+        memberIds,
+        reason: null,
+        actorId: user.id,
+        at: now(),
+      },
+    });
     await tx.application.update({ where: { id: app.id }, data: { evcScheduled: true, holderType: 'COMMITTEE', holderUserId: null } });
     await closeItems(tx, app.id, ['EVC_SCHEDULE'], 'outcome');
     await releaseOpen(tx, app.id, ['EVC_DESK'], 'COMPLETED', actor);
@@ -497,6 +509,18 @@ const handlers: Record<CaseAction, Handler> = {
       where: { applicationId: app.id },
       data: { status: 'REPORTED', checklist: input.payload.checklist, recommendation: input.payload.recommendation, reportText: input.payload.reportText, reportedById: user.id, reportedAt: now() },
     });
+    await tx.evcVisitEvent.create({
+      data: {
+        applicationId: app.id,
+        action: 'REPORT_SUBMITTED',
+        visitDate: visit.visitDate,
+        mode: visit.mode,
+        memberIds: (visit.memberIds as any) ?? [],
+        reason: input.payload.recommendation,
+        actorId: user.id,
+        at: now(),
+      },
+    });
     await closeItems(tx, app.id, ['EVC_REPORT'], 'outcome');
     const next = await advance(tx, app, actor);
     return { reason: input.payload.recommendation, meta: { recommendation: input.payload.recommendation, nextStage: next } };
@@ -508,25 +532,60 @@ const handlers: Record<CaseAction, Handler> = {
     await releaseOpen(tx, app.id, ['SAC_SHC_FORWARD'], 'COMPLETED', actor);
     await syncResponsible(tx, app.id);
     const committee = (await tx.user.findMany({ where: { role: 'COMMITTEE', active: true }, select: { id: true } })).map((u) => u.id);
+    const targetMemberIds: string[] = Array.isArray(input.payload.memberIds) && input.payload.memberIds.length > 0
+      ? input.payload.memberIds
+      : committee;
+    for (const memberId of targetMemberIds) {
+      await tx.committeeMembership.upsert({
+        where: { applicationId_userId_committeeRole: { applicationId: app.id, userId: memberId, committeeRole: 'SAC_SHC' } },
+        create: { applicationId: app.id, userId: memberId, committeeRole: 'SAC_SHC', appointedById: user.id, recused: false },
+        update: { recused: false },
+      });
+    }
     return {
       reason: input.payload.note,
-      notifications: [{ userIds: committee, message: `${app.applicationNo} was forwarded to SAC/SHC for a recommendation.` }],
+      meta: { appointedMemberIds: targetMemberIds },
+      notifications: [{ userIds: targetMemberIds, message: `${app.applicationNo} was forwarded to SAC/SHC for a recommendation.` }],
     };
   },
 
   async SUBMIT_RECOMMENDATION(tx, user, app, input) {
     const actor = { id: user.id, role: user.role };
     await tx.recommendation.create({ data: { applicationId: app.id, committeeRole: 'SAC_SHC', memberId: user.id, text: input.payload.text, at: now() } });
-    await closeItems(tx, app.id, ['STAGE_SLA'], 'outcome');
-    const next = await advance(tx, app, actor);
-    return { reason: input.payload.text, meta: { nextStage: next } };
+
+    // Quorum check: provisional demo quorum is 2 members required to advance
+    const recommendationsCount = await tx.recommendation.count({ where: { applicationId: app.id, committeeRole: 'SAC_SHC' } });
+    const activeMembersCount = await tx.committeeMembership.count({ where: { applicationId: app.id, committeeRole: 'SAC_SHC', recused: false } });
+    const QUORUM = 2;
+    const targetQuorum = Math.min(QUORUM, activeMembersCount > 0 ? activeMembersCount : 1);
+    const quorumReached = recommendationsCount >= targetQuorum;
+
+    if (quorumReached) {
+      await closeItems(tx, app.id, ['STAGE_SLA'], 'outcome');
+      const next = await advance(tx, app, actor);
+      return { reason: input.payload.text, meta: { nextStage: next, recommendationsCount, quorum: targetQuorum, quorumReached: true } };
+    }
+    return { reason: input.payload.text, meta: { recommendationsCount, quorum: targetQuorum, quorumReached: false } };
   },
 
-  async REVERT(tx, user, app) {
+  async REVERT(tx, user, app, input) {
     const actor = { id: user.id, role: user.role };
     await closeItems(tx, app.id, ['STAGE_SLA', 'EVC_SCHEDULE', 'EVC_REPORT'], 'closed');
     await releaseOpen(tx, app.id, ['EVC_DESK', 'SAC_SHC_FORWARD', 'SCRUTINY', 'RE_SCRUTINY'], 'REVERTED', actor);
     if (app.stage === 'EVC') {
+      const currentEvc = await tx.evcVisit.findUnique({ where: { applicationId: app.id } });
+      await tx.evcVisitEvent.create({
+        data: {
+          applicationId: app.id,
+          action: 'REVERTED',
+          visitDate: currentEvc?.visitDate ?? null,
+          mode: currentEvc?.mode ?? null,
+          memberIds: (currentEvc?.memberIds as any) ?? [],
+          reason: (input as any)?.reason ?? null,
+          actorId: user.id,
+          at: now(),
+        },
+      });
       await tx.evcVisit.updateMany({ where: { applicationId: app.id }, data: { status: 'UNSCHEDULED', memberIds: [], visitDate: null } });
     }
     await tx.application.update({ where: { id: app.id }, data: { evcScheduled: false, sacForwarded: false, previousOfficerId: null } });
@@ -607,12 +666,24 @@ export async function uploadEvidence(user: AuthUser, undertakingId: string, file
       const doc = await tx.document.create({
         data: { applicationId: app.id, institutionId: app.institutionId, kind: 'UNDERTAKING_EVIDENCE', ...s, uploadedById: user.id, uploadedAt: now() },
       });
+      const roundCount = await tx.undertakingEvidenceRound.count({ where: { undertakingId: u.id } });
+      await tx.undertakingEvidenceRound.create({
+        data: {
+          undertakingId: u.id,
+          roundNumber: roundCount + 1,
+          documentId: doc.id,
+          uploadedAt: now(),
+          uploadedById: user.id,
+          verdict: 'PENDING',
+          remarks: note ?? null,
+        },
+      });
       await tx.undertaking.update({ where: { id: u.id }, data: { status: 'SUBMITTED', evidenceDocId: doc.id, remarks: null } });
       await assign(tx, { applicationId: app.id, regionId: app.regionId, taskType: 'VERIFY', category: app.category, taskRefId: u.id }, user);
       const days = (await rulesForApp(app, tx)).timelines.VERIFICATION;
       await openItem(tx, { applicationId: app.id, type: 'VERIFICATION', sourceId: u.id, dueDate: addWorkingDays(today(), days), unit: 'WORKING', totalDays: days });
       await tx.application.update({ where: { id: app.id }, data: { lastActionAt: now() } });
-      await appendAudit(tx, { actorId: user.id, actorRole: user.role, action: 'UPLOAD_EVIDENCE', applicationId: app.id, reason: note ?? null, meta: { undertakingId: u.id, condition: u.condition, documentId: doc.id } });
+      await appendAudit(tx, { actorId: user.id, actorRole: user.role, action: 'UPLOAD_EVIDENCE', applicationId: app.id, reason: note ?? null, meta: { undertakingId: u.id, condition: u.condition, documentId: doc.id, roundNumber: roundCount + 1 } });
     }, TX_OPTIONS);
   } catch (e) {
     await removeStored([s.storedName]);
@@ -630,6 +701,21 @@ export async function verifyEvidence(user: AuthUser, undertakingId: string, inpu
   if (!input.accept && !input.remarks?.trim()) throw badRequest('Enter remarks that tell the college what is wrong.');
   await prisma.$transaction(async (tx) => {
     const task = (await holdsVerify(tx, app.id, user.id, u.id))!;
+    const latestRound = await tx.undertakingEvidenceRound.findFirst({
+      where: { undertakingId: u.id },
+      orderBy: { roundNumber: 'desc' },
+    });
+    if (latestRound) {
+      await tx.undertakingEvidenceRound.update({
+        where: { id: latestRound.id },
+        data: {
+          verdict: input.accept ? 'ACCEPTED' : 'REJECTED',
+          remarks: input.remarks ?? null,
+          verifiedById: user.id,
+          verifiedAt: now(),
+        },
+      });
+    }
     await tx.undertaking.update({
       where: { id: u.id },
       data: input.accept ? { status: 'VERIFIED', verifiedById: user.id, verifiedAt: now(), remarks: input.remarks ?? null } : { status: 'OPEN', remarks: input.remarks!.trim() },
@@ -645,7 +731,7 @@ export async function verifyEvidence(user: AuthUser, undertakingId: string, inpu
       action: 'VERIFY_EVIDENCE',
       applicationId: app.id,
       reason: input.remarks ?? null,
-      meta: { undertakingId: u.id, accept: input.accept },
+      meta: { undertakingId: u.id, accept: input.accept, roundNumber: latestRound?.roundNumber ?? 1 },
     });
     const colleges = await collegeUserIds(tx, app.institutionId);
     if (!input.accept) {

@@ -172,9 +172,12 @@ export async function caseDetail(user: AuthUser, applicationId: string) {
       region: true,
       deficiencies: { orderBy: { raisedAt: 'asc' } },
       evcVisit: true,
+      evcVisitEvents: { orderBy: { at: 'asc' } },
       recommendations: { orderBy: { at: 'asc' } },
+      committeeMemberships: { orderBy: { createdAt: 'asc' }, include: { user: { select: { id: true, name: true, role: true } } } },
+      appeals: { orderBy: { filedAt: 'desc' } },
       decision: true,
-      undertakings: { orderBy: { dueDate: 'asc' } },
+      undertakings: { orderBy: { dueDate: 'asc' }, include: { rounds: { orderBy: { roundNumber: 'asc' } } } },
       deadlineItems: { orderBy: { id: 'asc' } },
       flags: { where: { resolvedAt: null } },
       formChecks: { orderBy: { createdAt: 'desc' } },
@@ -190,7 +193,19 @@ export async function caseDetail(user: AuthUser, applicationId: string) {
   if (app.holderUserId) userIds.add(app.holderUserId);
   const visitMembers = [...((app.evcVisit?.memberIds as string[]) ?? []), ...((app.evcVisit?.proposedMemberIds as string[]) ?? [])];
   visitMembers.forEach((id) => userIds.add(id));
+  for (const ev of app.evcVisitEvents) {
+    if (ev.actorId) userIds.add(ev.actorId);
+    ((ev.memberIds as string[]) ?? []).forEach((id) => userIds.add(id));
+  }
+  for (const u of app.undertakings) {
+    for (const rnd of u.rounds) {
+      if (rnd.uploadedById) userIds.add(rnd.uploadedById);
+      if (rnd.verifiedById) userIds.add(rnd.verifiedById);
+    }
+  }
   for (const r of app.recommendations) userIds.add(r.memberId);
+  for (const m of app.committeeMemberships) userIds.add(m.userId);
+  for (const a of app.appeals) if (a.decidedById) userIds.add(a.decidedById);
   if (app.decision) userIds.add(app.decision.decidedById);
   const users = await prisma.user.findMany({ where: { id: { in: [...userIds] } }, select: { id: true, name: true, role: true, title: true } });
   const u = new Map(users.map((x) => [x.id, x]));
@@ -280,7 +295,42 @@ export async function caseDetail(user: AuthUser, applicationId: string) {
         }
       : null,
     recommendations: isCollege ? [] : app.recommendations.map((r) => ({ id: r.id, text: r.text, by: name(r.memberId), at: r.at.toISOString() })),
+    committee: {
+      quorum: 2,
+      recommendationsCount: app.recommendations.length,
+      quorumReached: app.recommendations.length >= 2,
+      members: isCollege ? [] : app.committeeMemberships.map((m) => ({
+        id: m.id,
+        userId: m.userId,
+        name: m.user?.name ?? name(m.userId),
+        role: m.committeeRole,
+        recused: m.recused,
+        recusedReason: m.recusedReason,
+        hasRecommended: app.recommendations.some((r) => r.memberId === m.userId),
+      })),
+    },
     decision: app.decision ? { outcome: app.decision.outcome, reason: app.decision.reason, by: isCollege ? 'Competent authority' : name(app.decision.decidedById), at: app.decision.at.toISOString() } : null,
+    appeals: app.appeals.map((a) => ({
+      id: a.id,
+      reason: a.reason,
+      status: a.status,
+      documentId: a.documentId,
+      filedAt: a.filedAt.toISOString(),
+      deadline: a.deadline.toISOString(),
+      decisionReason: a.decisionReason,
+      decidedAt: a.decidedAt?.toISOString() ?? null,
+      decidedBy: name(a.decidedById),
+    })),
+    evcEvents: app.evcVisitEvents.map((ev) => ({
+      id: ev.id,
+      action: ev.action,
+      visitDate: ev.visitDate ? isoDate(ev.visitDate) : null,
+      mode: ev.mode,
+      members: ((ev.memberIds as string[]) ?? []).map((id) => ({ id, name: name(id) })),
+      reason: ev.reason,
+      actor: name(ev.actorId),
+      at: ev.at.toISOString(),
+    })),
     undertakings: app.undertakings.map((x) => ({
       id: x.id,
       condition: x.condition,
@@ -290,6 +340,17 @@ export async function caseDetail(user: AuthUser, applicationId: string) {
       evidenceDocId: x.evidenceDocId,
       verifiedAt: x.verifiedAt?.toISOString() ?? null,
       remarks: x.remarks,
+      rounds: x.rounds.map((r) => ({
+        id: r.id,
+        roundNumber: r.roundNumber,
+        documentId: r.documentId,
+        uploadedAt: r.uploadedAt.toISOString(),
+        uploadedBy: name(r.uploadedById),
+        verdict: r.verdict,
+        remarks: r.remarks,
+        verifiedAt: r.verifiedAt?.toISOString() ?? null,
+        verifiedBy: name(r.verifiedById),
+      })),
     })),
     deadlineItems: app.deadlineItems.map((i) => presentItem({ ...i, responsibleName: isCollege ? null : name(i.responsibleUserId) })),
     flags: app.flags

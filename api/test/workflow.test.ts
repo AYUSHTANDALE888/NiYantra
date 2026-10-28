@@ -125,8 +125,16 @@ describe('workflow', () => {
     const bureau = (await holderOf(id))!;
     expect(bureau.role).toBe('BUREAU');
     expect((await act(app, bureau, id, 'FORWARD_SAC_SHC', { payload: { note: 'Forwarded with the EVC report.' } })).status).toBe(200);
-    const member = await userById((await committee())[3]!.id);
-    expect((await act(app, member, id, 'SUBMIT_RECOMMENDATION', { payload: { text: 'Restore approval for 2026-27.' } })).status).toBe(200);
+    const comm = await committee();
+    const member1 = await userById(comm[3]!.id);
+    const member2 = await userById(comm[4]!.id);
+    expect((await act(app, member1, id, 'SUBMIT_RECOMMENDATION', { payload: { text: 'Restore approval for 2026-27.' } })).status).toBe(200);
+    // 1 recommendation does NOT advance stage: quorum is 2
+    expect((await prisma.application.findUniqueOrThrow({ where: { id } })).stage).toBe('SAC_SHC');
+    // Duplicate recommendation by same member is rejected
+    expect((await act(app, member1, id, 'SUBMIT_RECOMMENDATION', { payload: { text: 'Duplicate recommendation.' } })).status).toBe(403);
+    // Second member recommends -> quorum met -> advances to DECISION
+    expect((await act(app, member2, id, 'SUBMIT_RECOMMENDATION', { payload: { text: 'Concur with restoration.' } })).status).toBe(200);
     expect((await prisma.application.findUniqueOrThrow({ where: { id } })).stage).toBe('DECISION');
     await decide(id, 'REJECTED');
     expect((await prisma.application.findUniqueOrThrow({ where: { id } })).status).toBe('REJECTED');

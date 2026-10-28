@@ -20,7 +20,7 @@ async function openAssignment(db: Db, applicationId: string, userId: string, tas
 export async function can(user: AuthUser, action: CaseAction, app: App, db: Db = prisma): Promise<Decision> {
   const t = transitionFor(action);
   if (!t.roles.includes(user.role)) return no(`${t.label} is not available to your role.`);
-  if (!(await inScope(user, app.id, db))) return no("You don't have access to this application.", 404);
+  if (!(await inScope(user, app.id, db))) return no("You don't have access to this application.", 403);
   if (!t.from(app)) return no(`${t.label} is not possible while the application is in ${app.stage.toLowerCase()} (${app.status.toLowerCase().replace(/_/g, ' ')}).`);
 
   switch (action) {
@@ -46,8 +46,18 @@ export async function can(user: AuthUser, action: CaseAction, app: App, db: Db =
     }
     case 'FORWARD_SAC_SHC':
       return (await openAssignment(db, app.id, user.id, ['SAC_SHC_FORWARD'])) ? ok : no('Only the Bureau officer holding the forwarding task can do this.');
-    case 'SUBMIT_RECOMMENDATION':
+    case 'SUBMIT_RECOMMENDATION': {
+      const membership = await db.committeeMembership.findUnique({
+        where: { applicationId_userId_committeeRole: { applicationId: app.id, userId: user.id, committeeRole: 'SAC_SHC' } },
+      });
+      if (!membership) return no('Only appointed committee members may submit a recommendation.');
+      if (membership.recused) return no('You have recused yourself from this committee case.');
+      const existing = await db.recommendation.findFirst({
+        where: { applicationId: app.id, memberId: user.id },
+      });
+      if (existing) return no('You have already submitted your recommendation.');
       return ok;
+    }
     case 'REVERT': {
       const inst = await db.institution.findUniqueOrThrow({ where: { id: app.institutionId }, select: { portfolioOfficerId: true } });
       if (!inst.portfolioOfficerId) return no('This institution has no portfolio officer.');

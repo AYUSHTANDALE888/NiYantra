@@ -128,6 +128,19 @@ enum UndertakingStatus {
   VERIFIED
 }
 
+enum AppealStatus {
+  PENDING
+  UNDER_REVIEW
+  ACCEPTED
+  REJECTED
+}
+
+enum DeliveryStatus {
+  PENDING
+  SENT
+  FAILED
+}
+
 enum RulePackStatus {
   DRAFT
   IN_REVIEW
@@ -187,6 +200,7 @@ model User {
   portfolio     Institution[]         @relation("Portfolio")
   assignments   Assignment[]          @relation("AssignmentOfficer")
   notifications Notification[]
+  committeeMemberships CommitteeMembership[]
 
   @@index([reportsToId])
   @@index([regionId, role])
@@ -229,6 +243,7 @@ model Institution {
   collegeUsers       User[]        @relation("CollegeUsers")
   applications       Application[]
   documents          Document[]
+  appeals            Appeal[]
 }
 
 model PortfolioHistory {
@@ -278,6 +293,9 @@ model Application {
   deadlineItems   DeadlineItem[]
   flags           ExceptionFlag[]
   formChecks      FormCheckResult[]
+  committeeMemberships CommitteeMembership[]
+  evcVisitEvents       EvcVisitEvent[]
+  appeals              Appeal[]
 
   @@index([regionId, stage])
   @@index([institutionId])
@@ -389,6 +407,7 @@ model Undertaking {
   verifiedById  String?
   verifiedAt    DateTime?
   remarks       String?
+  rounds        UndertakingEvidenceRound[]
 }
 
 model DeadlineItem {
@@ -470,6 +489,7 @@ model Notification {
   message       String
   read          Boolean  @default(false)
   createdAt     DateTime
+  deliveries    NotificationDelivery[]
 
   @@index([userId, read])
 }
@@ -566,4 +586,89 @@ model StoredBlob {
   name      String   @id
   data      Bytes
   createdAt DateTime @default(now())
+}
+
+model CommitteeMembership {
+  id            String      @id @default(uuid())
+  applicationId String
+  application   Application @relation(fields: [applicationId], references: [id])
+  userId        String
+  user          User        @relation(fields: [userId], references: [id])
+  committeeRole String      @default("SAC_SHC")
+  appointedById String?
+  recused       Boolean     @default(false)
+  recusedReason String?
+  createdAt     DateTime    @default(now())
+
+  @@unique([applicationId, userId, committeeRole])
+  @@index([userId])
+  @@index([applicationId])
+}
+
+model Appeal {
+  id             String       @id @default(uuid())
+  applicationId  String
+  application    Application  @relation(fields: [applicationId], references: [id])
+  institutionId  String
+  institution    Institution  @relation(fields: [institutionId], references: [id])
+  reason         String
+  documentId     String?
+  status         AppealStatus @default(PENDING)
+  filedAt        DateTime     @default(now())
+  deadline       DateTime
+  decisionReason String?
+  decidedById    String?
+  decidedAt      DateTime?
+
+  @@index([applicationId])
+  @@index([institutionId])
+}
+
+model NotificationDelivery {
+  id             String         @id @default(uuid())
+  notificationId String
+  notification   Notification   @relation(fields: [notificationId], references: [id])
+  channel        String
+  idempotencyKey String         @unique
+  status         DeliveryStatus @default(PENDING)
+  attempts       Int            @default(0)
+  lastError      String?
+  nextAttemptAt  DateTime?
+  sentAt         DateTime?
+  createdAt      DateTime       @default(now())
+
+  @@index([status, nextAttemptAt])
+  @@index([notificationId])
+}
+
+model EvcVisitEvent {
+  id            String      @id @default(uuid())
+  applicationId String
+  application   Application @relation(fields: [applicationId], references: [id])
+  action        String
+  visitDate     DateTime?   @db.Date
+  mode          String?
+  memberIds     Json
+  reason        String?
+  actorId       String
+  at            DateTime    @default(now())
+
+  @@index([applicationId, at])
+}
+
+model UndertakingEvidenceRound {
+  id            String      @id @default(uuid())
+  undertakingId String
+  undertaking   Undertaking @relation(fields: [undertakingId], references: [id])
+  roundNumber   Int
+  documentId    String
+  uploadedAt    DateTime    @default(now())
+  uploadedById  String
+  verdict       String?
+  remarks       String?
+  verifiedById  String?
+  verifiedAt    DateTime?
+
+  @@unique([undertakingId, roundNumber])
+  @@index([undertakingId])
 }

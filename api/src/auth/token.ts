@@ -3,6 +3,7 @@ import jwt from 'jsonwebtoken';
 export interface TokenClaims {
   sub: string;
   role: string;
+  authTime?: number;
 }
 
 function secret(): string {
@@ -12,6 +13,7 @@ function secret(): string {
 }
 
 export const TOKEN_TTL_SECONDS = 8 * 60 * 60;
+export const MAX_SESSION_SECONDS = 24 * 60 * 60; // 24 hours ceiling
 
 export function signToken(claims: TokenClaims): string {
   return jwt.sign(claims, secret(), { expiresIn: TOKEN_TTL_SECONDS });
