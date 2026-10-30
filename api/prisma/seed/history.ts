@@ -46,6 +46,7 @@ interface Fault {
 }
 
 export async function seedHistory(dir: Directory): Promise<void> {
+  const isHosted = process.env.HOSTED === 'vercel' || process.env.FAST_SEED === 'true';
   const T0 = clock.today();
   const rand = rng(20261024);
   const wd = (n: number) => addWorkingDays(T0, -n);
@@ -63,7 +64,6 @@ export async function seedHistory(dir: Directory): Promise<void> {
     }
     return users.get(id)!;
   }
-  const byEmail = (e: string) => user(dir.byEmail.get(e)!);
   let minute = 0;
   let currentDay = T0;
   function setDay(d: Date) {
@@ -251,13 +251,51 @@ export async function seedHistory(dir: Directory): Promise<void> {
     for (const u of userIds) await prisma.officerAvailability.create({ data: { userId: u, kind, startsOn: from, endsOn: to, reason, createdById: by } });
   }
 
-  // ---------------------------------------------------------------- the schedule
+  // ---------------------------------------------------------------- HOSTED FAST MODE
+  if (isHosted) {
+    console.log('[seed] hosted mode: seeding clean demo cases...');
+    await loadHolidays(prisma);
+
+    // 1. Approved prior case for ABC Engineering College so Extension filings are eligible
+    const abc = dir.institutions.find((i) => i.name === 'ABC Engineering College') ?? south[0]!;
+    setDay(wd(20));
+    await file('prior-abc', abc, 'VERIFICATION_VISIT');
+    await schedule('prior-abc', wd(18));
+    await report('prior-abc');
+    await decide('prior-abc', 'APPROVED');
+
+    // 2. Active Scrutiny case for Priya Raman
+    setDay(wd(5));
+    await file('case-scrutiny-priya', south[0]!, 'NEW_INSTITUTION');
+
+    // 3. Returned Scrutiny case for student rectification test
+    setDay(wd(8));
+    await file('case-returned', south[1] ?? south[0]!, 'NEW_INSTITUTION');
+    await ret('case-returned', 'The building plan is missing the local planning approval.', ['BUILDING_PLAN']);
+
+    // 4. Case in Decision stage for Regional Authority
+    setDay(wd(10));
+    await file('case-decision', south[2] ?? south[0]!, 'EXTENSION');
+    await complete('case-decision');
+
+    // 5. West region case for cross-region access-denied check (W-2026-0008)
+    setDay(wd(4));
+    await file('W-2026-0008', west[0]!, 'NEW_INSTITUTION');
+
+    setDay(T0);
+    clock.setOverride(null);
+    await runEngineCycle({ source: 'seed-final' }).catch(() => undefined);
+    console.log(`[seed] hosted mode: ${appIds.size} demo cases seeded successfully in seconds.`);
+    return;
+  }
+
+  // ---------------------------------------------------------------- the full schedule (local only)
   type Ev = { date: Date; run: () => Promise<unknown> };
   const events: Ev[] = [];
   const on = (date: Date, run: () => Promise<unknown>) => events.push({ date: toDateOnly(date), run });
   const kumarId = dir.byEmail.get('kumar@demo.in')!;
 
-  // Meena is in training for the whole backdated history, ending yesterday (so she shows as idle).
+  // Meena is in training for the backdated history, ending yesterday (so she shows as idle).
   const start = wd(125);
   await away([meena!], addDays(start, -1), addDays(T0, -1), 'TRAINING', 'Induction training at the AICTE academy', kumarId);
 
@@ -313,7 +351,6 @@ export async function seedHistory(dir: Directory): Promise<void> {
     { key: 'd-closed-2', lease: 800, outcome: 'APPROVED_WITH_CONDITIONS', conditions: [{ condition: 'Appoint a librarian with the required qualifications', due: 20 }] },
   ];
   const decidedPool = take(otherSouth(), decided.length);
-  // Earlier-approved institutions used for open special cases: one per portfolio officer.
   const sp = [priorPool[6]!, priorPool[8]!, priorPool[10]!, priorPool[12]!];
   decided.forEach((d, k) => {
     const inst = d.inst ?? decidedPool[k]!;
@@ -341,18 +378,15 @@ export async function seedHistory(dir: Directory): Promise<void> {
 
   // Open South cases arranged so every Action Center reason appears.
   const pool = takeSpread(otherSouth(), 14);
-  // Overdue scrutiny at escalation levels 3, 2 (Sneha, Kumar's team) and 1 (Arjun and Priya).
   on(wd(31), () => file('o-l3', pool[0]!, 'NEW_INSTITUTION'));
   on(wd(30), () => file('o-l3b', pool[1]!, 'NEW_INSTITUTION', { fault: { builtupOverLand: true }, justification: 'Built-up area includes two basement floors approved by the local authority.' }));
   on(wd(25), () => file('o-l2', snehaInsts[0]!, 'EXTENSION'));
   on(wd(19), () => file('o-l1-arjun', arjunInsts[0]!, 'NAME_CHANGE'));
   on(wd(19), () => file('o-l1-priya', priyaSecond, 'INTAKE_INCREASE'));
-  // At risk and urgent (2 and 3 working days left), stalled (no action for 11 working days).
   on(filedWithLeft(2), () => file('o-risk1', pool[2]!, 'NEW_INSTITUTION'));
   on(filedWithLeft(3), () => file('o-risk2', pool[3]!, 'NEW_INSTITUTION', { fault: { facultyShortage: true }, justification: 'Additional faculty join in the next academic session.' }));
   on(filedWithLeft(4), () => file('o-stall1', pool[4]!, 'NEW_INSTITUTION'));
   on(filedWithLeft(5), () => file('o-stall2', pool[5]!, 'NEW_INSTITUTION'));
-  // Returned to colleges (three in Kumar's team).
   on(wd(9), () => file('o-ret-sneha1', snehaInsts[1]!, 'EXTENSION'));
   on(wd(9), () => file('o-ret-sneha2', snehaInsts[0]!, 'NAME_CHANGE'));
   on(wd(9), () => file('o-ret-arjun', arjunInsts[1]!, 'NAME_CHANGE'));
@@ -361,38 +395,31 @@ export async function seedHistory(dir: Directory): Promise<void> {
   on(wd(6), () => ret('o-ret-sneha2', 'The society resolution is not signed by the secretary.', ['SOCIETY_RESOLUTION']));
   on(wd(5), () => ret('o-ret-arjun', 'The affidavit is not on non-judicial stamp paper.', ['AFFIDAVIT']));
   on(wd(4), () => ret('o-ret-other', 'The building plan is not approved by the local planning authority.', ['BUILDING_PLAN']));
-  // A returned case that was replied to and went back to the same officer.
   on(wd(14), () => file('o-replied', pool[7]!, 'NEW_INSTITUTION'));
   on(wd(12), () => ret('o-replied', 'The lease deed pages 4 to 6 are missing.', ['LAND_LEASE']));
   on(wd(8), () => reply('o-replied', 'Attached the complete lease deed.'));
-  // EVC not scheduled: Ravi (escalates to Kumar) and a Bureau overflow while Ravi was away.
   on(wd(30), () => file('o-evc-ravi', pool[8]!, 'NEW_INSTITUTION'));
   on(wd(14), () => complete('o-evc-ravi'));
   on(wd(28), () => file('o-evc-bureau', sp[0]!, 'CHANGE_OF_SITE'));
   on(wd(16), () => away([ravi!], wd(16), wd(15), 'FIELD_VISIT', 'Inspection visits in Tirunelveli district', kumarId));
   on(wd(16), () => complete('o-evc-bureau'));
-  // No eligible officer: Ravi and the whole Bureau away when the case reached EVC.
   on(wd(22), () => file('o-blocked', pool[9]!, 'NEW_INSTITUTION'));
   on(wd(9), async () => {
     const bureau = (await prisma.user.findMany({ where: { role: 'BUREAU' } })).map((b) => b.id);
     await away([ravi!, ...bureau], wd(9), wd(8), 'LEAVE', 'Annual review meeting in New Delhi', dir.byEmail.get('hod.south@demo.in')!);
   });
   on(wd(9), () => complete('o-blocked'));
-  // EVC reports overdue (committee owners).
   on(wd(36), () => file('o-evcrep1', pool[10]!, 'NEW_INSTITUTION'));
   on(wd(24), () => complete('o-evcrep1'));
   on(wd(21), () => schedule('o-evcrep1', wd(15), 'PHYSICAL'));
   on(wd(33), () => file('o-evcrep2', pool[11]!, 'NEW_INSTITUTION'));
   on(wd(22), () => complete('o-evcrep2'));
   on(wd(19), () => schedule('o-evcrep2', wd(12)));
-  // Blocked: the land lease (a critical document) has already expired.
   on(wd(4), () => file('o-doc-blocked', pool[12]!, 'NEW_INSTITUTION', { fault: { expiredLeaseDays: 3 }, justification: 'Lease renewal is with the state revenue department; the receipt is attached.' }));
-  // In decision: one due soon, one overdue.
   on(wd(14), () => file('o-dec1', sp[1]!, 'EXTENSION'));
   on(wd(4), () => complete('o-dec1'));
   on(wd(22), () => file('o-dec2', sp[2]!, 'EXTENSION'));
   on(wd(12), () => complete('o-dec2'));
-  // SAC/SHC: one forwarded and overdue with the committee, one waiting for the Bureau to forward.
   on(wd(21), () => file('o-sac1', sp[3]!, 'RESTORATION'));
   on(wd(20), () => schedule('o-sac1', wd(18)));
   on(wd(18), () => report('o-sac1', 'RECOMMEND_CONDITIONS'));
@@ -401,7 +428,6 @@ export async function seedHistory(dir: Directory): Promise<void> {
   on(wd(6), () => schedule('o-sac2', wd(5)));
   on(wd(5), () => report('o-sac2'));
 
-  // Arjun's portfolio files several applications (continuity sends them to him); later his capacity drops.
   const arjunTypes: AppType[] = ['EXTENSION', 'INTAKE_INCREASE', 'CHANGE_OF_SITE'];
   arjunInsts.forEach((inst, i) =>
     arjunTypes.forEach((t, j) => on(wd(6 - j - i), () => file(`arjun-${i}-${t}`, inst, t))),
@@ -410,8 +436,6 @@ export async function seedHistory(dir: Directory): Promise<void> {
     await prisma.officerProfile.update({ where: { userId: arjun! }, data: { capacityPoints: 6 } });
   });
 
-  // Every South institution without an open case files a fresh one, so officers carry real load. Institutions with
-  // an earlier approval file extension-type applications; the rest file for a new institution.
   const openInst = new Set<string>([...pool.map((p) => p.id), ...arjunInsts.map((i) => i.id), ...snehaInsts.map((i) => i.id), priyaSecond.id, ...sp.map((i) => i.id)]);
   const approved = new Set<string>(priorPool.map((p) => p.id));
   decided.forEach((d, k) => {
@@ -421,11 +445,9 @@ export async function seedHistory(dir: Directory): Promise<void> {
   fresh.forEach((inst, k) => {
     const type: AppType = approved.has(inst.id) ? (k % 2 ? 'EXTENSION' : 'NAME_CHANGE') : 'NEW_INSTITUTION';
     const fault: Fault | undefined = k % 9 === 4 ? { builtupOverLand: true } : k % 11 === 7 ? { facultyShortage: true } : undefined;
-    // Filed two to ten working days ago (never on Meena's last training day, when the next-day horizon would pick her).
     on(wd(2 + (k % 9)), () => file(`fresh-${k}`, inst, type, { fault }));
   });
-  // Balance: officers carrying under 3 points get extension-type applications from earlier-approved institutions in
-  // their portfolio, so a busy region looks busy (and an idle officer stands out).
+
   on(wd(2), async () => {
     const officers = await prisma.user.findMany({ where: { role: 'OFFICER', regionId: dir.regions.SOUTH, id: { notIn: [meena!, arjun!, ravi!] } } });
     for (const o of officers) {
@@ -442,12 +464,12 @@ export async function seedHistory(dir: Directory): Promise<void> {
       }
     }
   });
+
   for (const k of [2, 5, 9, 14]) on(wd(0), () => label(`fresh-${k}`, true).catch(() => undefined));
   on(wd(0), () => label('o-l3b', true));
   on(wd(0), () => label('o-risk2', false));
   on(wd(0), () => label('o-doc-blocked', true));
 
-  // West: a smaller region with the same kinds of cases.
   const westFresh = west.slice(5);
   westFresh.forEach((inst, k) => {
     const key = `w-${k}`;
@@ -486,7 +508,6 @@ export async function seedHistory(dir: Directory): Promise<void> {
       n++;
     }
   }
-  // Events dated today (labels) run at the real date.
   setDay(T0);
   for (const e of events.filter((x) => x.date.getTime() === T0.getTime())) {
     await e.run();
