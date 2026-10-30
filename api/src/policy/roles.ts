@@ -15,6 +15,7 @@ export async function logAccessDenied(
     actorId: user.id,
     actorRole: user.role,
     action: 'ACCESS_DENIED',
+    applicationId: what.applicationId ?? null,
     reason: what.reason,
     meta: { applicationId: what.applicationId ?? null, path: what.path ?? null, attempted: what.action ?? null },
   });

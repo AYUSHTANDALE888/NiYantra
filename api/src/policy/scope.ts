@@ -37,7 +37,7 @@ export async function scopeWhere(user: AuthUser, db: Db = prisma): Promise<Prism
       return {
         OR: [
           { evcVisit: { memberIds: { array_contains: [user.id] } } },
-          { stage: 'SAC_SHC', sacForwarded: true },
+          { committeeMemberships: { some: { userId: user.id, recused: false } } },
           { recommendations: { some: { memberId: user.id } } },
         ],
       };

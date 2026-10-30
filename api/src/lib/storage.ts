@@ -41,7 +41,32 @@ export interface StoredFile {
   size: number;
 }
 
+export function validateFileMagicBytes(buf: Buffer, mimeType: string): void {
+  if (buf.length < 4) {
+    throw badRequest('Uploaded file is corrupted or too small.');
+  }
+  if (mimeType === 'application/pdf') {
+    const isPdf = buf[0] === 0x25 && buf[1] === 0x50 && buf[2] === 0x44 && buf[3] === 0x46;
+    if (!isPdf) {
+      throw badRequest('Invalid PDF file signature (magic bytes mismatch).');
+    }
+  } else if (mimeType === 'image/png') {
+    const isPng = buf[0] === 0x89 && buf[1] === 0x50 && buf[2] === 0x4e && buf[3] === 0x47;
+    if (!isPng) {
+      throw badRequest('Invalid PNG file signature (magic bytes mismatch).');
+    }
+  } else if (mimeType === 'image/jpeg') {
+    const isJpeg = buf[0] === 0xff && buf[1] === 0xd8 && buf[2] === 0xff;
+    if (!isJpeg) {
+      throw badRequest('Invalid JPEG file signature (magic bytes mismatch).');
+    }
+  } else {
+    throw badRequest(`Unsupported file MIME type: ${mimeType}`);
+  }
+}
+
 export async function saveBuffer(buf: Buffer, originalName: string, mimeType: string): Promise<StoredFile> {
+  validateFileMagicBytes(buf, mimeType);
   const ext = path.extname(originalName).toLowerCase();
   const storedName = `${crypto.randomUUID()}${ext}`;
   if (inDb()) await prisma.storedBlob.create({ data: { name: storedName, data: buf } });

@@ -194,8 +194,55 @@ export interface CaseDetail {
     reportedAt: string | null;
   } | null;
   recommendations: { id: string; text: string; by: string | null; at: string }[];
+  committee?: {
+    quorum: number;
+    recommendationsCount: number;
+    quorumReached: boolean;
+    members: { id: string; userId: string; name: string | null; role: string; recused: boolean; recusedReason: string | null; hasRecommended: boolean }[];
+  };
   decision: { outcome: string; reason: string; by: string | null; at: string } | null;
-  undertakings: { id: string; condition: string; dueDate: string; daysToDue: number; status: string; evidenceDocId: string | null; verifiedAt: string | null; remarks: string | null }[];
+  appeals: {
+    id: string;
+    reason: string;
+    status: 'PENDING' | 'UNDER_REVIEW' | 'ACCEPTED' | 'REJECTED';
+    documentId: string | null;
+    filedAt: string;
+    deadline: string;
+    decisionReason: string | null;
+    decidedAt: string | null;
+    decidedBy: string | null;
+  }[];
+  evcEvents?: {
+    id: string;
+    action: string;
+    visitDate: string | null;
+    mode: string | null;
+    members: { id: string; name: string | null }[];
+    reason: string | null;
+    actor: string | null;
+    at: string;
+  }[];
+  undertakings: {
+    id: string;
+    condition: string;
+    dueDate: string;
+    daysToDue: number;
+    status: string;
+    evidenceDocId: string | null;
+    verifiedAt: string | null;
+    remarks: string | null;
+    rounds?: {
+      id: string;
+      roundNumber: number;
+      documentId: string;
+      uploadedAt: string;
+      uploadedBy?: string | null;
+      verdict: string | null;
+      remarks: string | null;
+      verifiedAt: string | null;
+      verifiedBy?: string | null;
+    }[];
+  }[];
   deadlineItems: DeadlineItemView[];
   flags: FlagView[];
   currentAssignment: { id: string; taskType: string; label: string; officer: { id: string; name: string; role: string; region: string | null }; reasonText: string; assignedAt: string; tier: number } | null;
@@ -307,7 +354,26 @@ export interface UnassignedRow {
 }
 
 export interface ComplianceView {
-  undertakings: { id: string; applicationId: string; applicationNo: string; condition: string; dueDate: string; daysToDue: number; status: string; remarks: string | null }[];
+  undertakings: {
+    id: string;
+    applicationId: string;
+    applicationNo: string;
+    condition: string;
+    dueDate: string;
+    daysToDue: number;
+    status: string;
+    remarks: string | null;
+    evidenceDocId?: string | null;
+    rounds?: {
+      id: string;
+      roundNumber: number;
+      documentId: string;
+      uploadedAt: string;
+      verdict: string | null;
+      remarks: string | null;
+      verifiedAt: string | null;
+    }[];
+  }[];
   documents: { id: string; applicationId: string; applicationNo: string; kind: string; label: string; fileName: string; expiryDate: string; daysToExpiry: number; renewalPending: { id: string; expiryDate: string } | null }[];
 }
 

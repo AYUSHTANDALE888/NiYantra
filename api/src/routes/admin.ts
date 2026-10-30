@@ -111,5 +111,37 @@ export function adminRouter(): Router {
     }),
   );
 
+  r.get(
+    '/notifications/failed',
+    h(async (_req, res) => {
+      const failed = await prisma.notificationDelivery.findMany({
+        where: { status: 'FAILED' },
+        include: {
+          notification: {
+            include: {
+              user: { select: { id: true, name: true, email: true, role: true } },
+            },
+          },
+        },
+        orderBy: { createdAt: 'desc' },
+        take: 100,
+      });
+      res.json({
+        failed: failed.map((f) => ({
+          id: f.id,
+          notificationId: f.notificationId,
+          channel: f.channel,
+          recipient: f.notification.user,
+          kind: f.notification.kind,
+          message: f.notification.message,
+          applicationId: f.notification.applicationId,
+          attempts: f.attempts,
+          lastError: f.lastError,
+          createdAt: f.createdAt.toISOString(),
+        })),
+      });
+    }),
+  );
+
   return r;
 }

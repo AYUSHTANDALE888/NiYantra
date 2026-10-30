@@ -3,7 +3,7 @@ import { Loader2 } from 'lucide-react';
 import { cx } from '../../lib/format';
 import { useT } from '../../lib/prefs';
 
-export type ButtonVariant = 'primary' | 'secondary' | 'tertiary' | 'destructive';
+export type ButtonVariant = 'primary' | 'secondary' | 'tertiary' | 'destructive' | 'gold' | 'outline';
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: ButtonVariant;
@@ -16,10 +16,12 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const variants: Record<ButtonVariant, string> = {
-  primary: 'bg-accent text-on-solid border border-accent hover:bg-accent-hover hover:border-accent-hover',
+  primary: 'bg-accent text-on-solid border border-accent hover:bg-accent-hover hover:border-accent-hover shadow-sm',
+  gold: 'bg-gradient-to-r from-amber-500 to-amber-600 text-white font-semibold border border-amber-600 hover:from-amber-600 hover:to-amber-700 shadow-sm rounded-full',
   secondary: 'bg-surface text-primary border border-input hover:bg-subtle',
   tertiary: 'bg-transparent text-accent border border-transparent hover:bg-accent-soft',
   destructive: 'bg-danger text-on-solid border border-danger hover:opacity-90',
+  outline: 'bg-transparent text-accent border border-accent hover:bg-accent-soft shadow-xs',
 };
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button(

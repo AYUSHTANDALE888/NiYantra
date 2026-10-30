@@ -19,6 +19,8 @@ const colors = {
   scrim: v('scrim'),
   'on-solid': v('on-solid'),
   accent: { DEFAULT: v('accent'), hover: v('accent-hover'), soft: v('accent-soft'), contrast: v('accent-contrast') },
+  gold: { DEFAULT: v('gold'), hover: v('gold-hover'), soft: v('gold-soft') },
+  'card-border': v('card-border'),
   success: { DEFAULT: v('success'), soft: v('success-soft') },
   warning: { DEFAULT: v('warning'), soft: v('warning-soft') },
   danger: { DEFAULT: v('danger'), soft: v('danger-soft') },

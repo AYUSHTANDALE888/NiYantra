@@ -30,7 +30,9 @@ const cellInput = 'h-control-sm w-full min-w-0 rounded border border-input bg-su
 
 function SourceChip({ s }: { s: Source }) {
   const t = sourceText(s);
-  return t ? <Badge tone="neutral">{t}</Badge> : null;
+  if (!t) return null;
+  const isPlaceholder = t.toLowerCase().includes('placeholder') || t.toLowerCase().includes('unverified');
+  return <Badge tone={isPlaceholder ? 'warning' : 'neutral'}>{t}</Badge>;
 }
 
 function rowErrors(errors: SectionProps['errors'], section: string, i: number) {
@@ -187,6 +189,7 @@ function ApplicationTypes({ pack, set, editable, vars, errors }: SectionProps) {
         { header: 'Route', cell: (r) => <span>{r.route.map((s) => (s.when ? `${s.stage} (${describeExpr(s.when)})` : s.stage)).join(' → ')}</span> },
         { header: 'Eligible when', cell: (r, u) => <ConditionCell label={`Eligibility for ${r.label}`} value={r.eligibility} onChange={(eligibility) => u({ eligibility })} editable={editable} vars={vars} normKeys={normKeys} /> },
         { header: 'Channel', cell: (r, u) => pick('Channel', r.channel, ['PORTAL', 'NSWS'], (channel) => u({ channel }), editable), className: 'w-28' },
+        { header: 'Source', cell: (r) => <SourceChip s={r.source} />, className: 'w-48' },
       ]}
     />
   );
@@ -271,6 +274,7 @@ function FormCheck({ pack, set, editable, vars, errors }: SectionProps) {
         { header: 'Severity', cell: (r, u) => pick('Severity', r.severity, ['HIGH', 'MEDIUM'], (severity) => u({ severity: severity as 'HIGH' | 'MEDIUM' }), editable), className: 'w-24' },
         { header: 'Warn when', cell: (r, u) => <ConditionCell label={`Condition of ${r.id}`} value={r.when} onChange={(when) => u({ when })} editable={editable} vars={vars} normKeys={normKeys} /> },
         { header: 'Message to the college', cell: (r, u) => <textarea aria-label="Message" className={cx(cellInput, 'h-16 py-1')} value={r.message} disabled={!editable} onChange={(e) => u({ message: e.target.value })} /> },
+        { header: 'Source', cell: (r) => <SourceChip s={r.source} />, className: 'w-48' },
       ]}
     />
   );

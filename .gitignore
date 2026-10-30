@@ -11,3 +11,5 @@ __pycache__/
 .vite/
 coverage/
 .vercel
+.test-pgdata/
+

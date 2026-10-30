@@ -29,7 +29,7 @@ export function complianceRouter(): Router {
       const t = today();
       const apps = await prisma.application.findMany({
         where: { institutionId: user.institutionId ?? '-', status: { in: ['APPROVED', 'APPROVED_WITH_CONDITIONS', 'CLOSED'] } },
-        include: { undertakings: { orderBy: { dueDate: 'asc' } }, documents: true },
+        include: { undertakings: { orderBy: { dueDate: 'asc' }, include: { rounds: { orderBy: { roundNumber: 'asc' } } } }, documents: true },
         orderBy: { applicationNo: 'asc' },
       });
       const undertakings = apps.flatMap((a) =>
@@ -42,6 +42,16 @@ export function complianceRouter(): Router {
           daysToDue: calendarDaysBetween(t, u.dueDate),
           status: u.status,
           remarks: u.remarks,
+          evidenceDocId: u.evidenceDocId,
+          rounds: u.rounds.map((r) => ({
+            id: r.id,
+            roundNumber: r.roundNumber,
+            documentId: r.documentId,
+            uploadedAt: r.uploadedAt.toISOString(),
+            verdict: r.verdict,
+            remarks: r.remarks,
+            verifiedAt: r.verifiedAt?.toISOString() ?? null,
+          })),
         })),
       );
       const docLabels = new Map<string, Map<string, string>>();
